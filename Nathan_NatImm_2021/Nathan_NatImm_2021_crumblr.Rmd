@@ -32,6 +32,8 @@ library(SingleCellExperiment)
 library(zellkonverter)
 library(ggplot2)
 library(crumblr)
+library(aplot)
+library(tidyverse)
 ```
 
 # Load data
@@ -52,6 +54,8 @@ sce$batch = factor(sce$batch)
 sce$season = factor(sce$season)
 sce$TB_status = factor(sce$TB_status, c("CONTROL", "CASE"))
 
+reducedDim(sce, "UMAP") = with(colData(sce), data.frame(UMAP_1, UMAP_2))
+
 # sort cell clusters by name
 sce = sce[only_rna,sce$cluster_name != "NA"]
 colData(sce) = droplevels(colData(sce))
@@ -67,7 +71,56 @@ sce$cluster_ids = factor(sce$cluster_ids, unique(tab$cluster_ids))
 ```
 
 
+
 # Cell type composition
+```{r test.crumblr, fig.width=8}
+
+# Create hierarchical clustering
+hcl = buildClusterTree(sce, "X_pca_regressed", "subtype")
+
+# compute cell counts
+counts = computeCellCounts(sce, "subtype", "Channel")
+
+idx = match( rownames(counts), sce$Channel)
+info = colData(sce)[idx,]
+rownames(info) = info$Channel
+
+cobj = crumblr(counts)
+
+form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + AD
+
+fit = dream(cobj, form, info)
+fit = eBayes(fit)
+
+res1 = treeTest( fit, cobj, hcl, coef="AD1", method="FE")
+fig.tree = plotTreeTest(res1) + xlim(0, 13) + ggtitle("FE")
+
+# plot of LogFC
+tab = topTable(fit, "AD1", number=Inf, sort.by="none")
+
+# sort based on tree
+# tab2 = tab[get_taxa_name(fig.tree),]
+# df = data.frame(ID = factor(rownames(tab2), rev(rownames(tab2))), tab2)
+df = data.frame(ID = rownames(tab), tab)
+df$se = with(df, logFC/ t)
+
+fig.logFC = ggplot(df, aes(ID, logFC)) +
+  geom_hline(yintercept=0, linetype="dashed", color="grey50") + 
+  geom_errorbar(aes(ymin=logFC - 1.96*se, ymax=logFC + 1.96*se), width=0) +
+  geom_point(color="dodgerblue") +
+  coord_flip() +
+  theme_classic() +
+  xlab('') +
+  theme(aspect.ratio=4, axis.text.y = element_blank())
+
+fig.logFC %>% insert_left(fig.tree)
+```
+
+
+
+
+
+
 
 ```{r crumblr}
 library(crumblr)
