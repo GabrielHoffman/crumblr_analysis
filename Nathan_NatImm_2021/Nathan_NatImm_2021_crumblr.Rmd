@@ -1,0 +1,133 @@
+---
+title: "Multimodally profiling memory T cells from a tuberculosis cohort identifies cell state associations with demographics, environment and disease (GSE158769)"
+subtitle: '[Nathan, et al. Nat Immunol  (2021)](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE158769)'
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+documentclass: article
+output: 
+  html_document:
+    toc: true
+    smart: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  dev = c("png", "pdf"),
+  cache = TRUE,
+  cache.lazy = FALSE)
+```
+
+Perform dreamlet analysis of single cell data assaying T cell populations in donors infected with tuberculosis.
+
+# Loading
+## Load libraries
+```{r load.packages, cache=FALSE}
+library(SingleCellExperiment)
+library(zellkonverter)
+library(ggplot2)
+library(crumblr)
+```
+
+# Load data
+```{r load.data}
+# read H5AD file
+path = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/Nathan_NatImm_2021/"
+file = paste0(path, "/Nathan_NatImm_2021.h5ad")
+sce = readH5AD(file, use_hdf5=TRUE)   
+
+# get only single-cell RNA-seq
+# rest is CITE-seq proteins
+only_rna = grep("prot", rownames(sce), invert=TRUE)
+
+# create variable that distinguishes cells from the same donor
+# but different batches
+sce$donor_batch = with(colData(sce), paste(donor, batch))
+sce$batch = factor(sce$batch)
+sce$season = factor(sce$season)
+sce$TB_status = factor(sce$TB_status, c("CONTROL", "CASE"))
+
+# sort cell clusters by name
+sce = sce[only_rna,sce$cluster_name != "NA"]
+colData(sce) = droplevels(colData(sce))
+tab = colData(sce) %>%
+  as_tibble %>%
+  group_by(cluster_ids, cluster_name) %>%
+  filter(row_number()==1) %>%
+  summarise(cluster_ids, cluster_name) %>%
+  arrange(as.numeric(gsub("C-", '', cluster_ids)))
+
+sce$cluster_name = factor(sce$cluster_name, unique(tab$cluster_name))
+sce$cluster_ids = factor(sce$cluster_ids, unique(tab$cluster_ids))
+```
+
+
+# Cell type composition
+
+```{r crumblr}
+library(crumblr)
+
+# run crumblr transformation
+cobj = crumblr(cellCounts(pb))
+
+# variance partitioning analysis
+form = ~ (1|TB_status) + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
+vp_res = fitExtractVarPartModel(cobj, form, colData(pb))
+plotVarPart(sortCols(vp_res))
+
+# PCA
+E_vst = vst(cobj)
+dcmp = prcomp(t(E_vst))
+
+biplot(dcmp)
+
+dcmp$x %>%
+  merge(colData(pb), by="row.names") %>%
+  as.data.frame %>%
+  ggplot(aes(PC1, PC2, color=season)) +
+    geom_point() +
+    theme_classic() +
+    theme(aspect.ratio=1)
+
+# differential abundance analysis
+fit = dream(cobj, ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT, colData(pb))
+fit = eBayes(fit)
+topTable(fit, coef='TB_statusCASE', number=Inf) %>%   
+  select(logFC, AveExpr, t, P.Value, adj.P.Val) %>% 
+  kbl() %>% 
+  kable_classic(full_width = FALSE) 
+```
+
+
+
+
+
+
+
+
+
+# Session info
+<details>
+```{r sessionInfo}
+sessionInfo()
+```
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
