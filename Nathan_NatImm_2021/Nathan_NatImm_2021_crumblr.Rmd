@@ -77,10 +77,10 @@ sce$cluster_ids = factor(sce$cluster_ids, unique(tab$cluster_ids))
 # Cell type composition
 ```{r test.crumblr, fig.width=8}
 # Create hierarchical clustering
-hcl = buildClusterTree(sce, "UMAP", "cluster_ids")
+hcl = buildClusterTree(sce, "UMAP", "cluster_name")
 
 # compute cell counts
-counts = computeCellCounts(sce, "cluster_ids", "donor_batch")
+counts = computeCellCounts(sce, "cluster_name", "donor_batch")
 
 idx = match( rownames(counts), sce$donor_batch)
 info = colData(sce)[idx,]
@@ -103,7 +103,7 @@ plotVarPart(sortCols(vp))
 form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
 
 fit = dream(cobj, form, info)
-fit = eBayes(fit)
+fit = eBayes(fit) 
 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE", method="FE")
 fig.tree = plotTreeTest(res1) + xlim(0, 13) + ggtitle("FE")
@@ -130,7 +130,7 @@ fig.logFC %>% insert_left(fig.tree)
 ```{r diff.test2}
 topTable(fit, coef='TB_statusCASE', number=Inf) %>%   
   select(logFC, AveExpr, t, P.Value, adj.P.Val) %>% 
-  kbl() %>% 
+  kbl() %>%  
   kable_classic(full_width = FALSE)
 ```
 
