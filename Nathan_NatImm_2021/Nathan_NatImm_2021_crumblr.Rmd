@@ -35,6 +35,7 @@ library(crumblr)
 library(aplot)
 library(tidyverse)
 library(dreamlet)
+library(kableExtra)
 ```
 
 # Load data
