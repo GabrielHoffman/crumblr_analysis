@@ -75,7 +75,7 @@ sce$cluster_ids = factor(sce$cluster_ids, unique(tab$cluster_ids))
 
 
 # Cell type composition
-```{r test.crumblr, fig.width=8}
+```{r test.crumblr}
 # Create hierarchical clustering
 hcl = buildClusterTree(sce, "UMAP", "cluster_name")
 
@@ -106,7 +106,7 @@ fit = dream(cobj, form, info)
 fit = eBayes(fit) 
 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE", method="FE")
-fig.tree = plotTreeTest(res1) + xlim(0, 13) + ggtitle("FE")
+fig.tree = plotTreeTest(res1) + xlim(0, 20) 
 
 # plot of LogFC
 tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
