@@ -34,6 +34,7 @@ library(ggplot2)
 library(crumblr)
 library(aplot)
 library(tidyverse)
+library(dreamlet)
 ```
 
 # Load data
@@ -74,33 +75,42 @@ sce$cluster_ids = factor(sce$cluster_ids, unique(tab$cluster_ids))
 
 # Cell type composition
 ```{r test.crumblr, fig.width=8}
-
 # Create hierarchical clustering
-hcl = buildClusterTree(sce, "X_pca_regressed", "subtype")
+hcl = buildClusterTree(sce, "UMAP", "cluster_ids")
 
 # compute cell counts
-counts = computeCellCounts(sce, "subtype", "Channel")
+counts = computeCellCounts(sce, "cluster_ids", "donor_batch")
 
-idx = match( rownames(counts), sce$Channel)
+idx = match( rownames(counts), sce$donor_batch)
 info = colData(sce)[idx,]
-rownames(info) = info$Channel
+rownames(info) = info$donor_batch
 
 cobj = crumblr(counts)
+```
 
-form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + AD
+## Variance partitioning analysis
+```{r vp}
+form = ~ (1|TB_status) + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
+
+vp = fitExtractVarPartModel(cobj, form, info)
+
+plotVarPart(sortCols(vp))
+```
+
+## Differential testing
+```{r diff.test}
+form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
 
 fit = dream(cobj, form, info)
 fit = eBayes(fit)
 
-res1 = treeTest( fit, cobj, hcl, coef="AD1", method="FE")
+res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE", method="FE")
 fig.tree = plotTreeTest(res1) + xlim(0, 13) + ggtitle("FE")
 
 # plot of LogFC
-tab = topTable(fit, "AD1", number=Inf, sort.by="none")
+tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
 
 # sort based on tree
-# tab2 = tab[get_taxa_name(fig.tree),]
-# df = data.frame(ID = factor(rownames(tab2), rev(rownames(tab2))), tab2)
 df = data.frame(ID = rownames(tab), tab)
 df$se = with(df, logFC/ t)
 
@@ -116,46 +126,12 @@ fig.logFC = ggplot(df, aes(ID, logFC)) +
 fig.logFC %>% insert_left(fig.tree)
 ```
 
-
-
-
-
-
-
-```{r crumblr}
-library(crumblr)
-
-# run crumblr transformation
-cobj = crumblr(cellCounts(pb))
-
-# variance partitioning analysis
-form = ~ (1|TB_status) + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
-vp_res = fitExtractVarPartModel(cobj, form, colData(pb))
-plotVarPart(sortCols(vp_res))
-
-# PCA
-E_vst = vst(cobj)
-dcmp = prcomp(t(E_vst))
-
-biplot(dcmp)
-
-dcmp$x %>%
-  merge(colData(pb), by="row.names") %>%
-  as.data.frame %>%
-  ggplot(aes(PC1, PC2, color=season)) +
-    geom_point() +
-    theme_classic() +
-    theme(aspect.ratio=1)
-
-# differential abundance analysis
-fit = dream(cobj, ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT, colData(pb))
-fit = eBayes(fit)
+```{r diff.test2}
 topTable(fit, coef='TB_statusCASE', number=Inf) %>%   
   select(logFC, AveExpr, t, P.Value, adj.P.Val) %>% 
   kbl() %>% 
-  kable_classic(full_width = FALSE) 
+  kable_classic(full_width = FALSE)
 ```
-
 
 
 
