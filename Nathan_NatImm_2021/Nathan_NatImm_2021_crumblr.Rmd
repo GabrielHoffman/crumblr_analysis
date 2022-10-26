@@ -99,7 +99,7 @@ plotVarPart(sortCols(vp))
 ```
 
 ## Differential testing
-```{r diff.test}
+```{r diff.test, fig.width=9}
 form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
 
 fit = dream(cobj, form, info)
