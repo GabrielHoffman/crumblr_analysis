@@ -33,6 +33,8 @@ library(crumblr)
 library(aplot)
 library(tidyverse)
 library(kableExtra)
+library(ggplot2)
+library(scattermore)
 })
 ```
 
@@ -87,11 +89,6 @@ Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table
 ```{r umap9, dev="png"}
 ggplot(df, aes(V1, V2, color=celltype9)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
 ```
-
-
-
-
-
 
 
 # Cell type composition
