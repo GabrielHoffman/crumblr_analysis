@@ -120,12 +120,11 @@ form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + (1|AD)
 
 vp = fitExtractVarPartModel(cobj, form, info)
 
-plotVarPart(sortCols(vp))
+plotVarPart(sortCols(vp)) + theme(aspect.ratio=1)
 ```
 
 ## Differential testing
 ```{r diff.test, fig.width=9}
-
 form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + AD
 
 fit = dream(cobj, form, info)
