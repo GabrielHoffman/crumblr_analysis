@@ -112,6 +112,19 @@ info = colData(sce)[idx,]
 rownames(info) = info$Channel
 
 cobj = crumblr(counts)
+```
+
+## Variance partitioning analysis
+```{r vp}
+form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + (1|AD)
+
+vp = fitExtractVarPartModel(cobj, form, info)
+
+plotVarPart(sortCols(vp))
+```
+
+## Differential testing
+```{r diff.test, fig.width=9}
 
 form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + AD
 
