@@ -101,8 +101,10 @@ ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + 
 
 # Cell type composition
 ```{r test.crumblr, fig.width=8}
+# Compute hierarchical clustering
 hcl = buildClusterTree(sce, "X_pca_regressed", "subtype")
 
+# Get cell counts
 counts = computeCellCounts(sce, "subtype", "Channel")
 
 idx = match( rownames(counts), sce$Channel)
@@ -123,8 +125,6 @@ fig.tree = plotTreeTest(res1) + xlim(0, 13) + ggtitle("FE")
 tab = topTable(fit, "AD1", number=Inf, sort.by="none")
 
 # sort based on tree
-# tab2 = tab[get_taxa_name(fig.tree),]
-# df = data.frame(ID = factor(rownames(tab2), rev(rownames(tab2))), tab2)
 df = data.frame(ID = rownames(tab), tab)
 df$se = with(df, logFC/ t)
 
@@ -138,6 +138,13 @@ fig.logFC = ggplot(df, aes(ID, logFC)) +
   theme(aspect.ratio=4, axis.text.y = element_blank())
 
 fig.logFC %>% insert_left(fig.tree)
+```
+
+```{r diff.test2}
+topTable(fit, coef='AD1', number=Inf) %>%   
+  select(logFC, AveExpr, t, P.Value, adj.P.Val) %>% 
+  kbl() %>%  
+  kable_classic(full_width = FALSE)
 ```
 
 
