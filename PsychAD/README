@@ -1,0 +1,16 @@
+
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/PsychAD_r0
+ml python git
+git pull
+R --vanilla
+
+
+system("git pull"); rmarkdown::render("PsychAD_r0.Rmd");
+
+
+# https://hoffmg01.hpc.mssm.edu/dreamlet_analysis/
+
+# rm -rf PsychAD_r0_analysis_cache
+
+
+SPRY4-AS1
