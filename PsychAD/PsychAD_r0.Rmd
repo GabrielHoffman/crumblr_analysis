@@ -29,22 +29,10 @@ suppressPackageStartupMessages({
 library(SingleCellExperiment)
 library(zellkonverter)
 library(dreamlet)
-library(zenith)
-library(DelayedArray)
-
-library(GSEABase)
-library(muscat)
-library(cowplot)
-library(scater)
-
+library(crumblr)
+library(aplot)
 library(tidyverse)
 library(kableExtra)
-library(qvalue)
-library(scattermore)
-library(corrplot)
-library(dplyr)
-library(org.Hs.eg.db)
-library(EnrichmentBrowser)
 })
 ```
 
@@ -108,9 +96,6 @@ ggplot(df, aes(V1, V2, color=celltype9)) + geom_scattermore() + theme_classic() 
 
 # Cell type composition
 ```{r test.crumblr, fig.width=8}
-library(crumblr)
-library(aplot)
-
 hcl = buildClusterTree(sce, "X_pca_regressed", "subtype")
 
 counts = computeCellCounts(sce, "subtype", "Channel")
