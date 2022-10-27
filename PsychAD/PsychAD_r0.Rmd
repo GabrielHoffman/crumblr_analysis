@@ -93,6 +93,9 @@ df = cbind(reducedDim(sce, "X_umap"),
     as.data.frame
 
 ggplot(df, aes(V1, V2, color=celltype9)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
+
+
+ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
 ```
 
 
