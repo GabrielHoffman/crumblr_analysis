@@ -61,19 +61,14 @@ Power and false positive rate
 
 
 ```{R load.packages, cache=FALSE}
-library(dreamlet)
 library(PRROC)
 library(MASS)
-library(BiocParallel)
 library(compositions)
 library(parallel)
 library(Rfast)
-library(nnet)
-library(lme4)
 library(cowplot)
 library(crumblr)
 library(HMP)
-library(MGLM)
 library(gtools)
 
 source("scCoda_wrapper.R")
@@ -204,6 +199,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	}, mc.cores=36)
 	df_res = do.call(rbind, df_res)
 	
+	# Compute AUPR
 	df_aupr = lapply( unique(df_res$Method), function(method){
 
 		res1 = lapply( unique(df_res$assay), function(CT){
@@ -323,9 +319,9 @@ mean_counts_max = 1000
 n_sims = 250
 beta.true = .06
 n_batches = floor(n_samples/2)
-var.batch = .01 
-methods = c("lm")
-
+var.batch = 0.2 
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+ 
 # ceiling((mean_counts_max - 50) / 5)
        
 df_res = lapply(seq(50, mean_counts_max, by=200), function(mean_counts){
