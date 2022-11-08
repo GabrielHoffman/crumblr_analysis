@@ -82,6 +82,19 @@ source("cellTypeCompositionTest.R")
 python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python"
 ```
 
+# Simulations
+1) crumblr is best when alpha 1 and there is no batch effect
+2) crumblr can handle high dimension batch effect
+
+crumblr can
+- handles random effects
+- handle high dimensional batch effect
+- use standard dream precision weighted linear mixed model with empirical Bayes moderated t-statistics
+- is very fast
+- compatible with variance partitioning analysis
+- compatible with multivariate testing
+
+
 ```{r sim.functions}
 rmultinomdir = function(n, size, alpha){
 
@@ -143,7 +156,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df_cellTypeFreq = data.frame(cellTypeFreq)
 
 		# CLR
-		Y = t(as.data.frame(clr(counts)))
+		Y = t(as.data.frame(compositions::clr(counts)))
 		fit_clr = suppressMessages(dream( Y, formula, X, BPPARAM=SerialParam(), useWeights=FALSE))
 		fit_clr = eBayes(fit_clr)
 		tab_clr = topTable(fit_clr, coef="trait", sort.by="none")
@@ -188,7 +201,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
 
 		df
-	}, mc.cores=8)
+	}, mc.cores=36)
 	df_res = do.call(rbind, df_res)
 	
 	df_aupr = lapply( unique(df_res$Method), function(method){
@@ -278,7 +291,7 @@ mean_counts = 1000
 n_sims = 500
 beta.true = .06
 n_batches = floor(n_samples/2)
-var.batch = .01 #.25
+var.batch = .20
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
 # methods = c( "lm", "lmlog") 
 # methods = c("lm")
