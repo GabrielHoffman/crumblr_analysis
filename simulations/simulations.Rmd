@@ -219,7 +219,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 			}else{
 				isZero = df$value == 0
 
-				browser()
 				score0 = -log10(df$p.value[!isZero])
 				score1 = -log10(df$p.value[isZero])
 
