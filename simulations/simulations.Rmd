@@ -1,0 +1,404 @@
+---
+title: "Test differences in cell type composition"
+subtitle: ''
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+documentclass: article
+output: 
+  html_document:
+  toc: true
+  smart: false
+vignette: >
+  %\VignetteIndexEntry{CTC}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+---
+
+
+
+<!---
+cd /Users/gabrielhoffman/workspace/repos/crumblr_analysis/simulations
+R
+
+rmarkdown::render('simulations.Rmd')
+
+
+cd /Users/gabrielhoffman/workspace/repos/crumblr_analysis/simulations
+R
+# rm -rf test_ctc_cache
+system("ml git; git pull"); rmarkdown::render("simulations.Rmd");
+
+
+# https://hoffmg01.u.hpc.mssm.educrumblr_analysis/simulations/simulations.Rmd
+
+
+--->
+
+```{r setup, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(	
+						tidy=FALSE, 
+						cache=TRUE,
+						echo=FALSE,
+          	dev=c("png", "pdf"),
+          	# dev.args = list(png = list(type = "Xlib")),
+          	package.startup.message = FALSE,
+          	message=FALSE, 
+          	error=FALSE, 
+          	warning=FALSE)
+
+knitr::opts_chunk$set()
+
+options(width=100)
+```	
+
+Power and false positive rate
+- sample size
+- read count
+- batch effect
+- number of components
+ - number of non-zero components
+
+
+```{R load.packages, cache=FALSE}
+library(dreamlet)
+library(PRROC)
+library(MASS)
+library(BiocParallel)
+library(compositions)
+library(parallel)
+library(Rfast)
+library(nnet)
+library(lme4)
+library(cowplot)
+library(crumblr)
+library(HMP)
+library(MGLM)
+library(gtools)
+
+source("scCoda_wrapper.R")
+source("cellTypeCompositionTest.R")
+
+python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python"
+```
+
+```{r sim.functions}
+rmultinomdir = function(n, size, alpha){
+
+	p = rdirichlet(n, alpha)
+	res = lapply( seq(1, n), function(i){
+		rmultinom(1, size, prob=p[i,])
+		})
+	res = do.call(cbind, res)
+
+	t(res)
+} 
+
+run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau){
+
+	# each batch is observed at last twice
+	X = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
+
+	rownames(X) = paste0("sample_", 1:nrow(X))
+
+	df_res = mclapply( 1:n_sims, function(i){
+
+		RhpcBLASctl::omp_set_num_threads(1)
+
+		if( i %% 10 == 0) message("\r", i, " / ", n_sims, '    ', appendLF=FALSE)
+
+		value = ifelse( i <= n_sims*0.9, 0, beta.true )
+		beta = data.frame(mu = rep(0, n_clusters), b = c(0, value, rep(0, n_clusters-2)))
+		a = n_clusters 
+		b = nlevels(X$Batch)-1
+		v = rgamma(1, var.batch, 1)
+		beta_batch = matrix(rnorm(a*b, sd=sqrt(v)), a, b)
+		beta = cbind(beta, beta_batch)
+
+		eta = model.matrix(~., X) %*% t(beta)
+
+		probs = exp(eta)
+
+		totalCounts = rnegbin(nrow(probs), mu=mean_counts, theta = 3)
+
+		if( tau == 1){
+			# large a0 corresponds to multinomial
+			alpha = probs * 1e9
+		}else{
+			# convert tau overdispersion value to alpha from p
+			rhoSq = (tau - 1) / (mean(totalCounts)-1)
+			a0 = (1-rhoSq) / rhoSq
+			alpha = probs*a0
+		}
+
+		# Multinomial-Dirichlet
+		counts = lapply( 1:length(totalCounts), function(i){
+			Dirichlet.multinomial(totalCounts[i], alpha[i,]) 
+		})
+		counts = do.call(rbind, counts)
+		rownames(counts) = paste0("sample_", 1:nrow(counts))
+		colnames(counts) = paste0("CT_", 1:ncol(counts))
+
+		cellTypeFreq = rowMeans(apply(counts, 1, function(x) x/sum(x)))
+		df_cellTypeFreq = data.frame(cellTypeFreq)
+
+		# CLR
+		Y = t(as.data.frame(clr(counts)))
+		fit_clr = suppressMessages(dream( Y, formula, X, BPPARAM=SerialParam(), useWeights=FALSE))
+		fit_clr = eBayes(fit_clr)
+		tab_clr = topTable(fit_clr, coef="trait", sort.by="none")
+
+		# crumblr
+		cobj = crumblr(counts)
+		fit = suppressMessages(dream(cobj, formula, X, BPPARAM=SerialParam()))
+		fit = eBayes(fit)
+		tab.crumblr = topTable(fit, coef="trait", sort.by="none")
+
+		df_p = data.frame(assay = rownames(tab.crumblr),
+			"CLR" = tab_clr$P.Value,
+			"crumblr" = tab.crumblr$P.Value,check.names=FALSE)
+
+		df_methods = lapply( methods, function(method){
+			
+			if( length(findbars(formula)) > 0 & method == "betabinomial"){
+				# betabinomial can't accept random effects
+				
+				res = data.frame(Method = method, 
+								assay = "CT_1",   
+								Estimate = NA,  
+								se = NA,    
+								zstat  = NA,
+								pValue = NA, 
+								p.adj= NA)
+			}else{
+
+				res = testComposition( counts, formula, X, coef="trait", eval="test", method = method)
+				res = data.frame(Method = method, res, check.names=FALSE)
+			}
+			res
+		})
+		df_methods = do.call(rbind, df_methods)
+
+		df = with(df_methods, data.frame(Method, assay, p.value = pValue, check.names=FALSE))
+		df = rbind(df, reshape2::melt(df_p, value.name="p.value", variable.name="Method", id.vars="assay"))
+
+		df$i = i
+		df$value = value
+
+		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
+
+		df
+	}, mc.cores=1)
+	df_res = do.call(rbind, df_res)
+	
+	df_aupr = lapply( unique(df_res$Method), function(method){
+
+		res1 = lapply( unique(df_res$assay), function(CT){
+
+			df = df_res[(df_res$Method == method)&(df_res$assay == CT),]
+
+			df = df[!is.na(df$p.value),]
+
+			if( nrow(df) == 0){
+				res = data.frame(method,  
+					assay = CT, 
+					 AUPR = 0, AUPR.rnd=NA,
+					ROC = 0, ROC.rnd = NA, FPR = 0)
+			}else{
+				isZero = df$value == 0
+
+				score0 = -log10(df$p.value[!isZero])
+				score1 = -log10(df$p.value[isZero])
+
+				pr = pr.curve(score0, score1, curve=TRUE, rand.compute=TRUE)
+				roc = roc.curve(score0, score1, curve=TRUE, rand.compute=TRUE)
+
+				res = data.frame(method, 
+					assay = CT,
+					AUPR = pr$auc.integral, 
+					AUPR.rnd = pr$rand$auc.integral,
+					ROC = roc$auc,
+					ROC.rnd = roc$rand$auc,
+					FPR = sum(df$p.value[isZero] < 0.05) / sum(isZero))
+			}
+			res
+		})
+		do.call(rbind,res1)
+	})
+	df_aupr = do.call(rbind, df_aupr)
+
+	df_return = cbind(df_aupr, n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch)
+
+	df_return
+}
+```
+
+
+# Simulations
+Linear mixed model matters when batch effect is small so rdf.merMod < rdf.fixed. rdf is most different for small sample size
+
+```{r run_simulations, cache=TRUE}
+run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau){
+
+	RNGkind("L'Ecuyer-CMRG")
+
+	set.seed(1)
+	formula = ~ trait
+	res_none = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau)
+	res_none$Status = "none"
+
+	return(res_none)
+
+	set.seed(1)
+	formula = ~ trait + Batch
+	res_fixed = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau)
+	res_fixed$Status = "fixed"
+	  
+	df_res = rbind(res_none, res_fixed)
+
+	df_res$Status = factor(df_res$Status, c("none", "fixed", "random"))
+	return(df_res)
+	   
+	set.seed(1)
+	formula = ~ trait + (1|Batch)
+	res_random = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau)
+	res_random$Status = "random"
+
+	df_res = rbind(df_res, res_random)
+
+	df_res$method = factor(df_res$method)
+	df_res$Status = factor(df_res$Status, c("none", "fixed", "random"))
+
+	df_res
+}
+  
+n_samples = 300
+n_clusters = 5
+mean_counts = 1000
+n_sims = 500
+beta.true = .06
+n_batches = floor(n_samples/2)
+var.batch = .01 #.25
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+# methods = c( "lm", "lmlog") 
+# methods = c("lm")
+       
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=1.2)  
+  
+```
+
+
+```{r plot.sims, cache=FALSE, fig.height=4, fig.width=16}
+
+CT = "CT_1"
+# AUPR
+aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+fig1 = ggplot(df_res[df_res$assay==CT,], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey")
+
+# FPR
+ymax = max(max(df_res$FPR), .1)
+fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate")
+
+plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+```
+
+# Increasing number of cells
+```{r increase.cells}
+n_samples = 200
+n_clusters = 5
+mean_counts_max = 1000
+n_sims = 250
+beta.true = .06
+n_batches = floor(n_samples/2)
+var.batch = .01 
+methods = c("lm")
+
+# ceiling((mean_counts_max - 50) / 5)
+       
+df_res = lapply(seq(50, mean_counts_max, by=200), function(mean_counts){
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=1) 
+})
+df_res = do.call(rbind, df_res)
+
+
+CT = "CT_1"
+# AUPR
+aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=method)) +
+	geom_bar(stat="identity", position = "dodge") +
+	theme_classic() +
+	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+	 ggtitle("AUPR") + 
+	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
+	 xlab("Mean counts per sample")
+```
+
+
+
+```{r exit2, cache=FALSE, eval=TRUE}
+knitr::knit_exit()
+```
+
+```{r plot.sims_ct, cache=FALSE, fig.height=12, fig.width=10}
+
+figList = lapply( unique(df_res$assay), function(CT){
+
+	# AUPR
+	aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+	fig1 = ggplot(df_res[df_res$assay == CT,], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey")
+
+	# FPR
+	ymax = max(max(df_res$FPR), .1)
+	fig2 = ggplot(df_res[df_res$assay == CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate")
+
+	plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+})
+
+plot_grid(plotlist=figList, ncol=1)
+```
+
+
+# Test multiple settings
+```{r sim2}
+
+n_samples = 50
+n_clusters = 5
+# mean_counts = 300
+n_sims = 1000     
+beta.true = .06
+n_batches = floor(n_samples/2)
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = c( "lm", "lmlog") 
+  
+df_res2 = lapply(c(20, 50, 100, 300, 1000), function(mean_counts){  
+	df = lapply(c( 0, .1, .25, .5), function(var.batch){  
+		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2)  
+	})
+	do.call(rbind, df)
+})
+df_res2 = do.call(rbind, df_res2)
+```
+
+```{r sim2.plots, fig.height=12, fig.width=10, cache=FALSE}
+aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
+
+ymax = max(max(df_res2$FPR), .1)
+ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
+```
+
+# SessionInfo
+<details>
+```{r session_info}
+sessionInfo()
+```
+<\details>
+
+
+
+
+
+
+
+
