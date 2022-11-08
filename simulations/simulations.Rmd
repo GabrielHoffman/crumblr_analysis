@@ -199,6 +199,9 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	}, mc.cores=36)
 	df_res = do.call(rbind, df_res)
 	
+	# small offset to fix error if p-value is exactly zero
+	df_res$p.value = df_res$p.value + 1e-300
+
 	# Compute AUPR
 	df_aupr = lapply( unique(df_res$Method), function(method){
 
