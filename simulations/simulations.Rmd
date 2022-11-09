@@ -356,7 +356,7 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=method)) +
 
 # Increasing overdispersion
 ```{r increase.tau}
-n_samples = 600
+n_samples = 800
 n_clusters = 5
 tau_max = 10
 mean_counts = 300
