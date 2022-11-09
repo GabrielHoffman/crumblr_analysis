@@ -198,7 +198,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
 
 		df
-	}, mc.cores=36)
+	}, mc.cores=12)
 	df_res = do.call(rbind, df_res)
 	
 	# small offset to fix error if p-value is exactly zero
