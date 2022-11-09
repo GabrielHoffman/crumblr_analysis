@@ -363,8 +363,8 @@ n_sims = 5000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0.01
-# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-methods = "lm"
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+# methods = "lm"
  
 df_res = lapply(c(1, 3, 6, 10), function(tau){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau) 
