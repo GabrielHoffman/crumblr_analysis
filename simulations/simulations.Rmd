@@ -319,8 +319,8 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```{r increase.cells}
 n_samples = 400
 n_clusters = 5
-mean_counts_max = 2000
-n_sims = 100
+mean_counts_max = 3000
+n_sims = 1000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0.2 
@@ -329,8 +329,8 @@ methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")
  
 # ceiling((mean_counts_max - 50) / 5)
        
-df_res = lapply(seq(50, mean_counts_max, by=400), function(mean_counts){
-	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=1) 
+df_res = lapply(seq(100, mean_counts_max, by=400), function(mean_counts){
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=4) 
 })
 df_res = do.call(rbind, df_res)
 ```
