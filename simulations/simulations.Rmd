@@ -26,7 +26,6 @@ rmarkdown::render('simulations.Rmd')
 
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations
 R
-# rm -rf test_ctc_cache
 system("ml git; git pull"); rmarkdown::render("simulations.Rmd");
 
 
@@ -53,10 +52,11 @@ options(width=100)
 ```	
 
 Power and false positive rate
-- sample size
-- read count
-- batch effect
-- number of components
+
+ - sample size
+ - read count
+ - batch effect
+ - number of components
  - number of non-zero components
 
 
@@ -82,12 +82,12 @@ python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python"
 2) crumblr can handle high dimension batch effect
 
 crumblr can
-- handles random effects
-- handle high dimensional batch effect
-- use standard dream precision weighted linear mixed model with empirical Bayes moderated t-statistics
-- is very fast
-- compatible with variance partitioning analysis
-- compatible with multivariate testing
+ - handles random effects
+ - handle high dimensional batch effect
+ - use standard dream precision weighted linear mixed model with empirical Bayes moderated t-statistics
+ - is very fast
+ - compatible with variance partitioning analysis
+ - compatible with multivariate testing
 
 
 ```{r sim.functions}
@@ -199,6 +199,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	}, mc.cores=36)
 	df_res = do.call(rbind, df_res)
 	
+	browser()
 	# small offset to fix error if p-value is exactly zero
 	df_res$p.value = df_res$p.value + 1e-300
 
