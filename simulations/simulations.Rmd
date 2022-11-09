@@ -322,11 +322,12 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 n_samples = 200
 n_clusters = 5
 mean_counts_max = 1000
-n_sims = 250
+n_sims = 1000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0.2 
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = "lm"
  
 # ceiling((mean_counts_max - 50) / 5)
        
