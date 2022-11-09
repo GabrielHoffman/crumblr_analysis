@@ -351,6 +351,41 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=method)) +
 
 
 
+# Increasing overdispesion
+```{r increase.tau}
+n_samples = 400
+n_clusters = 5
+tau_max = 10
+mean_counts = 1000
+n_sims = 100
+beta.true = .06
+n_batches = floor(n_samples/2)
+var.batch = 0.2 
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = "lm"
+
+df_res = lapply(seq(1, tau_max, by=3), function(tau){
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau) 
+})
+df_res = do.call(rbind, df_res)
+```
+
+```{r plot.increasing.tau, cache=FALSE}
+CT = "CT_1"
+# AUPR
+aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
+	geom_bar(stat="identity", position = "dodge") +
+	theme_classic() +
+	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+	 ggtitle("AUPR") + 
+	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
+	 xlab("Mean counts per sample")
+```
+
+
+
 ```{r exit2, cache=FALSE, eval=TRUE}
 knitr::knit_exit()
 ```
