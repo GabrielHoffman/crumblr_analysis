@@ -150,6 +150,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		cellTypeFreq = rowMeans(apply(counts, 1, function(x) x/sum(x)))
 		df_cellTypeFreq = data.frame(cellTypeFreq)
 
+		browser()
 		# CLR
 		Y = t(as.data.frame(compositions::clr(counts)))
 		fit_clr = suppressMessages(dream( Y, formula, X, BPPARAM=SerialParam(), useWeights=FALSE))
