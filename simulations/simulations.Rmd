@@ -181,7 +181,8 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 								p.adj= NA)
 			}else{
 
-				res = testComposition( counts, formula, X, coef="trait", eval="test", method = method)
+				i = rowSums(counts) > 10
+				res = testComposition( counts[i,], formula, X[i,], coef="trait", eval="test", method = method)
 				res = data.frame(Method = method, res, check.names=FALSE)
 			}
 			res
