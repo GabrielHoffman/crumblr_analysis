@@ -150,7 +150,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		cellTypeFreq = rowMeans(apply(counts, 1, function(x) x/sum(x)))
 		df_cellTypeFreq = data.frame(cellTypeFreq)
 
-		browser()
 		# CLR
 		Y = t(as.data.frame(compositions::clr(counts)))
 		fit_clr = suppressMessages(dream( Y, formula, X, BPPARAM=SerialParam(), useWeights=FALSE))
@@ -198,10 +197,9 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
 
 		df
-	}, mc.cores=1)
+	}, mc.cores=36)
 	df_res = do.call(rbind, df_res)
 	
-	browser()
 	# small offset to fix error if p-value is exactly zero
 	df_res$p.value = df_res$p.value + 1e-300
 
