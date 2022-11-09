@@ -363,7 +363,7 @@ n_batches = floor(n_samples/2)
 var.batch = 0.2 
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
 methods = "lm"
-
+ 
 df_res = lapply(seq(1, tau_max, by=3), function(tau){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau) 
 })
