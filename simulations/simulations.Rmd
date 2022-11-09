@@ -23,6 +23,9 @@ cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations
 R
 system("ml git; git pull"); rmarkdown::render("simulations.Rmd");
 
+# disable X11
+
+ssh -x sklar1
 
 # https://hoffmg01.u.hpc.mssm.educrumblr_analysis/simulations/simulations.Rmd
 
@@ -314,7 +317,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 # Increasing number of cells
 ```{r increase.cells}
-n_samples = 200
+n_samples = 400
 n_clusters = 5
 mean_counts_max = 2000
 n_sims = 100
