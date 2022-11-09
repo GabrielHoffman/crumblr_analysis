@@ -49,14 +49,6 @@ knitr::opts_chunk$set()
 options(width=100)
 ```	
 
-Power and false positive rate
-
- - sample size
- - read count
- - batch effect
- - number of components
- - number of non-zero components
-
 
 ```{R load.packages, cache=FALSE}
 library(crumblr)
@@ -77,10 +69,21 @@ python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python"
 ```
 
 # Simulations
+
+
+Power and false positive rate
+
+ - sample size
+ - read count
+ - batch effect
+ - number of components
+ - number of non-zero components
+
 1) crumblr is best when alpha 1 and there is no batch effect
 2) crumblr can handle high dimension batch effect
 
 crumblr can
+
  - handles random effects
  - handle high dimensional batch effect
  - use standard dream precision weighted linear mixed model with empirical Bayes moderated t-statistics
