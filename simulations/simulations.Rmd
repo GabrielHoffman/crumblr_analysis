@@ -240,7 +240,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	})
 	df_aupr = do.call(rbind, df_aupr)
 
-	df_return = cbind(df_aupr, n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch)
+	df_return = cbind(df_aupr, n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, tau)
 
 	df_return
 }
@@ -381,7 +381,7 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 ggtitle("AUPR") + 
 	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
-	 xlab("Mean counts per sample")
+	 xlab("Overdispersion (tau)")
 ```
 
 
