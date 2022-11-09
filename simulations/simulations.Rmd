@@ -61,13 +61,14 @@ Power and false positive rate
 
 
 ```{R load.packages, cache=FALSE}
+library(crumblr)
+library(variancePartition)
 library(PRROC)
 library(MASS)
 library(compositions)
 library(parallel)
 library(Rfast)
 library(cowplot)
-library(crumblr)
 library(HMP)
 library(gtools)
 
