@@ -20,7 +20,7 @@ R
 
 system("git pull"); rmarkdown::render("Velmeshev_2019.Rmd")
 
-https://hoffmg01.hpc.mssm.edu/crumblr_analysis/Velmeshev_2019/Velmshev_2019.html
+https://hoffmg01.hpc.mssm.edu/crumblr_analysis/Velmeshev_2019/Velmeshev_2019.html
 
 --->
 
@@ -44,6 +44,7 @@ library(zellkonverter)
 library(SingleCellExperiment)
 library(dreamlet)
 library(DelayedArray)
+library(crumblr)
 library(BiocParallel)
 
 setAutoBlockSize(1e9)
@@ -55,12 +56,79 @@ setAutoBlockSize(1e9)
 file = "/sc/arion/projects/CommonMind/hoffman/crumblr_analysis/Velmeshev_2019/data/Velmeshev_2019.h5ad"
 sce = readH5AD(file, use_hdf5=TRUE)
 
+sce$diagnosis = factor(sce$diagnosis, c("Control", "ASD"))
+
 pb <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "cluster",  
     sample_id = "sample", 
     BPPARAM = SnowParam(6, progressbar=TRUE))
 ```
+
+```{r cca}
+form = ~ individual + region + age + sex + diagnosis + Capbatch + Seqbatch + post.mortem.interval..hours. + RNA.Integrity.Number
+
+C = canCorPairs(form, colData(pb) )
+plotCorrMatrix(C)
+```
+
+# crumblr
+```{r crumblr}
+cobj = crumblr(cellCounts(pb))
+
+form = ~ (1|individual) + (1|region) + age + (1|sex) + (1|diagnosis) + (1|Capbatch) + (1|Seqbatch) + post.mortem.interval..hours. + RNA.Integrity.Number
+
+vp.c = fitExtractVarPartModel(cobj, form, colData(pb))
+
+plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) 
+
+plotPercentBars( sortCols(vp.c) )
+
+form = ~ (1|individual) + (1|region) + age + (1|sex) + diagnosis + (1|Capbatch) + (1|Seqbatch) + post.mortem.interval..hours. + RNA.Integrity.Number
+fit = dream( cobj, form, colData(pb))
+fit = eBayes(fit)
+```
+
+
+```{r sd, eval=FALSE}
+# hc = hclust(dist(cobj$E))
+
+res = treeTest( fit, cobj, hc, coef="hPA")
+
+fig1 = plotTreeTest(res) + xlim(0, 13)
+
+tab = topTable(fit, coef="hPA", number=Inf)
+
+tab$celltype = factor(rownames(tab), hc$labels[hc$order])
+tab$se = with(tab, logFC/t)
+
+fig2 = ggplot(tab, aes(celltype, logFC)) + 
+  geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
+  geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
+  geom_point(color="dodgerblue") +
+  theme_classic() +
+  coord_flip() 
+
+plot_grid(fig1, fig2, rel_widths=c(1, .6))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
