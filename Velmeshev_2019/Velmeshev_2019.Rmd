@@ -44,8 +44,14 @@ library(zellkonverter)
 library(SingleCellExperiment)
 library(dreamlet)
 library(DelayedArray)
+library(ggplot2)
+library(tidyverse)
+library(cowplot)
+library(scattermore)
 library(crumblr)
+library(DelayedMatrixStats)
 library(BiocParallel)
+library(edgeR)
 
 setAutoBlockSize(1e9)
 ```
@@ -64,6 +70,33 @@ pb <- aggregateToPseudoBulk(sce,
     sample_id = "sample", 
     BPPARAM = SnowParam(6, progressbar=TRUE))
 ```
+
+## tNSE
+```{r tsne}
+reducedDim(sce, "tSNE") %>%
+  as_tibble %>%
+  cbind( cluster = sce$cluster) %>% 
+  ggplot(aes(tsne1,tsne2, color=cluster)) +
+    geom_scattermore() +
+    theme_void() +
+    theme(aspect.ratio=1)
+```
+
+```{r hclust}
+geneCounts = lapply(assayNames(pb), function(CT){
+  rowSums2(assay(pb, CT))
+  })
+names(geneCounts) = assayNames(pb)
+geneCounts = do.call(cbind, geneCounts)
+
+keep = filterByExpr(geneCounts)
+
+dge = DGEList(geneCounts[keep,])
+dge = calcNormFactors(dge)
+geneExpr = cpm(dge, log=TRUE)
+
+hc = hclust(as.dist(1-cor(geneExpr)^2))
+```     
 
 ```{r cca}
 form = ~ individual + region + age + sex + diagnosis + Capbatch + Seqbatch + post.mortem.interval..hours. + RNA.Integrity.Number
@@ -90,14 +123,16 @@ fit = eBayes(fit)
 ```
 
 
+
 ```{r sd, eval=FALSE}
-# hc = hclust(dist(cobj$E))
 
-res = treeTest( fit, cobj, hc, coef="hPA")
+# hc = hclust(as.dist(1-cor(t(cobj$E))^2))
 
-fig1 = plotTreeTest(res) + xlim(0, 13)
+res = treeTest( fit, cobj, hc, coef="diagnosisASD")
 
-tab = topTable(fit, coef="hPA", number=Inf)
+fig1 = plotTreeTest(res) + xlim(0, 9)
+
+tab = topTable(fit, coef="diagnosisASD", number=Inf)
 
 tab$celltype = factor(rownames(tab), hc$labels[hc$order])
 tab$se = with(tab, logFC/t)
@@ -110,6 +145,16 @@ fig2 = ggplot(tab, aes(celltype, logFC)) +
   coord_flip() 
 
 plot_grid(fig1, fig2, rel_widths=c(1, .6))
+
+
+
+# tab$value = tab$logFC
+# tab$label = rownames(tab)
+
+# fig1 + geom_facet(panel="bar", data=tab, geom = geom_point, mapping=aes(x=value))
+
+
+
 ```
 
 
