@@ -1,0 +1,68 @@
+---
+title: "Analysis of single cell RNA-seq in autism"
+subtitle: '[Velmeshev, et al. 2019](https://www.science.org/doi/10.1126/science.aav8130)'
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+documentclass: article
+output: 
+  html_document:
+  toc: true
+  smart: false
+---
+
+
+
+<!---
+
+cd /sc/arion/projects/CommonMind/hoffman/eval_methods/dreamlet/Velmeshev_2019
+ml git
+R
+
+system("git pull"); rmarkdown::render("Velmshev_2019.Rmd")
+
+https://hoffmg01.hpc.mssm.edu/eval_methods/dreamlet/Velmeshev_2019/Velmshev_2019.html
+
+--->
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  dev = c("png", "pdf"),
+  cache = TRUE,
+  package.startup.message = FALSE,
+  cache.lazy = FALSE)
+```
+
+# Load packages
+```{r pkgs, cache=FALSE}
+library(zellkonverter)
+library(SingleCellExperiment)
+library(dreamlet)
+library(DelayedArray)
+library(BiocParallel)
+
+setAutoBlockSize(1e9)
+```
+
+# Load data
+```{r load.data}
+# read H5AD files
+file = "/sc/arion/projects/CommonMind/hoffman/eval_methods/dreamlet/Velmeshev_2019/data/Velmeshev_2019.h5ad"
+sce = readH5AD(file, use_hdf5=TRUE)
+
+pb <- aggregateToPseudoBulk(sce,
+    assay = "counts",     
+    cluster_id = "cluster",  
+    sample_id = "sample", 
+    BPPARAM = SnowParam(6, progressbar=TRUE))
+```
+
+
+
+
+
