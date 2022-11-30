@@ -167,7 +167,7 @@ res.proc = processAssays( pb, form, BPPARAM = SnowParam(6))
 plotVoom( res.proc)
 ```
 
-```{r vp}
+```{r vp}form = ~ (1|individual) + (1|region) + age + (1|sex) + (1|diagnosis) + (1|Capbatch) + (1|Seqbatch) + post.mortem.interval..hours. + RNA.Integrity.Number
 vp.lst = fitVarPart( res.proc, form, BPPARAM = SnowParam(6))
 ```
 
