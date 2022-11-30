@@ -124,7 +124,7 @@ fit = eBayes(fit)
 
 
 
-```{r sd, eval=FALSE}
+```{r sd}
 
 # hc = hclust(as.dist(1-cor(t(cobj$E))^2))
 
@@ -158,7 +158,7 @@ plot_grid(fig1, fig2, rel_widths=c(1, .6))
 ```
 
 
-
+# dreamlet
 
 
 
