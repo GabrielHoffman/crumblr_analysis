@@ -1,7 +1,7 @@
 
 # Download data
 ###############
-cd /sc/arion/projects/CommonMind/hoffman/eval_methods/dreamlet/Velmeshev_2019/data
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/Velmeshev_2019/data
 
 wget --no-check-certificate https://cells.ucsc.edu/autism/rawMatrix.zip
 wget --no-check-certificate https://cells.ucsc.edu/autism/meta.tsv

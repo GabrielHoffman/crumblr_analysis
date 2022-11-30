@@ -14,13 +14,13 @@ output:
 
 <!---
 
-cd /sc/arion/projects/CommonMind/hoffman/eval_methods/dreamlet/Velmeshev_2019
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/Velmeshev_2019
 ml git
 R
 
-system("git pull"); rmarkdown::render("Velmshev_2019.Rmd")
+system("git pull"); rmarkdown::render("Velmeshev_2019.Rmd")
 
-https://hoffmg01.hpc.mssm.edu/eval_methods/dreamlet/Velmeshev_2019/Velmshev_2019.html
+https://hoffmg01.hpc.mssm.edu/crumblr_analysis/Velmeshev_2019/Velmshev_2019.html
 
 --->
 
@@ -52,7 +52,7 @@ setAutoBlockSize(1e9)
 # Load data
 ```{r load.data}
 # read H5AD files
-file = "/sc/arion/projects/CommonMind/hoffman/eval_methods/dreamlet/Velmeshev_2019/data/Velmeshev_2019.h5ad"
+file = "/sc/arion/projects/CommonMind/hoffman/crumblr_analysis/Velmeshev_2019/data/Velmeshev_2019.h5ad"
 sce = readH5AD(file, use_hdf5=TRUE)
 
 pb <- aggregateToPseudoBulk(sce,
