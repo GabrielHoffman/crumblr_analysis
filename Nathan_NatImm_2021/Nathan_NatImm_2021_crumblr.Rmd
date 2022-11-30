@@ -72,22 +72,47 @@ sce$cluster_name = factor(sce$cluster_name, unique(tab$cluster_name))
 sce$cluster_ids = factor(sce$cluster_ids, unique(tab$cluster_ids))
 ```
 
+```{r pb}
+# create pseudobulk 
+pb <- aggregateToPseudoBulk(sce,
+    assay = "counts",     
+    cluster_id = "cluster_name",  
+    sample_id = "donor_batch")
+```
+
+## Plot UMAP
+```{r UMAP}
+colData(sce) %>%  
+  data.frame %>%
+  ggplot(aes(UMAP_1, UMAP_2, color=cluster_name)) +
+    geom_scattermore() +
+    theme_classic() +
+    theme(aspect.ratio=1)
+```
+
 
 
 # Cell type composition
+# ```{r test.crumblr}
+# # Create hierarchical clustering
+# hcl = buildClusterTree(sce, "UMAP", "cluster_name", method="eucl")
+
+# # compute cell counts
+# counts = computeCellCounts(sce, "cluster_name", "donor_batch")
+
+# idx = match( rownames(counts), sce$donor_batch)
+# info = colData(sce)[idx,]
+# rownames(info) = info$donor_batch
+
+# cobj = crumblr(counts)
+# ```
+
 ```{r test.crumblr}
-# Create hierarchical clustering
-hcl = buildClusterTree(sce, "UMAP", "cluster_name")
+cobj = crumblr(cellCounts(sce))
 
-# compute cell counts
-counts = computeCellCounts(sce, "cluster_name", "donor_batch")
-
-idx = match( rownames(counts), sce$donor_batch)
-info = colData(sce)[idx,]
-rownames(info) = info$donor_batch
-
-cobj = crumblr(counts)
+hcl = buildClusterTreeFromPB( pb )
 ```
+
 
 ## Variance partitioning analysis
 ```{r vp}
@@ -105,7 +130,7 @@ form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^
 fit = dream(cobj, form, info)
 fit = eBayes(fit) 
 
-res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE", method="FE")
+res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
 fig.tree = plotTreeTest(res1) + xlim(0, 20) 
 
 # plot of LogFC
