@@ -84,27 +84,7 @@ reducedDim(sce, "tSNE") %>%
     theme_void() +
     theme(aspect.ratio=1)
 ```
-
-```{r hclust}
-cellClusterTree = function(pb){
-  geneCounts = lapply(assayNames(pb), function(CT){
-    rowSums2(assay(pb, CT))
-    })
-  names(geneCounts) = assayNames(pb)
-  geneCounts = do.call(cbind, geneCounts)
-
-  keep = filterByExpr(geneCounts)
-
-  dge = DGEList(geneCounts[keep,])
-  dge = calcNormFactors(dge)
-  geneExpr = cpm(dge, log=TRUE)
-
-  hc = hclust(as.dist(1-cor(geneExpr)^2))
-  hc
-}
-
-hc = cellClusterTree(pb)
-```     
+    
 
 ```{r cca}
 form = ~ individual + region + age + sex + diagnosis + Capbatch + Seqbatch + post.mortem.interval..hours. + RNA.Integrity.Number
@@ -133,6 +113,8 @@ fit = eBayes(fit)
 
 
 ```{r sd}
+hc = buildClusterTreeFromPB(pb)
+
 res = treeTest( fit, cobj, hc, coef="diagnosisASD")
 
 fig1 = plotTreeTest(res) + xlim(0, 9)
