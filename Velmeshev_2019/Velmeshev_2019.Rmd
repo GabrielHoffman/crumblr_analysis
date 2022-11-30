@@ -178,7 +178,7 @@ plotVarPart(vp.lst, label.angle=60)
 ```
 
 
-```{r dreamlet}
+```{r run.de}
 res.dl = dreamlet( res.proc, form, BPPARAM = SnowParam(6) )
 ```
 
