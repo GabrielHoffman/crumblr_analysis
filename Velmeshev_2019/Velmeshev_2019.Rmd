@@ -20,6 +20,8 @@ R
 
 system("git pull"); rmarkdown::render("Velmeshev_2019.Rmd")
 
+
+
 https://hoffmg01.hpc.mssm.edu/crumblr_analysis/Velmeshev_2019/Velmeshev_2019.html
 
 --->
@@ -161,19 +163,42 @@ res.proc = processAssays( pb, form, BPPARAM = SnowParam(6))
 ```
 
 
-```{r voom}
+```{r voom, fig.height=12}
 plotVoom( res.proc)
+```
+
+```{r vp}
+vp.lst = fitVarPart( res.proc, form, BPPARAM = SnowParam(6))
 ```
 
 
 
+```{r plotVarPart}
+plotVarPart(vp.lst, label.angle=60) 
+```
 
 
+```{r dreamlet}
+res.dl = dreamlet( res.proc, form, BPPARAM = SnowParam(6) )
+```
 
 
+```{r plotVolcano}
+plotVolcano( res.dl, coef = 'diagnosisASD' )
+```
+
+```{r zenith}
+# Load Gene Ontology database 
+go.gs = get_GeneOntology(to="SYMBOL")
+   
+# Run zenith gene set analysis on result of dreamlet
+res_zenith = zenith_gsa(res.dl, coef = 'diagnosisASD', go.gs)
+```
 
 
-
+```{r plotZenithResults}
+plotZenithResults(res_zenith, 5, 1)
+```
 
 
 
