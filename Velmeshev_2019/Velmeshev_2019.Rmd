@@ -136,7 +136,7 @@ fig1 = plotTreeTest(res) + xlim(0, 9)
 
 tab = topTable(fit, coef="diagnosisASD", number=Inf)
 
-tab$celltype = factor(rownames(tab), hc$labels[hc$order])
+tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
 tab$se = with(tab, logFC/t)
 
 fig2 = ggplot(tab, aes(celltype, logFC)) + 
@@ -144,19 +144,12 @@ fig2 = ggplot(tab, aes(celltype, logFC)) +
   geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
   geom_point(color="dodgerblue") +
   theme_classic() +
-  coord_flip() 
+  coord_flip() +
+  xlab('') + 
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
 
-plot_grid(fig1, fig2, rel_widths=c(1, .6))
-
-
-
-# tab$value = tab$logFC
-# tab$label = rownames(tab)
-
-# fig1 + geom_facet(panel="bar", data=tab, geom = geom_point, mapping=aes(x=value))
-
-
-
+plot_grid(fig1, fig2, rel_widths=c(1, .3), align="hv", axis="tblr")
 ```
 
 
