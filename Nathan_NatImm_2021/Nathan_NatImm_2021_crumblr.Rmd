@@ -36,6 +36,9 @@ library(aplot)
 library(tidyverse)
 library(dreamlet)
 library(kableExtra)
+
+library(DelayedArray)
+setAutoBlockSize(1e9)
 ```
 
 # Load data
