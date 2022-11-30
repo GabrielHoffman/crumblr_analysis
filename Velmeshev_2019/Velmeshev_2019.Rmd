@@ -155,7 +155,15 @@ plot_grid(fig1, fig2, rel_widths=c(1, .3), align="hv", axis="tblr")
 
 
 # dreamlet
+```{r dreamlet}
+form = ~ (1|individual) + (1|region) + age + (1|sex) + diagnosis + (1|Capbatch) + (1|Seqbatch) + post.mortem.interval..hours. + RNA.Integrity.Number
+res.proc = processAssays( pb, form)
+```
 
+
+```{r voom}
+plotVoom( res.proc)
+```
 
 
 
