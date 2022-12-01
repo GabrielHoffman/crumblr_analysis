@@ -135,7 +135,7 @@ fit = dream(cobj, form, colData(pb))
 fit = eBayes(fit) 
 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
-fig.tree = plotTreeTest(res1) + xlim(0, 10) 
+fig.tree = plotTreeTest(res1) + xlim(0, 30) 
 
 # plot of LogFC
 tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
