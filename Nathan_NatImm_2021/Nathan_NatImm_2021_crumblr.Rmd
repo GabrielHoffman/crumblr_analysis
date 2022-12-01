@@ -114,7 +114,7 @@ plotVarPart(sortCols(vp))
 ```
 
 ## Differential testing
-```{r diff.test, fig.height=5, fig.width=9}
+```{r diff.test}
 # Run precision-weighted linear mixed model using dream()
 # and compute empirical Bayes moderated t-statistics
 form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
@@ -129,7 +129,7 @@ topTable(fit, coef='TB_statusCASE', number=Inf) %>%
 ```
 
 ## Multivariate test along hierarchy
-```{r diff.test, fig.height=5, fig.width=9}
+```{r treeTest, fig.height=5, fig.width=9}
 # Perform multivariate testing 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
 
