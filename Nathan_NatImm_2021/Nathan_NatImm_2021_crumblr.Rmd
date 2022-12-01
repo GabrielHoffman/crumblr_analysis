@@ -36,6 +36,7 @@ library(aplot)
 library(tidyverse)
 library(dreamlet)
 library(kableExtra)
+library(ggcorrplot)
 
 library(DelayedArray)
 setAutoBlockSize(1e9)
@@ -155,6 +156,16 @@ fig.logFC %>% insert_left(fig.tree)
 ```
 
 
+
+```{r ggcorrplot}
+V = vcov(fit, cobj, coef="TB_statusCASE")
+rownames(V) = gsub(":TB_statusCASE", '', rownames(V))
+colnames(V) = gsub(":TB_statusCASE", '', colnames(V))
+
+i = match(rev(get_taxa_name(fig1)), rownames(V))
+
+ggcorrplot(V[i,i])
+```
 
 
 
