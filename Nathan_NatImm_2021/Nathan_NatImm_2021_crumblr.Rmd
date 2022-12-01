@@ -162,7 +162,7 @@ V = vcov(fit, cobj, coef="TB_statusCASE")
 rownames(V) = gsub(":TB_statusCASE", '', rownames(V))
 colnames(V) = gsub(":TB_statusCASE", '', colnames(V))
 
-i = match(rev(get_taxa_name(fig1)), rownames(V))
+i = match(rev(get_taxa_name(fig.tree)), rownames(V))
 
 ggcorrplot(V[i,i])
 ```
