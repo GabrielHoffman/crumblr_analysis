@@ -135,7 +135,7 @@ fit = dream(cobj, form, colData(pb))
 fit = eBayes(fit) 
 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
-fig.tree = plotTreeTest(res1) + xlim(0, 30) 
+fig.tree = plotTreeTest(res1) + xlim(0, 105) 
 
 # plot of LogFC
 tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
@@ -154,6 +154,8 @@ fig.logFC = ggplot(df, aes(ID, logFC)) +
   theme(aspect.ratio=3, axis.text.y = element_blank())
 
 fig.logFC %>% insert_left(fig.tree)
+
+plot_grid(fig.tree, fig.logFC, rel_widths=c(1, .3), align="hv", axis="tblr")
 ```
 
 ```{r diff.test2}
