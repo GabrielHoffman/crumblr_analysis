@@ -31,6 +31,7 @@ Perform dreamlet analysis of single cell data assaying T cell populations in don
 library(SingleCellExperiment)
 library(zellkonverter)
 library(ggplot2)
+library(scattermore)
 library(crumblr)
 library(aplot)
 library(tidyverse)
