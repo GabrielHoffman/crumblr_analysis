@@ -119,7 +119,7 @@ hc = buildClusterTreeFromPB(pb)
 
 res = treeTest( fit, cobj, hc, coef="diagnosisASD")
 
-fig1 = plotTreeTest(res) + xlim(0, 9)# + theme(legend.position="none")
+fig1 = plotTreeTest(res) + xlim(0, 9) + theme(legend.position="none")
 
 tab = topTable(fit, coef="diagnosisASD", number=Inf)
 
