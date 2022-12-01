@@ -166,13 +166,19 @@ fig.logFC %>% insert_left(fig.tree)
 ```
 
 
-
+## Correlation between coefficient estimates
 ```{r ggcorrplot}
+# get covariance matrix
 V = vcov(fit, cobj, coef="TB_statusCASE")
+
+# convert to correlation matrix
 V = cov2cor(V)
+
+# shorten names
 rownames(V) = gsub(":TB_statusCASE", '', rownames(V))
 colnames(V) = gsub(":TB_statusCASE", '', colnames(V))
 
+# sort to match tree
 i = match(rev(get_taxa_name(fig.tree)), rownames(V))
 
 ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
