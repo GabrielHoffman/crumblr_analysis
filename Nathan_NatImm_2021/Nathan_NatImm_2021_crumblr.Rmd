@@ -140,7 +140,7 @@ fig.tree = plotTreeTest(res1) + xlim(0, 15)
 # plot of logFC
 tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig.tree)))
-tab$se = with(df, logFC/ t)
+tab$se = with(tab, logFC/ t)
 
 fig.logFC = ggplot(tab, aes(celltype, logFC)) +
   geom_hline(yintercept=0, linetype="dashed", color="grey50") + 
