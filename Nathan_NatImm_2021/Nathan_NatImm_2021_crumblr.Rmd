@@ -122,7 +122,7 @@ hcl = buildClusterTreeFromPB( pb )
 ```{r vp}
 form = ~ (1|TB_status) + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
 
-vp = fitExtractVarPartModel(cobj, form, info)
+vp = fitExtractVarPartModel(cobj, form, colData(pb))
 
 plotVarPart(sortCols(vp))
 ```
@@ -131,7 +131,7 @@ plotVarPart(sortCols(vp))
 ```{r diff.test, fig.width=9}
 form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
 
-fit = dream(cobj, form, info)
+fit = dream(cobj, form, colData(pb))
 fit = eBayes(fit) 
 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
