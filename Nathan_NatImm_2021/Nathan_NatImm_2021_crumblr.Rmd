@@ -159,6 +159,7 @@ fig.logFC %>% insert_left(fig.tree)
 
 ```{r ggcorrplot}
 V = vcov(fit, cobj, coef="TB_statusCASE")
+V = cov2cor(V)
 rownames(V) = gsub(":TB_statusCASE", '', rownames(V))
 colnames(V) = gsub(":TB_statusCASE", '', colnames(V))
 
