@@ -178,7 +178,7 @@ fig.logFC = ggplot(tab, aes(celltype, logFC)) +
   theme(aspect.ratio=3, axis.text.y = element_blank())
 
 # combine plots
-fig.logFC %>% insert_left(fig.tree)
+fig.logFC %>% insert_left(fig.tree)  %>% insert_right(plotPercentBars(sortCols(vp)))
 ```
 
 
