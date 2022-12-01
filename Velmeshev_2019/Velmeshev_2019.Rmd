@@ -147,7 +147,7 @@ colnames(V) = gsub(":diagnosisASD", '', colnames(V))
 
 i = match(rev(get_taxa_name(fig1)), rownames(V))
 
-ggcorrplot(V[i,i])
+ggcorrplot(V[i,i], outline.color=NA)
 ```
 
 
