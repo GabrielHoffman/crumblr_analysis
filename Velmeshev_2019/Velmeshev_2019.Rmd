@@ -141,6 +141,7 @@ fig2 %>% insert_left(fig1)
 
 ```{r ggcorrplot}
 V = vcov(fit, cobj, coef="diagnosisASD")
+V = cov2cor(V)
 rownames(V) = gsub(":diagnosisASD", '', rownames(V))
 colnames(V) = gsub(":diagnosisASD", '', colnames(V))
 
