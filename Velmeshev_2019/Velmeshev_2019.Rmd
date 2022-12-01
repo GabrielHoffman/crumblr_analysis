@@ -111,7 +111,7 @@ fit = eBayes(fit)
 
 
 
-```{r sd}
+```{r sd, fig.width=9}
 hc = buildClusterTreeFromPB(pb)
 
 res = treeTest( fit, cobj, hc, coef="diagnosisASD")
@@ -180,7 +180,7 @@ res_zenith = zenith_gsa(res.dl, coef = 'diagnosisASD', go.gs)
 ```
 
 
-```{r plotZenithResults, fig.height=12, fig.width=9}
+```{r plotZenithResults, fig.height=16, fig.width=10}
 plotZenithResults(res_zenith, 5, 1)
 ```
 
