@@ -144,7 +144,7 @@ tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig.tree)))
 tab$se = with(df, logFC/ t)
 
-fig.logFC = ggplot(tab, aes(ID, logFC)) +
+fig.logFC = ggplot(tab, aes(celltype, logFC)) +
   geom_hline(yintercept=0, linetype="dashed", color="grey50") + 
   geom_errorbar(aes(ymin=logFC - 1.96*se, ymax=logFC + 1.96*se), width=0) +
   geom_point(color="dodgerblue") +
