@@ -112,7 +112,7 @@ colData(sce) %>%
 # ```
 
 ```{r test.crumblr}
-cobj = crumblr(cellCounts(sce))
+cobj = crumblr(cellCounts(pb))
 
 hcl = buildClusterTreeFromPB( pb )
 ```
