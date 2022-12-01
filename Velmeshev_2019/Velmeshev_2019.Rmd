@@ -52,6 +52,7 @@ library(ggtree)
 library(scattermore)
 library(zenith)
 library(crumblr)
+library(ggcorrplot)
 library(BiocParallel)
 
 library(DelayedArray)
@@ -89,7 +90,7 @@ reducedDim(sce, "tSNE") %>%
 form = ~ individual + region + age + sex + diagnosis + Capbatch + Seqbatch + post.mortem.interval..hours. + RNA.Integrity.Number
 
 C = canCorPairs(form, colData(pb) )
-plotCorrMatrix(C)
+ggcorplot(C)
 ```
 
 # crumblr
@@ -136,6 +137,21 @@ fig2 = ggplot(tab, aes(celltype, logFC)) +
 # combine plots
 fig2 %>% insert_left(fig1)
 ```
+
+
+```{r ggcorrplot}
+
+V = vcov(fit, cobj, coef="diagnosisASD")
+rownames(V) = gsub(":diagnosisASD", '', rownames(V))
+colnames(V) = gsub(":diagnosisASD", '', colnames(V))
+
+i = match(rev(get_taxa_name(fig1)), rownames(V))
+
+ggcorrplot(V[i,i])
+```
+
+
+
 
 
 # dreamlet
