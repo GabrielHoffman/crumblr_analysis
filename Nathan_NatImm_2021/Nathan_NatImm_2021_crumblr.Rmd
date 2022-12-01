@@ -25,8 +25,7 @@ knitr::opts_chunk$set(
 
 Perform dreamlet analysis of single cell data assaying T cell populations in donors infected with tuberculosis.
 
-# Loading
-## Load libraries
+# Loading libraries
 ```{r load.packages, cache=FALSE}
 library(SingleCellExperiment)
 library(zellkonverter)
@@ -76,13 +75,6 @@ sce$cluster_name = factor(sce$cluster_name, unique(tab$cluster_name))
 sce$cluster_ids = factor(sce$cluster_ids, unique(tab$cluster_ids))
 ```
 
-```{r pb}
-# create pseudobulk 
-pb <- aggregateToPseudoBulk(sce,
-    assay = "counts",     
-    cluster_id = "cluster_name",  
-    sample_id = "donor_batch")
-```
 
 ## Plot UMAP
 ```{r UMAP}
@@ -94,9 +86,20 @@ colData(sce) %>%
     theme(aspect.ratio=1)
 ```
 
+## Create pseudobulk
+```{r pb}
+pb <- aggregateToPseudoBulk(sce,
+    assay = "counts",     
+    cluster_id = "cluster_name",  
+    sample_id = "donor_batch")
+```
+
+# Evaluate crumblr and build tree
 ```{r test.crumblr}
+# run crumblr on cell counts
 cobj = crumblr(cellCounts(pb))
 
+# build tree from pseudobulk expression
 hcl = buildClusterTreeFromPB( pb )
 ```
 
@@ -111,15 +114,29 @@ plotVarPart(sortCols(vp))
 ```
 
 ## Differential testing
-```{r diff.test, fig.height=6, fig.width=9}
+```{r diff.test, fig.height=5, fig.width=9}
+# Run precision-weighted linear mixed model using dream()
+# and compute empirical Bayes moderated t-statistics
 form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
 fit = dream(cobj, form, colData(pb))
 fit = eBayes(fit) 
 
+# show results
+topTable(fit, coef='TB_statusCASE', number=Inf) %>%   
+  select(logFC, AveExpr, t, P.Value, adj.P.Val) %>% 
+  kbl() %>%  
+  kable_classic(full_width = FALSE)
+```
+
+## Multivariate test along hierarchy
+```{r diff.test, fig.height=5, fig.width=9}
+# Perform multivariate testing 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
+
+# plot tree with results
 fig.tree = plotTreeTest(res1) + xlim(0, 15) 
 
-# plot of LogFC
+# plot of logFC
 tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig.tree)))
 tab$se = with(df, logFC/ t)
@@ -133,14 +150,8 @@ fig.logFC = ggplot(tab, aes(celltype, logFC)) +
   xlab('') +
   theme(aspect.ratio=3, axis.text.y = element_blank())
 
+# combine plots
 fig.logFC %>% insert_left(fig.tree)
-```
-
-```{r diff.test2}
-topTable(fit, coef='TB_statusCASE', number=Inf) %>%   
-  select(logFC, AveExpr, t, P.Value, adj.P.Val) %>% 
-  kbl() %>%  
-  kable_classic(full_width = FALSE)
 ```
 
 
