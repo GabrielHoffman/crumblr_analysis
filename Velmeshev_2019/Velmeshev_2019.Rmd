@@ -102,8 +102,10 @@ vp.c = fitExtractVarPartModel(cobj, form, colData(pb))
 
 plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) 
 
-plotPercentBars( sortCols(vp.c) )
+fig.vp = plotPercentBars( sortCols(vp.c) )
+fig.vp
 
+# analysis with dream()
 form = ~ (1|individual) + (1|region) + age + (1|sex) + diagnosis + (1|Capbatch) + (1|Seqbatch) + post.mortem.interval..hours. + RNA.Integrity.Number
 fit = dream( cobj, form, colData(pb))
 fit = eBayes(fit)
@@ -135,7 +137,7 @@ fig2 = ggplot(tab, aes(celltype, logFC)) +
         axis.ticks.y=element_blank())
 
 # combine plots
-fig2 %>% insert_left(fig1)
+fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 
