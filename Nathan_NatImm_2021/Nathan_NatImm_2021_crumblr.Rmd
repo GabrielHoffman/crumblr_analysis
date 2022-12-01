@@ -114,6 +114,16 @@ vp = fitExtractVarPartModel(cobj, form, colData(pb))
 plotVarPart(sortCols(vp))
 ```
 
+## removing repeated measures
+```{r vp.nodup}
+form = ~ (1|TB_status) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
+
+keep = !duplicated(colData(pb)$donor)
+vp = fitExtractVarPartModel(cobj[,keep], form, colData(pb)[keep,])
+
+plotVarPart(sortCols(vp))
+```
+
 ## Differential testing
 ```{r diff.test}
 # Run precision-weighted linear mixed model using dream()
