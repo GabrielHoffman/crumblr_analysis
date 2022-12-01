@@ -112,6 +112,7 @@ fit = eBayes(fit)
 
 
 
+## Multivariate test along hierarchy
 ```{r sd, fig.width=9}
 hc = buildClusterTreeFromPB(pb)
 
@@ -139,12 +140,19 @@ fig2 %>% insert_left(fig1)
 ```
 
 
+## Correlation between coefficient estimates
 ```{r ggcorrplot}
+# get covariance matrix
 V = vcov(fit, cobj, coef="diagnosisASD")
+
+# convert to correlation matrix
 V = cov2cor(V)
+
+# shorten names
 rownames(V) = gsub(":diagnosisASD", '', rownames(V))
 colnames(V) = gsub(":diagnosisASD", '', colnames(V))
 
+# sort to match tree
 i = match(rev(get_taxa_name(fig1)), rownames(V))
 
 ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
