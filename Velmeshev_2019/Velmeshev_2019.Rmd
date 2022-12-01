@@ -90,7 +90,7 @@ reducedDim(sce, "tSNE") %>%
 form = ~ individual + region + age + sex + diagnosis + Capbatch + Seqbatch + post.mortem.interval..hours. + RNA.Integrity.Number
 
 C = canCorPairs(form, colData(pb) )
-ggcorplot(C)
+ggcorrplot(C)
 ```
 
 # crumblr
