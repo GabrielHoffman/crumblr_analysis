@@ -136,7 +136,8 @@ plotVarPart(sortCols(vp))
 
 
 ```{r plotPercentBars2}
-plotPercentBars(sortCols(vp))
+fig.vp = plotPercentBars(sortCols(vp))
+fig.vp
 ```
 
 
@@ -156,7 +157,7 @@ topTable(fit, coef='TB_statusCASE', number=Inf) %>%
 ```
 
 ## Multivariate test along hierarchy
-```{r treeTest, fig.height=6, fig.width=7}
+```{r treeTest, fig.height=6, fig.width=9}
 # Perform multivariate testing 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
 
@@ -178,7 +179,7 @@ fig.logFC = ggplot(tab, aes(celltype, logFC)) +
   theme(aspect.ratio=3, axis.text.y = element_blank())
 
 # combine plots
-fig.logFC %>% insert_left(fig.tree)  %>% insert_right(plotPercentBars(sortCols(vp)))
+fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
 ```
 
 
