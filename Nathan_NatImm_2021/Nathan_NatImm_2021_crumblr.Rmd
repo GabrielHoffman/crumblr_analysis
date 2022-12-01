@@ -130,7 +130,7 @@ topTable(fit, coef='TB_statusCASE', number=Inf) %>%
 ```
 
 ## Multivariate test along hierarchy
-```{r treeTest, fig.height=4, fig.width=5}
+```{r treeTest, fig.height=5, fig.width=5}
 # Perform multivariate testing 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
 
@@ -149,7 +149,7 @@ fig.logFC = ggplot(tab, aes(celltype, logFC)) +
   coord_flip() +
   theme_classic() +
   xlab('') +
-  theme(aspect.ratio=3, axis.text.y = element_blank())
+  theme(aspect.ratio=2, axis.text.y = element_blank())
 
 # combine plots
 fig.logFC %>% insert_left(fig.tree)
