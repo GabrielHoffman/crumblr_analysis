@@ -149,7 +149,7 @@ fig.logFC = ggplot(tab, aes(celltype, logFC)) +
   coord_flip() +
   theme_classic() +
   xlab('') +
-  theme(aspect.ratio=2, axis.text.y = element_blank())
+  theme(aspect.ratio=3, axis.text.y = element_blank())
 
 # combine plots
 fig.logFC %>% insert_left(fig.tree)
