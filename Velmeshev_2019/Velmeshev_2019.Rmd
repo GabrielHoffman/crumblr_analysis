@@ -90,7 +90,7 @@ reducedDim(sce, "tSNE") %>%
 form = ~ individual + region + age + sex + diagnosis + Capbatch + Seqbatch + post.mortem.interval..hours. + RNA.Integrity.Number
 
 C = canCorPairs(form, colData(pb) )
-ggcorrplot(C)
+ggcorrplot(C, hc.order = TRUE)
 ```
 
 # crumblr
@@ -140,7 +140,6 @@ fig2 %>% insert_left(fig1)
 
 
 ```{r ggcorrplot}
-
 V = vcov(fit, cobj, coef="diagnosisASD")
 rownames(V) = gsub(":diagnosisASD", '', rownames(V))
 colnames(V) = gsub(":diagnosisASD", '', colnames(V))
