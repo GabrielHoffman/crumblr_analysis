@@ -155,7 +155,9 @@ fig.logFC = ggplot(df, aes(ID, logFC)) +
   theme(aspect.ratio=3, axis.text.y = element_blank())
 
 fig.logFC %>% insert_left(fig.tree)
+```
 
+```{r plot_grid}
 plot_grid(fig.tree, fig.logFC, rel_widths=c(1, .3), align="hv", axis="tblr")
 ```
 
