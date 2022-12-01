@@ -111,6 +111,9 @@ form = ~ (1|TB_status) + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(
 
 vp = fitExtractVarPartModel(cobj, form, colData(pb))
 
+vp$age = vp$age + vp[,'I(age^2)']
+vp[,'I(age^2)'] = c()
+
 plotVarPart(sortCols(vp))
 ```
 
@@ -124,6 +127,9 @@ form = ~ (1|TB_status) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + pro
 
 keep = !duplicated(colData(pb)$donor)
 vp = fitExtractVarPartModel(cobj[,keep], form, colData(pb)[keep,])
+
+vp$age = vp$age + vp[,'I(age^2)']
+vp[,'I(age^2)'] = c()
 
 plotVarPart(sortCols(vp))
 ```
