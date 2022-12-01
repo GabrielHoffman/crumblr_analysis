@@ -172,7 +172,7 @@ plotVolcano( res.dl, coef = 'diagnosisASD' )
 
 ```{r zenith}
 # Load Gene Ontology database 
-go.gs = get_GeneOntology(to="SYMBOL")
+go.gs = get_GeneOntology(to="ENSEMBL")
    
 # Run zenith gene set analysis on result of dreamlet
 res_zenith = zenith_gsa(res.dl, coef = 'diagnosisASD', go.gs)
@@ -182,12 +182,6 @@ res_zenith = zenith_gsa(res.dl, coef = 'diagnosisASD', go.gs)
 ```{r plotZenithResults}
 plotZenithResults(res_zenith, 5, 1)
 ```
-
-
-
-
-
-
 
 
 
