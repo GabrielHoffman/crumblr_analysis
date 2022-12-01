@@ -50,7 +50,6 @@ library(tidyverse)
 library(aplot)
 library(ggtree)
 library(scattermore)
-library(zenith)
 library(crumblr)
 library(ggcorrplot)
 library(BiocParallel)
@@ -158,55 +157,6 @@ i = match(rev(get_taxa_name(fig1)), rownames(V))
 ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 ```
 
-
-
-
-
-# dreamlet
-```{r dreamlet}
-form = ~ (1|individual) + (1|region) + age + (1|sex) + diagnosis + (1|Capbatch) + (1|Seqbatch) + post.mortem.interval..hours. + RNA.Integrity.Number
-res.proc = processAssays( pb, form, BPPARAM = SnowParam(6))
-```
-
-
-```{r voom, fig.height=12}
-plotVoom( res.proc)
-```
-
-```{r vp}
-form = ~ (1|individual) + (1|region) + age + (1|sex) + (1|diagnosis) + (1|Capbatch) + (1|Seqbatch) + post.mortem.interval..hours. + RNA.Integrity.Number
-vp.lst = fitVarPart( res.proc, form, BPPARAM = SnowParam(6))
-```
-
-
-
-```{r plotVarPart, fig.height=12, fig.width=9}
-plotVarPart(vp.lst, label.angle=60) 
-```
-
-
-```{r run.de}
-form = ~ (1|individual) + (1|region) + age + (1|sex) + diagnosis + (1|Capbatch) + (1|Seqbatch) + post.mortem.interval..hours. + RNA.Integrity.Number
-res.dl = dreamlet( res.proc, form, BPPARAM = SnowParam(6) )
-```
-
-
-```{r plotVolcano, fig.height=12, fig.width=9}
-plotVolcano( res.dl, coef = 'diagnosisASD' )
-```
-
-```{r zenith}
-# Load Gene Ontology database 
-go.gs = get_GeneOntology(to="ENSEMBL")
-   
-# Run zenith gene set analysis on result of dreamlet
-res_zenith = zenith_gsa(res.dl, coef = 'diagnosisASD', go.gs)
-```
-
-
-```{r plotZenithResults, fig.height=16, fig.width=10}
-plotZenithResults(res_zenith, 5, 1)
-```
 
 
 
