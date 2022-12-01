@@ -45,17 +45,16 @@ knitr::opts_chunk$set(
 library(zellkonverter)
 library(SingleCellExperiment)
 library(dreamlet)
-library(DelayedArray)
 library(ggplot2)
 library(tidyverse)
 library(cowplot)
 library(ggtree)
 library(scattermore)
+library(zenith)
 library(crumblr)
-library(DelayedMatrixStats)
 library(BiocParallel)
-library(edgeR)
 
+library(DelayedArray)
 setAutoBlockSize(1e9)
 ```
 
