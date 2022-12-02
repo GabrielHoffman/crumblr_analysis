@@ -383,10 +383,10 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
 
 # Number of components
 ```{r increase.clusters}
-n_samples = 100
+n_samples = 400
 # mean_counts = 3000
 n_sims = 1000
-beta.true = 0.06
+beta.true = 0.1
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
 tau = 1
