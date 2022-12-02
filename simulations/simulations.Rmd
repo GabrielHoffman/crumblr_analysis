@@ -350,7 +350,7 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=method)) +
 ```{r increase.tau}
 n_samples = 100
 n_clusters = 5
-mean_counts = 3000
+mean_counts = 2000
 n_sims = 1000
 beta.true = .06
 n_batches = floor(n_samples/2)
