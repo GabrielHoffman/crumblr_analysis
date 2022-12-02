@@ -81,14 +81,6 @@ Power and false positive rate
 1) crumblr is best when alpha 1 and there is no batch effect
 2) crumblr can handle high dimension batch effect
 
-crumblr can
-
- - handles random effects
- - handle high dimensional batch effect
- - use standard dream precision weighted linear mixed model with empirical Bayes moderated t-statistics
- - is very fast
- - compatible with variance partitioning analysis
- - compatible with multivariate testing
 
 
 ```{r sim.functions}
@@ -319,7 +311,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 # Increasing number of cells
 ```{r increase.cells}
-n_samples = 400
+n_samples = 200
 n_clusters = 5
 mean_counts_max = 3000
 n_sims = 1000
