@@ -96,7 +96,7 @@ pb <- aggregateToPseudoBulk(sce,
 ```
 
 # Plots of cell fractions
-```{r fractions, fig.width=9}
+```{r fractions, fig.height=9, fig.width=9}
 fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 
 df = data.frame(fracs, TB_status = pb$TB_status, check.names=FALSE)
