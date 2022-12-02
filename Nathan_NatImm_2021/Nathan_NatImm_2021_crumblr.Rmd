@@ -95,6 +95,23 @@ pb <- aggregateToPseudoBulk(sce,
     sample_id = "donor_batch")
 ```
 
+# Plots of cell fractions
+```{r fractions, fig.width=9}
+fracs = cellCounts(pb) / rowSums(cellCounts(pb))
+
+df = data.frame(fracs, TB_status = pb$TB_status, check.names=FALSE)
+df = reshape2::melt(df, id.vars="TB_status")
+
+ggplot(df, aes(diagnosis, value, fill=variable)) + 
+  geom_violin() +
+  geom_boxplot(fill="grey50", width=.1) + 
+  facet_wrap(~ variable) +
+  theme_classic() +
+  theme(aspect.ratio=1, legend.position="none") +
+  ylab("Fraction")
+```
+
+
 # Evaluate crumblr and build tree
 ```{r test.crumblr}
 # run crumblr on cell counts
