@@ -111,16 +111,6 @@ ggplot(df, aes(TB_status, value, fill=variable)) +
   ylab("Fraction")
 ```
 
-```{r barplots}
-i = pb$TB_status=="CONTROL"
-fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions") + theme(legend.position = "none")
-i = pb$TB_status=="CASE"
-fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
-
-plot_grid(fig1, fig2, rel_widths=c(.75,1))
-```
-
-
 # Evaluate crumblr and build tree
 ```{r test.crumblr}
 # run crumblr on cell counts
