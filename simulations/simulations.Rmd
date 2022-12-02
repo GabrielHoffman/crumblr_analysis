@@ -348,11 +348,11 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=method)) +
 
 # Increasing overdispersion
 ```{r increase.tau}
-n_samples = 100
+n_samples = 200
 n_clusters = 5
 mean_counts = 3000
 n_sims = 1000
-beta.true = .06
+beta.true = .03
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
