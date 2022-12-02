@@ -348,11 +348,11 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=method)) +
 
 # Increasing overdispersion
 ```{r increase.tau}
-n_samples = 200
+n_samples = 100
 n_clusters = 5
 mean_counts = 3000
 n_sims = 1000
-beta.true = .03
+beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
@@ -369,6 +369,41 @@ CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
+	geom_bar(stat="identity", position = "dodge") +
+	theme_classic() +
+	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+	 ggtitle("AUPR") + 
+	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
+	 xlab("Overdispersion (tau)")
+```
+
+
+
+
+# Number of components
+```{r increase.clusters}
+n_samples = 100
+mean_counts = 3000
+n_sims = 1000
+beta.true = .06
+n_batches = floor(n_samples/2)
+var.batch = 0#0.01
+tau = 1
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = "lm"
+ 
+df_res = lapply(c(2, 3, 6, 10), function(n_clusters){
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau) 
+})
+df_res = do.call(rbind, df_res)
+```
+
+```{r plot.increase.clusters, cache=FALSE}
+CT = "CT_1"
+# AUPR
+aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
