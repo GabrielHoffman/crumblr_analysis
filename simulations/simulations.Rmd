@@ -384,7 +384,7 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
 # Number of components
 ```{r increase.clusters}
 n_samples = 100
-mean_counts = 300
+mean_counts = 3000
 n_sims = 1000
 beta.true = .06
 n_batches = floor(n_samples/2)
@@ -393,7 +393,7 @@ tau = 1
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
 methods = "lm"
  
-df_res = lapply(c(2, 3, 6, 10), function(n_clusters){
+df_res = lapply(c(5, 10, 20, 50), function(n_clusters){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau) 
 })
 df_res = do.call(rbind, df_res)
