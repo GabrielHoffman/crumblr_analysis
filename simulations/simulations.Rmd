@@ -311,7 +311,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 # Increasing number of cells
 ```{r increase.cells}
-n_samples = 200
+n_samples = 100
 n_clusters = 5
 mean_counts_max = 3000
 n_sims = 1000
