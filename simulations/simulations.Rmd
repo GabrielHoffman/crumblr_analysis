@@ -394,7 +394,7 @@ tau = 1
 methods = "lm"
  
 df_res = lapply(c(5, 10, 20, 50), function(n_clusters){
-	run_three_formulas( n_samples, n_clusters, mean_counts=100*n_clusters, n_sims, beta.true, n_batches, var.batch, methods, tau) 
+	run_three_formulas( n_samples, n_clusters, mean_counts=1000*n_clusters, n_sims, beta.true, n_batches, var.batch, methods, tau) 
 })
 df_res = do.call(rbind, df_res)
 ```
