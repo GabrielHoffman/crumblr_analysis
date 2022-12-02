@@ -27,7 +27,8 @@ system("ml git; git pull"); rmarkdown::render("simulations.Rmd");
 
 ssh -x sklar1
 
-# https://hoffmg01.u.hpc.mssm.educrumblr_analysis/simulations/simulations.Rmd
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
+
 
 
 --->
@@ -45,8 +46,6 @@ knitr::opts_chunk$set(
           	warning=FALSE)
 
 knitr::opts_chunk$set()
-
-options(width=100)
 ```	
 
 
@@ -295,8 +294,8 @@ n_sims = 5000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = .20
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-# methods = c( "lm", "lmlog") 
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = c( "lm", "lmlog") 
 # methods = c("lm")
        
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=1.2)  
@@ -327,8 +326,8 @@ n_sims = 1000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0.2 
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-# methods = "lm"
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = "lm"
  
 # ceiling((mean_counts_max - 50) / 5)
        
@@ -363,8 +362,8 @@ n_sims = 5000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0.01
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-# methods = "lm"
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = "lm"
  
 df_res = lapply(c(1, 3, 6, 10), function(tau){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau) 
