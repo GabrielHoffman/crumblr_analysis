@@ -102,7 +102,7 @@ fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell frac
 i = pb$diagnosis=="ASD"
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
 
-plot_grid(fig1, fig2)
+plot_grid(fig1, fig2, rel_widths=c(.8,1))
 ```
 
 ```{r plot.fracs}
