@@ -324,7 +324,7 @@ methods = "lm"
  
 # ceiling((mean_counts_max - 50) / 5)
        
-df_res = lapply(c(100, seq(500, mean_counts_max, by=500)), function(mean_counts){
+df_res = lapply(c(100, 500,seq(1000, mean_counts_max, by=1000)), function(mean_counts){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau) 
 })
 df_res = do.call(rbind, df_res)
