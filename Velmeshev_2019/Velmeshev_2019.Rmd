@@ -52,6 +52,7 @@ library(ggtree)
 library(scattermore)
 library(crumblr)
 library(ggcorrplot)
+library(cowplot)
 library(BiocParallel)
 
 library(DelayedArray)
@@ -91,6 +92,35 @@ form = ~ individual + region + age + sex + diagnosis + Capbatch + Seqbatch + pos
 C = canCorPairs(form, colData(pb) )
 ggcorrplot(C, hc.order = TRUE)
 ```
+
+# Plots of cell fractions
+```{r fractions}
+fracs = cellCounts(pb) / rowSums(cellCounts(pb))
+
+i = pb$diagnosis=="Control"
+fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
+i = pb$diagnosis=="ASD"
+fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
+
+plot_grid(fig1, fig2)
+```
+
+```{r plot.fracs}
+df = data.frame(fracs, diagnosis = pb$diagnosis, check.names=FALSE)
+df = reshape2::melt(df, id.vars="diagnosis")
+
+ggplot(df, aes(diagnosis, value, fill=variable)) + 
+  geom_violin() +
+  geom_boxplot(fill="grey50", width=.1) + 
+  facet_wrap(~ variable) +
+  theme_classic() +
+  theme(aspect.ratio=1, legend.position="none") +
+  ylab("Fraction")
+```
+
+
+
+
 
 # crumblr
 ```{r crumblr}
