@@ -94,11 +94,11 @@ ggcorrplot(C, hc.order = TRUE)
 ```
 
 # Plots of cell fractions
-```{r fractions}
+```{r fractions, fig.width=9}
 fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 
 i = pb$diagnosis=="Control"
-fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
+fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions") + theme(legend.position = "none")
 i = pb$diagnosis=="ASD"
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
 
