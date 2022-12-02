@@ -102,7 +102,7 @@ fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 df = data.frame(fracs, TB_status = pb$TB_status, check.names=FALSE)
 df = reshape2::melt(df, id.vars="TB_status")
 
-ggplot(df, aes(diagnosis, value, fill=variable)) + 
+ggplot(df, aes(TB_status, value, fill=variable)) + 
   geom_violin() +
   geom_boxplot(fill="grey50", width=.1) + 
   facet_wrap(~ variable) +
