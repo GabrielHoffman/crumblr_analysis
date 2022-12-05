@@ -410,7 +410,7 @@ error_var = matrix(runif(n*m, 1, 100), n, m)
 
 methods = c("FE", "tstat", "sidak", "fisher") # "RE2C",
 
-res = future_map_df( seq(n_reps), function(i){
+res = future_map_dfr( seq(n_reps), function(i){
 
   message('\r', i, '   ', appendLF=FALSE)
 
