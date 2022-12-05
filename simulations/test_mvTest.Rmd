@@ -152,7 +152,6 @@ res = map_df( seq(n_reps), function(i){
 
       res$i = i
       res$n_positive = n_positive
-      res$m = m
       res
     })
   })
