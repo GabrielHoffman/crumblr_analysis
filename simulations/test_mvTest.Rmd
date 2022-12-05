@@ -422,7 +422,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 
   map_df( values, function(n_positive){
 
-    if(i < n_reps/2){
+    if(n_positive == 0){
       beta = matrix(0, p,m)
     }else{    
       beta = matrnorm(p,m)/3
@@ -462,7 +462,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 
 ```{r FPR, cache=FALSE}
 res %>%
-  filter(i < n_reps/2) %>%
+  filter(n_positive==0) %>%
   group_by(method) %>%
   summarize( FPR = sum(pvalue < 0.05) / length(pvalue)) %>%
 ggplot(aes(method, FPR, fill=method)) +
@@ -476,7 +476,7 @@ ggplot(aes(method, FPR, fill=method)) +
 
 ```{r histogram, fig.height=4, fig.width=10, cache=FALSE, eval=FALSE }
 res %>%
-  filter(i < n_reps/2) %>%
+  filter(n_positive==0) %>%
   group_by(method) %>%
   ggplot(aes(pvalue, fill=method)) +
     geom_histogram() +
