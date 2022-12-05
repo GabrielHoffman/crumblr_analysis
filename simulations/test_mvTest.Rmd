@@ -202,7 +202,7 @@ ggplot(df, aes(method, AUPR, fill=method)) +
 
 ```{r plot.lines, fig.width=6, fig.height=5}
 ggplot(df, aes(n_positive, AUPR, color=method)) +
-  geom_line() + 
+  geom_line(size=1) + 
   geom_hline(yintercept=0.1, linetype="dashed") +
   theme_classic() +
   theme(aspect.ratio=1) +
