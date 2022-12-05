@@ -1,0 +1,517 @@
+---
+title: "Multivariate hypothesis testing for dream()"
+author:
+- name: "[Gabriel Hoffman](http://gabrielhoffman.github.io)"
+  affiliation: | 
+    Icahn School of Medicine at Mount Sinai, New York
+date: "Run on `r Sys.time()`"
+output:
+  rmarkdown::html_document:
+    highlight: pygments
+    toc: false
+    toc_depth: 3
+    fig_width: 5
+---
+
+<!---
+cd /Users/gabrielhoffman/workspace/repos
+R
+
+
+
+rmarkdown::render('test_mvTest.Rmd')
+
+--->
+
+```{r setup, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(tidy=FALSE, cache=TRUE,
+                      dev=c("png", "pdf"),
+                      package.startup.message = FALSE,
+                      message=FALSE, error=FALSE, warning=TRUE)
+```	
+
+
+
+
+
+```{r load, cache=FALSE}
+library(PRROC)
+library(remaCor)
+library(gridExtra)
+library(ggplot2)
+library(Rfast)
+library(variancePartition)
+library(purrr)
+library(tidyverse)
+```
+
+# Univariate
+```{r simulations1}
+n = 500
+p = 2
+
+X = matrnorm(n,p)
+
+# beta = rnorm(ncol(X))
+beta = rep(100,p)
+
+v = seq(1, n, length.out=n)*4
+# v = v / mean(v)
+# v[] = 122
+
+eta = X %*% beta
+
+set.seed(1)
+
+res = map( 1:1000, function(i){
+
+  epsilon = rnorm(n, 0, sqrt(v))
+  y = eta + epsilon
+
+  fit = lm(y ~ X, weights=1/v)
+  
+  list(beta = data.frame(t(coef(fit)[-1]), check.names=FALSE),
+    zstat = data.frame(t(coef(summary(fit))[-1,3]), check.names=FALSE),
+    vcov = vcov(fit)[-1,-1])
+})
+
+zstat = map_df(res, function(x) x$zstat)
+
+apply(zstat, 2, mean)
+apply(zstat, 2, var)
+
+A = cov(map_df(res, function(x) x$beta))
+
+B = Reduce('+', lapply(res, function(x) x$vcov)) / length(res)
+
+S = Reduce('+', lapply(res, function(x) x$sandwich)) / length(res)
+
+plot(A,B)
+abline(0,1, col="red")
+```
+
+
+
+
+
+
+# Univariate, but more complex
+```{r simulations2}
+n = 500 # samples
+p = 2 # features
+m = 4 # responses
+
+# X = matrnorm(n,p)
+beta = matrnorm(p,m)
+beta[] = 100
+
+# linear predictor with no noise
+Eta = X %*% beta
+
+# Error variance
+v = seq(1, n, length.out=n)
+
+set.seed(1)
+
+res = map( 1:1000, function(i){
+
+  epsilon = rnorm(n, 0, sqrt(v))
+
+  Y = Eta + epsilon
+
+  fit = lm(Y[,1] ~ X, weights=1/v)
+  
+  list(beta = data.frame(t(coef(fit)[-1]), check.names=FALSE),
+    zstat = data.frame(t(coef(summary(fit))[-1,3]), check.names=FALSE),
+    vcov = vcov(fit)[-1,-1])
+})
+
+zstat = map_df(res, function(x) x$zstat)
+
+apply(zstat, 2, mean)
+apply(zstat, 2, var)
+
+A = cov(map_df(res, function(x) x$beta))
+
+B = Reduce('+', lapply(res, function(x) x$vcov)) / length(res)
+
+plot(A,B)
+abline(0,1, col="red")
+
+```
+
+
+# Multivariate, no weights
+```{r simulations3}
+n = 500 # samples
+p = 2 # features
+m = 4 # responses
+
+X = matrnorm(n,p)
+beta = matrnorm(p,m)
+beta[] = 100
+
+# linear predictor with no noise
+Eta = X %*% beta
+
+colnames(Eta) = paste0("gene_", 1:m)
+rownames(Eta) = paste0("sample_", 1:n)
+
+set.seed(1)
+
+res = map( 1:1000, function(i){
+
+  Y = Eta + rnorm(length(Eta), 0, 50)
+
+  fit1 = lm(Y ~ X)
+  
+  B = coef(fit1)
+
+  beta_hat = matrix(B, nrow=1, byrow=FALSE)
+  colnames(beta_hat) = c(outer(rownames(B), colnames(B), function(a,b) paste0(b,':', a)))
+
+  list(beta = beta_hat,
+    vcov = vcov(fit1))
+})
+
+A = cov(map_df(res, function(x) as.data.frame(x$beta)))
+
+B = Reduce('+', lapply(res, function(x) x$vcov)) / length(res)
+
+plot(A,B)
+abline(0,1, col="red")
+
+```
+
+
+# Multivariate
+## Fixed effect model
+```{r simulations4}
+n = 100 # samples
+p = 3 # features
+m = 3 # responses
+rho = .7 # correlation between covariates
+rho_error = .4 # error correlation between responses
+set.seed(1)
+
+Sigma = matrix(rho, p,p)
+diag(Sigma) = 1
+
+X = rmvnorm(n,rep(0,p), Sigma)
+Xdf = as.data.frame(X)
+form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
+
+beta = matrnorm(p,m)*5
+
+# linear predictor with no noise
+Eta = X %*% beta
+
+colnames(Eta) = paste0("gene_", 1:m)
+rownames(Eta) = paste0("sample_", 1:n)
+rownames(Xdf) = paste0("sample_", 1:n)
+
+# Error variance
+error_var = matrix(runif(n*m, 1, 100), n, m)
+
+autocorr.mat = function (p, rho){
+    mat <- diag(p)
+    rho^abs(row(mat) - col(mat))
+}
+
+# Simulate error with given variance and correlations
+sim_error = function(rho_error, error_var){
+  Epsilon = map(1:n, function(k){
+    # create correlation matrix
+    # Sig = matrix(rho_error, m,m)
+    # diag(Sig) = 1
+    Sig = autocorr.mat(m, rho_error)
+
+    # scale by variances to get covariance matrix
+    s = sqrt(error_var[k,])
+    Sig = diag(s) %*% Sig %*% diag(s)
+
+    rmvnorm(1, rep(0, m), Sig)
+  })
+  do.call(rbind, Epsilon)
+}
+
+res = map( 1:1000, function(i){
+
+  message('\r', i, '   ', appendLF=FALSE)
+
+  Epsilon = sim_error(rho_error, error_var)
+
+  # Observe data with error
+  Y = Eta + Epsilon
+
+  # Create EList object
+  vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
+
+  # run dream
+  suppressMessages(fit <- dream(vobj, form, data=Xdf))
+  fit = eBayes(fit)
+  
+  # extract estimated coefficients
+  beta_hat = matrix(t(coef(fit)), nrow=1, byrow=FALSE)
+  colnames(beta_hat) = c(outer(colnames(coef(fit)), rownames(coef(fit)), function(a,b) paste0(b,':', a)))
+
+  # return estimated coefficients and covariance
+  list(beta = beta_hat,
+      vcov = vcov(fit, vobj))
+})
+
+Sigma_empirical = cov(map_df(res, function(x) as.data.frame(x$beta)))
+Sigma_theory = Reduce('+', lapply(res, function(x) x$vcov)) / length(res)
+```
+
+```{r plot4, cache=FALSE}
+lim = range(c(Sigma_theory, Sigma_empirical))
+par(pty="s")
+plot( diag(Sigma_theory), diag(Sigma_empirical), xlab="Variances and covariances (Theoretical)", ylab="Variances and covariances (Empirical)", col="red", xlim=lim, ylim=lim)
+abline(0,1, col="grey70", lty="dashed")
+idx = lower.tri(Sigma_theory)
+points(Sigma_theory[idx], Sigma_empirical[idx], col="blue")
+legend("topleft", c("Variance", "Covariance"), fill=c("red", "blue"), box.lwd=0)
+```
+
+
+## Mixed effect model
+```{r simulations5}
+n = 100 # samples
+p = 3 # features
+m = 2 # responses
+rho = .7 # correlation between covariates
+rho_error = .4 # error correlation between responses
+n_levels = 5
+set.seed(1)
+
+Sigma = matrix(rho, p,p)
+diag(Sigma) = 1
+
+X = rmvnorm(n,rep(0,p), Sigma)
+
+category = sample(letters[1:n_levels], n, replace=TRUE)
+Xdf = data.frame(X, lvl = factor(category))
+
+form = as.formula(paste('~',paste0(colnames(Xdf)[1:p], collapse=' + '), ' + (1|lvl)'))
+
+alpha = matrnorm(n_levels,m)
+beta = matrnorm(p,m)*5
+
+# linear predictor with no noise
+Eta = X %*% beta + model.matrix(~0+., data.frame(category)) %*% alpha
+
+colnames(Eta) = paste0("gene_", 1:m)
+rownames(Eta) = paste0("sample_", 1:n)
+rownames(Xdf) = paste0("sample_", 1:n)
+
+# Error variance
+error_var = matrix(runif(n*m, 1, 100), n, m)
+
+res = map( 1:250, function(i){
+
+  message('\r', i, '   ', appendLF=FALSE)
+
+  Epsilon = sim_error(rho_error, error_var)
+
+  # Observe data with error
+  Y = Eta + Epsilon
+
+  # Create EList object
+  vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
+
+  # run dream
+  suppressMessages(fit <- dream(vobj, form, data=Xdf))
+  fit = eBayes(fit)
+
+  # extract estimated coefficients
+  beta_hat = matrix(t(coef(fit)), nrow=1, byrow=FALSE)
+  colnames(beta_hat) = c(outer(colnames(coef(fit)), rownames(coef(fit)), function(a,b) paste0(b,':', a)))
+
+  # return estimated coefficients and covariance
+  list(beta = beta_hat,
+      vcov = vcov(fit, vobj))
+})
+
+Sigma_empirical = cov(map_df(res, function(x) as.data.frame(x$beta)))
+Sigma_theory = Reduce('+', lapply(res, function(x) x$vcov)) / length(res)
+```
+
+```{r plot5, cache=FALSE}
+# note the issue with the intercept terms in the mixed model
+i = grep("Intercept", colnames(Sigma_theory))
+Sigma_theory = Sigma_theory[-i,-i]
+Sigma_empirical = Sigma_empirical[-i,-i]
+
+lim = range(c(Sigma_theory, Sigma_empirical))
+par(pty="s")
+plot( diag(Sigma_theory), diag(Sigma_empirical), xlab="Variances and covariances (Theoretical)", ylab="Variances and covariances (Empirical)", col="red", xlim=lim, ylim=lim)
+abline(0,1, col="grey70", lty="dashed")
+idx = lower.tri(Sigma_theory)
+points(Sigma_theory[idx], Sigma_empirical[idx], col="blue")
+legend("topleft", c("Variance", "Covariance"), fill=c("red", "blue"), box.lwd=0)
+```
+
+<!---
+
+suppressMessages(fit <- dream(vobj, form, data=Xdf))
+fit = eBayes(fit)
+# fit$cov.coefficients.list[[1]]
+# vcov(fit, vobj)[1:2, 1:2]
+
+# suppressMessages(fit2 <- dream(vobj, ~X1 + X2 + X3 , data=Xdf))
+# fit2 = eBayes(fit2)
+# vcov(fit2, vobj)[1:2, 1:2]
+# vcov(lm(vobj$E[1,] ~X1 + X2 + X3, Xdf))
+
+# vcov(lmer(vobj$E[1,] ~X1 + X2 + X3 + (1|lvl), Xdf))
+
+--->
+
+
+# Multivariate hypothesis testing
+
+## Fixed effect model
+```{r mvTest1}
+n = 100 # samples
+p = 2 # features
+m = 4 # responses
+rho = .2 # correlation between covariates
+rho_error = .7 # error correlation between responses
+n_reps = 5000
+set.seed(1)
+
+Sigma = matrix(rho, p,p)
+diag(Sigma) = 1
+
+X = rmvnorm(n,rep(0,p), Sigma)
+Xdf = as.data.frame(X)
+form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
+
+rownames(Xdf) = paste0("sample_", 1:n)
+
+# Error variance
+error_var = matrix(runif(n*m, 1, 100), n, m)
+
+methods = c("FE", "tstat", "sidak", "fisher") # "RE2C",
+
+res = map_df( seq(n_reps), function(i){
+
+  message('\r', i, '   ', appendLF=FALSE)
+
+  Epsilon = sim_error(rho_error, error_var)
+
+  values = 3 #1:m
+  if(i < n_reps/2) values = 0
+
+  map_df( values, function(n_positive){
+
+    if(i < n_reps/2){
+      beta = matrix(0, p,m)
+    }else{    
+      beta = matrnorm(p,m)/3
+      beta[] = 1
+
+      # set to zero
+      # beta[p,] = 0
+      # beta[sample.int(m, n_positive)] = (1:n_positive)*.3
+    }
+
+    # linear predictor with no noise
+    Eta = X %*% beta
+    colnames(Eta) = paste0("gene_", 1:m)
+    rownames(Eta) = paste0("sample_", 1:n)
+
+    # Observe data with error
+    Y = Eta + Epsilon
+
+    # Create EList object
+    vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
+
+    # run dream
+    suppressMessages(fit <- dream(vobj$E, form, data=Xdf))
+    fit = eBayes(fit)
+    
+    res = map_df(methods, function(method){
+      mvTest(fit, vobj$E, rownames(fit), coef="V2", method)
+    })
+
+    res$i = i
+    res$n_positive = n_positive
+    res
+  })
+})
+```
+
+
+```{r FPR, cache=FALSE}
+res %>%
+  filter(i < n_reps/2) %>%
+  group_by(method) %>%
+  summarize( FPR = sum(pvalue < 0.05) / length(pvalue)) %>%
+ggplot(aes(method, FPR, fill=method)) +
+  geom_bar(stat="identity") +
+  theme_classic() +
+  theme(aspect.ratio=1) +
+  geom_hline(yintercept=0.05, linetype="dashed") +
+  scale_color_brewer(palette = "Set1") +
+  scale_y_continuous("False positive rate", limits=c(0, 0.1), expand=c(0,0))
+```
+
+```{r histogram, fig.height=4, fig.width=10, cache=FALSE }
+res %>%
+  filter(i < n_reps/2) %>%
+  group_by(method) %>%
+  ggplot(aes(pvalue, fill=method)) +
+    geom_histogram() +
+    facet_wrap(~method, nrow=1)+
+  theme_classic() +
+  theme(aspect.ratio=1, legend.position="none") +
+  scale_color_brewer(palette = "Set1")
+```
+
+```{r AUPR, fig.height=5, fig.width=10, cache=FALSE}
+calc_aupr = function(pvalues, category){
+
+  pr = pr.curve(-log10(pvalues)[!category], -log10(pvalues)[category], rand.compute=TRUE, curve=TRUE)
+
+  pr$auc.integral
+}
+
+map_df(1:m, function(n_pos){
+  res %>%
+    filter(n_positive %in% c(0,n_pos))  %>%
+    group_by(method) %>%
+    summarize( AUPR = calc_aupr(pvalue, i < n_reps/2)) %>% 
+    mutate(n_positive = n_pos)
+}) %>%
+ggplot(aes(method, AUPR, fill=method)) +
+  geom_bar(stat="identity") +
+  facet_wrap(~n_positive, nrow=2) +
+  geom_hline(yintercept=0.5, linetype="dashed") +
+  theme_classic() +
+  theme(aspect.ratio=1, legend.position="none") +
+  scale_color_brewer(palette = "Set1") +
+  scale_y_continuous(limits=c(0, 1), expand=c(0,0))
+```
+
+
+
+
+
+
+<!---
+
+
+
+rmarkdown::render('test_mvTest.Rmd')
+
+
+
+--->
+
+
+
+
+
+
