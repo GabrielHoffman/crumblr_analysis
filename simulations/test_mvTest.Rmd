@@ -474,7 +474,7 @@ ggplot(aes(method, FPR, fill=method)) +
   scale_y_continuous("False positive rate", limits=c(0, 0.1), expand=c(0,0))
 ```
 
-```{r histogram, fig.height=4, fig.width=10, cache=FALSE }
+```{r histogram, fig.height=4, fig.width=10, cache=FALSE, eval=FALSE }
 res %>%
   filter(i < n_reps/2) %>%
   group_by(method) %>%
