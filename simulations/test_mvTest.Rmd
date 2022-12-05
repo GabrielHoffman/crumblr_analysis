@@ -175,7 +175,7 @@ ggplot(df, aes(method, FPR, fill=method)) +
 ```
 
 
-```{r plot.FPR, fig.width=6, fig.height=5}
+```{r plot.FPR, fig.width=6, fig.height=5, cache=FALSE}
 ggplot(df, aes(n_features, FPR, color=method)) +
   geom_line(size=1) + 
   geom_hline(yintercept=0.05, linetype="dashed") +
@@ -216,7 +216,7 @@ ggplot(df, aes(method, AUPR, fill=method)) +
   scale_y_continuous(limits=c(0, 1), expand=c(0,0))
 ```
 
-```{r plot.lines, fig.width=6, fig.height=5}
+```{r plot.lines, fig.width=6, fig.height=5, cache=FALSE}
 ggplot(df, aes(n_positive, AUPR, color=method)) +
   geom_line(size=1) + 
   geom_hline(yintercept=0.1, linetype="dashed") +
