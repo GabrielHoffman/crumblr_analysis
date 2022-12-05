@@ -445,11 +445,11 @@ res = future_map_dfr( seq(n_reps), function(i){
     vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
 
     # run dream
-    suppressMessages(fit <- dream(vobj$E, form, data=Xdf))
+    suppressMessages(fit <- dream(vobj, form, data=Xdf))
     fit = eBayes(fit)
     
     res = map_df(methods, function(method){
-      mvTest(fit, vobj$E, rownames(fit), coef="V2", method)
+      mvTest(fit, vobj, rownames(fit), coef="V2", method)
     })
 
     res$i = i
@@ -503,7 +503,7 @@ map_df(1:m, function(n_pos){
 }) %>%
 ggplot(aes(method, AUPR, fill=method)) +
   geom_bar(stat="identity") +
-  facet_wrap(~n_positive, nrow=2) +
+  facet_wrap(~n_positive, nrow=1) +
   geom_hline(yintercept=0.5, linetype="dashed") +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
