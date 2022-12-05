@@ -66,9 +66,9 @@ autocorr.mat = function (p, rho){
 sim_error = function(m, rho_error, error_var){
   Epsilon = map(1:n, function(k){
     # create correlation matrix
-    # Sig = matrix(rho_error, m,m)
-    # diag(Sig) = 1
-    Sig = autocorr.mat(m, rho_error)
+    Sig = matrix(rho_error, m,m)
+    diag(Sig) = 1
+    # Sig = autocorr.mat(m, rho_error)
 
     # scale by variances to get covariance matrix
     s = sqrt(error_var[k,])
@@ -83,7 +83,7 @@ sim_error = function(m, rho_error, error_var){
 
 # Multivariate hypothesis testing
 ```{r mvTest1}
-plan(multisession, workers = 20)
+plan(multisession, workers = 36)
 set.seed(12)
  
 n = 200 # samples
@@ -113,6 +113,8 @@ res = future_map_dfr( seq(n_reps), function(i){
 
     # Error variance
     error_var = matrix(runif(n*m, 1, 100), n, m)
+    error_var[] = 1
+
     Epsilon = sim_error(m, rho_error, error_var)
 
     values = m
