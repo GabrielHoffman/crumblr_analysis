@@ -168,7 +168,7 @@ ggplot(aes(method, FPR, fill=method)) +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
   geom_hline(yintercept=0.05, linetype="dashed") +
-  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
   facet_wrap(~ n_features)
 ```
@@ -182,23 +182,32 @@ calc_aupr = function(pvalues, category){
   pr$auc.integral
 }
 
-map_df(2:m.max, function(n_pos){
+df = map_df(2:m.max, function(n_pos){
   res %>%
     filter(n_positive %in% c(0,n_pos))  %>%
     group_by(method) %>%
     summarize( AUPR = calc_aupr(pvalue, n_positive==0)) %>% 
     mutate(n_positive = n_pos)
-}) %>%
-ggplot(aes(method, AUPR, fill=method)) +
+}) 
+
+ggplot(df, aes(method, AUPR, fill=method)) +
   geom_bar(stat="identity") +
   facet_wrap(~n_positive, nrow=1) +
+  geom_hline(yintercept=0.1, linetype="dashed") +
+  theme_classic() +
+  theme(aspect.ratio=1, legend.position="none") +
+  scale_fill_brewer(palette = "Set1") +
+  scale_y_continuous(limits=c(0, 1), expand=c(0,0))
+```
+
+```{r plot.lines}
+ggplot(df, aes(n_positive, AUPR, color=method)) +
   geom_hline(yintercept=0.1, linetype="dashed") +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
   scale_color_brewer(palette = "Set1") +
   scale_y_continuous(limits=c(0, 1), expand=c(0,0))
 ```
-
 
 
 
