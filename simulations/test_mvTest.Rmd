@@ -91,7 +91,7 @@ p = 2 # features
 m.max = 4 # responses
 rho = 0 # correlation between covariates
 rho_error = .7 # error correlation between responses
-n_reps = 1000
+n_reps = 10
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
@@ -104,7 +104,7 @@ rownames(Xdf) = paste0("sample_", 1:n)
 
 methods = c("FE", "tstat", "sidak", "fisher") # ,"RE2C"
 
-res = future_map_dfr( seq(n_reps), function(i){
+res = map_df( seq(n_reps), function(i){
 
   message('\r', i, '   ', appendLF=FALSE)
   RhpcBLASctl::omp_set_num_threads(1)
@@ -154,7 +154,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       res
     })
   })
-},.options = furrr_options(seed=TRUE))
+})#,.options = furrr_options(seed=TRUE))
 ```
 
 
