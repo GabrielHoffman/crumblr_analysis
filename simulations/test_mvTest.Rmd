@@ -397,7 +397,6 @@ m = 4 # responses
 rho = .2 # correlation between covariates
 rho_error = .7 # error correlation between responses
 n_reps = 5000
-set.seed(1)
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
@@ -428,7 +427,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       beta = matrix(0, p,m)
     }else{    
       beta = matrnorm(p,m)/3
-      beta[] = .1
+      beta[] = 1
 
       # set to zero
       # beta[p,] = 0
