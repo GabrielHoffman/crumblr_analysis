@@ -394,7 +394,7 @@ p = 2 # features
 m = 4 # responses
 rho = .2 # correlation between covariates
 rho_error = .7 # error correlation between responses
-n_reps = 5000
+n_reps = 1000
 set.seed(1)
 
 Sigma = matrix(rho, p,p)
@@ -498,7 +498,7 @@ map_df(1:m, function(n_pos){
   res %>%
     filter(n_positive %in% c(0,n_pos))  %>%
     group_by(method) %>%
-    summarize( AUPR = calc_aupr(pvalue, i < n_reps/2)) %>% 
+    summarize( AUPR = calc_aupr(pvalue, n_positive==0)) %>% 
     mutate(n_positive = n_pos)
 }) %>%
 ggplot(aes(method, AUPR, fill=method)) +
