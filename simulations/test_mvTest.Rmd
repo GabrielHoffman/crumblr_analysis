@@ -394,7 +394,7 @@ p = 2 # features
 m = 4 # responses
 rho = .2 # correlation between covariates
 rho_error = .7 # error correlation between responses
-n_reps = 5000
+n_reps = 500
 set.seed(1)
 
 Sigma = matrix(rho, p,p)
@@ -456,7 +456,7 @@ res = future_map_dfr( seq(n_reps), function(i){
     res$n_positive = n_positive
     res
   })
-})
+},.options = furrr_options(seed=TRUE))
 ```
 
 
