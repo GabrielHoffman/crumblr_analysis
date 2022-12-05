@@ -156,7 +156,7 @@ res = map_df( seq(n_reps), function(i){
       res
     })
   })
-},.options = furrr_options(seed=TRUE))
+})#,.options = furrr_options(seed=TRUE))
 ```
 
 
