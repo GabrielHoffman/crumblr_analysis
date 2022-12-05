@@ -106,7 +106,7 @@ rownames(Xdf) = paste0("sample_", 1:n)
 
 methods = c("FE", "tstat", "sidak", "fisher") # ,"RE2C"
 
-res = map_df( seq(n_reps), function(i){
+res = future_map_dfr( seq(n_reps), function(i){
 
   message('\r', i, '   ', appendLF=FALSE)
 
@@ -155,7 +155,7 @@ res = map_df( seq(n_reps), function(i){
       res
     })
   })
-})#,.options = furrr_options(seed=TRUE))
+},.options = furrr_options(seed=TRUE))
 ```
 
 
