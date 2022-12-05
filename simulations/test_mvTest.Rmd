@@ -403,7 +403,7 @@ diag(Sigma) = 1
 X = rmvnorm(n,rep(0,p), Sigma)
 Xdf = as.data.frame(X)
 form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
-
+ 
 rownames(Xdf) = paste0("sample_", 1:n)
 
 # Error variance
