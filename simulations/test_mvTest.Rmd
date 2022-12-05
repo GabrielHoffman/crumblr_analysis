@@ -66,9 +66,9 @@ autocorr.mat = function (p, rho){
 sim_error = function(m, rho_error, error_var){
   Epsilon = map(1:n, function(k){
     # create correlation matrix
-    Sig = matrix(rho_error, m,m)
-    diag(Sig) = 1
-    # Sig = autocorr.mat(m, rho_error)
+    # Sig = matrix(rho_error, m,m)
+    # diag(Sig) = 1
+    Sig = autocorr.mat(m, rho_error)
 
     # scale by variances to get covariance matrix
     s = sqrt(error_var[k,])
