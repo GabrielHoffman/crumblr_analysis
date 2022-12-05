@@ -389,7 +389,7 @@ fit = eBayes(fit)
 plan(multisession, workers = 12)
 set.seed(12)
 
-RhpcBLASctl::omp_get_max_threads(1)
+RhpcBLASctl::omp_set_num_threads(1)
 
 n = 100 # samples
 p = 2 # features
