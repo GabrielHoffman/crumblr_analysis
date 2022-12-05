@@ -386,7 +386,7 @@ fit = eBayes(fit)
 
 ## Fixed effect model
 ```{r mvTest1}
-plan(multisession, workers = 12, seed=TRUE)
+plan(multisession, workers = 12)
 set.seed(12)
 
 n = 100 # samples
