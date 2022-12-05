@@ -410,7 +410,7 @@ rownames(Xdf) = paste0("sample_", 1:n)
 # Error variance
 error_var = matrix(runif(n*m, 1, 100), n, m)
 
-methods = c("FE", "tstat", "sidak", "fisher") # "RE2C",
+methods = c("FE", "tstat", "sidak", "fisher","RE2C")
 
 res = future_map_dfr( seq(n_reps), function(i){
 
