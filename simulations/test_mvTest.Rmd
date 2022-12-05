@@ -86,8 +86,6 @@ sim_error = function(m, rho_error, error_var){
 plan(multisession, workers = 12)
 set.seed(12)
 
-RhpcBLASctl::omp_set_num_threads(1)
-
 n = 200 # samples
 p = 2 # features
 m.max = 4 # responses
@@ -109,6 +107,7 @@ methods = c("FE", "tstat", "sidak", "fisher") # ,"RE2C"
 res = future_map_dfr( seq(n_reps), function(i){
 
   message('\r', i, '   ', appendLF=FALSE)
+  RhpcBLASctl::omp_set_num_threads(1)
 
   map_df( seq(2, m.max), function(m){
 
