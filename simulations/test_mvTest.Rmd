@@ -29,7 +29,7 @@ system("ml git; git pull"); rmarkdown::render("test_mvTest.Rmd");
 
 ssh -x sklar1
 
-# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/test_mvTest.html
 
 
 
@@ -386,7 +386,8 @@ fit = eBayes(fit)
 
 ## Fixed effect model
 ```{r mvTest1}
-plan(multisession, workers = 12)
+plan(multisession, workers = 12, seed=TRUE)
+set.seed(12)
 
 n = 100 # samples
 p = 2 # features
