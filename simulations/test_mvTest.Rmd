@@ -391,10 +391,10 @@ set.seed(12)
 
 RhpcBLASctl::omp_set_num_threads(1)
 
-n = 100 # samples
+n = 200 # samples
 p = 2 # features
 m = 4 # responses
-rho = .2 # correlation between covariates
+rho = 0 # correlation between covariates
 rho_error = .7 # error correlation between responses
 n_reps = 1000
 
@@ -427,7 +427,6 @@ res = future_map_dfr( seq(n_reps), function(i){
       beta = matrix(0, p,m)
     }else{    
       beta = matrnorm(p,m)/3
-      # beta[] = 1
 
       # set to zero
       beta[p,] = 0
