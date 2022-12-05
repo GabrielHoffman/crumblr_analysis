@@ -427,7 +427,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       beta = matrix(0, p,m)
     }else{    
       beta = matrnorm(p,m)/3
-      beta[] = .5
+      beta[] = 1
 
       # set to zero
       # beta[p,] = 0
