@@ -417,8 +417,8 @@ res = future_map_dfr( seq(n_reps), function(i){
 
   Epsilon = sim_error(rho_error, error_var)
 
-  values = 1:m
-  if(i < n_reps/2) values = 0
+  values = seq(m)
+  if(i < n_reps/5) values = 0
 
   map_df( values, function(n_positive){
 
@@ -430,7 +430,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 
       # set to zero
       # beta[p,] = 0
-      # beta[sample.int(m, n_positive)] = (1:n_positive)*.3
+      beta[sample.int(m, n_positive)] = (1:n_positive)*.3
     }
 
     # linear predictor with no noise
