@@ -471,7 +471,7 @@ ggplot(aes(method, FPR, fill=method)) +
   theme(aspect.ratio=1) +
   geom_hline(yintercept=0.05, linetype="dashed") +
   scale_color_brewer(palette = "Set1") +
-  scale_y_continuous("False positive rate", limits=c(0, 0.1), expand=c(0,0))
+  scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0))
 ```
 
 ```{r histogram, fig.height=4, fig.width=10, cache=FALSE, eval=FALSE }
@@ -504,7 +504,7 @@ map_df(1:m, function(n_pos){
 ggplot(aes(method, AUPR, fill=method)) +
   geom_bar(stat="identity") +
   facet_wrap(~n_positive, nrow=1) +
-  geom_hline(yintercept=0.5, linetype="dashed") +
+  geom_hline(yintercept=0.2, linetype="dashed") +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
   scale_color_brewer(palette = "Set1") +
@@ -519,8 +519,7 @@ ggplot(aes(method, AUPR, fill=method)) +
 <!---
 
 
-
-rmarkdown::render('test_mvTest.Rmd')
+system("ml git; git pull"); rmarkdown::render("test_mvTest.Rmd");
 
 
 
