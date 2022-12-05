@@ -112,13 +112,13 @@ res = future_map_dfr( seq(n_reps), function(i){
 
   Epsilon = sim_error(rho_error, error_var)
 
-  values = m
-  if(i < n_reps*0.9) values = 0
-
   map_df( seq(2, m.max), function(m){
 
     # Error variance
     error_var = matrix(runif(n*m, 1, 100), n, m)
+
+    values = m
+    if(i < n_reps*0.9) values = 0
 
     map_df( values, function(n_positive){
 
