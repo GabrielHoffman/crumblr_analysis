@@ -90,8 +90,8 @@ n = 200 # samples
 p = 2 # features
 m.max = 10 # responses
 rho = 0 # correlation between covariates
-rho_error = .7 # error correlation between responses
-n_reps = 1e5
+rho_error = .5 # error correlation between responses
+n_reps = 1e4
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
@@ -124,7 +124,7 @@ res = future_map_dfr( seq(n_reps), function(i){
         beta = matrix(0, p,m)
       }else{    
         beta = matrnorm(p,m)/3
-        beta[p,] = .5
+        beta[p,] = .7
         # set to zero
         # beta[p,] = 0
         # beta[p,sample.int(m, n_positive)] = 1
