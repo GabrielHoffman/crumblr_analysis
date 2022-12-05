@@ -88,21 +88,21 @@ set.seed(12)
 
 n = 100 # samples
 p = 2 # features
-m.max = 8 # responses
+m.max = 10 # responses
 rho = 0 # correlation between covariates
 rho_error = .7 # error correlation between responses
-n_reps = 1000
+n_reps = 10000
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
 
 X = rmvnorm(n,rep(0,p), Sigma)
 Xdf = as.data.frame(X)
-form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
- 
 rownames(Xdf) = paste0("sample_", 1:n)
 
-methods = c("FE", "tstat", "sidak", "fisher") # ,"RE2C"
+form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
+
+methods = c("FE", "tstat", "sidak", "fisher") 
 
 res = future_map_dfr( seq(n_reps), function(i){
 
@@ -207,7 +207,8 @@ ggplot(df, aes(n_positive, AUPR, color=method)) +
   theme_classic() +
   theme(aspect.ratio=1) +
   scale_color_brewer(palette = "Set1") +
-  scale_y_continuous(limits=c(0, 1), expand=c(0,0))
+  scale_y_continuous(limits=c(0, 1), expand=c(0,0)) +
+  xlab("Number of responses")
 ```
 
 
