@@ -158,7 +158,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 ```
 
 
-```{r FPR, cache=FALSE}
+```{r FPR, fig.height=5, fig.width=10, cache=FALSE}
 res %>%
   filter(n_positive==0) %>%
   group_by(method, n_features) %>%
@@ -166,7 +166,7 @@ res %>%
 ggplot(aes(method, FPR, fill=method)) +
   geom_bar(stat="identity") +
   theme_classic() +
-  theme(aspect.ratio=1) +
+  theme(aspect.ratio=1, legend.position="none") +
   geom_hline(yintercept=0.05, linetype="dashed") +
   scale_color_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
