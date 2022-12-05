@@ -430,7 +430,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 
       # set to zero
       # beta[p,] = 0
-      beta[sample.int(m, n_positive)] = (1:n_positive)*.3
+      # beta[sample.int(m, n_positive)] = (1:n_positive)*.3
     }
 
     # linear predictor with no noise
