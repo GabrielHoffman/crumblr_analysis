@@ -418,7 +418,7 @@ res = future_map_dfr( seq(n_reps), function(i){
   Epsilon = sim_error(rho_error, error_var)
 
   values = seq(m)
-  if(i < n_reps/5) values = 0
+  if(i < n_reps*0.8) values = 0
 
   map_df( values, function(n_positive){
 
