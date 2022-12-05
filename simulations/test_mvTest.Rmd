@@ -17,9 +17,21 @@ output:
 cd /Users/gabrielhoffman/workspace/repos
 R
 
-
-
 rmarkdown::render('test_mvTest.Rmd')
+
+
+
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations
+R
+system("ml git; git pull"); rmarkdown::render("test_mvTest.Rmd");
+
+# disable X11
+
+ssh -x sklar1
+
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
+
+
 
 --->
 
@@ -42,6 +54,7 @@ library(ggplot2)
 library(Rfast)
 library(variancePartition)
 library(purrr)
+library(furrr)
 library(tidyverse)
 ```
 
@@ -373,6 +386,8 @@ fit = eBayes(fit)
 
 ## Fixed effect model
 ```{r mvTest1}
+plan(multisession, workers = 12)
+
 n = 100 # samples
 p = 2 # features
 m = 4 # responses
@@ -395,7 +410,7 @@ error_var = matrix(runif(n*m, 1, 100), n, m)
 
 methods = c("FE", "tstat", "sidak", "fisher") # "RE2C",
 
-res = map_df( seq(n_reps), function(i){
+res = future_map_df( seq(n_reps), function(i){
 
   message('\r', i, '   ', appendLF=FALSE)
 
