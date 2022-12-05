@@ -63,7 +63,7 @@ autocorr.mat = function (p, rho){
 }
 
 # Simulate error with given variance and correlations
-sim_error = function(rho_error, error_var){
+sim_error = function(m, rho_error, error_var){
   Epsilon = map(1:n, function(k){
     # create correlation matrix
     # Sig = matrix(rho_error, m,m)
@@ -114,7 +114,7 @@ res = map_df( seq(n_reps), function(i){
 
     # Error variance
     error_var = matrix(runif(n*m, 1, 100), n, m)
-    Epsilon = sim_error(rho_error, error_var)
+    Epsilon = sim_error(m, rho_error, error_var)
 
     values = m
     if(i < n_reps*0.9) values = 0
