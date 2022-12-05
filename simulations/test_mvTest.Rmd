@@ -181,7 +181,7 @@ calc_aupr = function(pvalues, category){
   pr$auc.integral
 }
 
-map_df(1:m, function(n_pos){
+map_df(1:m.max, function(n_pos){
   res %>%
     filter(n_positive %in% c(0,n_pos))  %>%
     group_by(method) %>%
