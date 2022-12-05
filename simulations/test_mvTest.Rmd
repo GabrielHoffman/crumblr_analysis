@@ -389,7 +389,9 @@ fit = eBayes(fit)
 plan(multisession, workers = 12)
 set.seed(12)
 
-n = 300 # samples
+RhpcBLASctl::omp_get_max_threads(1)
+
+n = 100 # samples
 p = 2 # features
 m = 4 # responses
 rho = .2 # correlation between covariates
