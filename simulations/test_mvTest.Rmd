@@ -90,7 +90,7 @@ RhpcBLASctl::omp_set_num_threads(1)
 
 n = 200 # samples
 p = 2 # features
-m = 4 # responses
+m.max = 4 # responses
 rho = 0 # correlation between covariates
 rho_error = .7 # error correlation between responses
 n_reps = 1000
@@ -104,10 +104,7 @@ form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
  
 rownames(Xdf) = paste0("sample_", 1:n)
 
-# Error variance
-error_var = matrix(runif(n*m, 1, 100), n, m)
-
-methods = c("FE", "tstat", "sidak", "fisher","RE2C")
+methods = c("FE", "tstat", "sidak", "fisher") # ,"RE2C"
 
 res = future_map_dfr( seq(n_reps), function(i){
 
@@ -118,40 +115,47 @@ res = future_map_dfr( seq(n_reps), function(i){
   values = m
   if(i < n_reps*0.9) values = 0
 
-  map_df( values, function(n_positive){
+  map_df( seq(2, m.max), function(m){
 
-    if(n_positive == 0){
-      beta = matrix(0, p,m)
-    }else{    
-      beta = matrnorm(p,m)/3
-      beta[p,] = 1
-      # set to zero
-      # beta[p,] = 0
-      # beta[p,sample.int(m, n_positive)] = 1
-    }
+    # Error variance
+    error_var = matrix(runif(n*m, 1, 100), n, m)
 
-    # linear predictor with no noise
-    Eta = X %*% beta
-    colnames(Eta) = paste0("gene_", 1:m)
-    rownames(Eta) = paste0("sample_", 1:n)
+    map_df( values, function(n_positive){
 
-    # Observe data with error
-    Y = Eta + Epsilon
+      if(n_positive == 0){
+        beta = matrix(0, p,m)
+      }else{    
+        beta = matrnorm(p,m)/3
+        beta[p,] = 1
+        # set to zero
+        # beta[p,] = 0
+        # beta[p,sample.int(m, n_positive)] = 1
+      }
 
-    # Create EList object
-    vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
+      # linear predictor with no noise
+      Eta = X %*% beta
+      colnames(Eta) = paste0("gene_", 1:m)
+      rownames(Eta) = paste0("sample_", 1:n)
 
-    # run dream
-    suppressMessages(fit <- dream(vobj, form, data=Xdf))
-    fit = eBayes(fit)
-    
-    res = map_df(methods, function(method){
-      mvTest(fit, vobj, rownames(fit), coef="V2", method)
+      # Observe data with error
+      Y = Eta + Epsilon
+
+      # Create EList object
+      vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
+
+      # run dream
+      suppressMessages(fit <- dream(vobj, form, data=Xdf))
+      fit = eBayes(fit)
+      
+      res = map_df(methods, function(method){
+        mvTest(fit, vobj, rownames(fit), coef="V2", method)
+      })
+
+      res$i = i
+      res$n_positive = n_positive
+      res$m = m
+      res
     })
-
-    res$i = i
-    res$n_positive = n_positive
-    res
   })
 },.options = furrr_options(seed=TRUE))
 ```
