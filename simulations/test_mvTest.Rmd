@@ -159,11 +159,12 @@ res = future_map_dfr( seq(n_reps), function(i){
 
 
 ```{r FPR, fig.height=5, fig.width=10, cache=FALSE}
-res %>%
+df = res %>%
   filter(n_positive==0) %>%
   group_by(method, n_features) %>%
-  summarize( FPR = sum(pvalue < 0.05) / length(pvalue)) %>%
-ggplot(aes(method, FPR, fill=method)) +
+  summarize( FPR = sum(pvalue < 0.05) / length(pvalue))
+
+ggplot(df, aes(method, FPR, fill=method)) +
   geom_bar(stat="identity") +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
@@ -172,6 +173,21 @@ ggplot(aes(method, FPR, fill=method)) +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
   facet_wrap(~ n_features)
 ```
+
+
+```{r plot.FPR, fig.width=6, fig.height=5}
+ggplot(df, aes(n_positive, FPR, color=method)) +
+  geom_line(size=1) + 
+  geom_hline(yintercept=0.1, linetype="dashed") +
+  theme_classic() +
+  theme(aspect.ratio=1) +
+  scale_color_brewer(palette = "Set1") +
+  scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
+  xlab("Number of responses")
+```
+
+
+
 
 
 ```{r AUPR, fig.height=5, fig.width=10, cache=FALSE}
