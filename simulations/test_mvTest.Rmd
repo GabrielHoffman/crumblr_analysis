@@ -86,7 +86,7 @@ sim_error = function(m, rho_error, error_var){
 plan(multisession, workers = 20)
 set.seed(12)
 
-n = 100 # samples
+n = 200 # samples
 p = 2 # features
 m.max = 10 # responses
 rho = 0 # correlation between covariates
@@ -124,7 +124,7 @@ res = future_map_dfr( seq(n_reps), function(i){
         beta = matrix(0, p,m)
       }else{    
         beta = matrnorm(p,m)/3
-        beta[p,] = 1
+        beta[p,] = .5
         # set to zero
         # beta[p,] = 0
         # beta[p,sample.int(m, n_positive)] = 1
