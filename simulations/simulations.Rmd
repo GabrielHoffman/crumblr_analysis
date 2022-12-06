@@ -290,7 +290,7 @@ beta.true = 0.1
 n_batches = floor(n_samples/2)
 var.batch = 0#.20
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-methods = c( "lm", "poisson") 
+methods = c( "lm", "poisson", "scoda") 
        
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=5)  
 ```
