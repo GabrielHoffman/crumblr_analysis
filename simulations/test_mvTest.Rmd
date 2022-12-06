@@ -175,8 +175,7 @@ ggplot(df, aes(method, FPR, fill=method)) +
   geom_hline(yintercept=0.05, linetype="dashed") +
   scale_fill_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
-  facet_wrap(~ n_features) +
-  scale_x_continuous()
+  facet_wrap(~ n_features) 
 ```
 
 
@@ -189,7 +188,7 @@ ggplot(df, aes(n_features, FPR, color=method)) +
   theme(aspect.ratio=1) +
   scale_color_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
-  xlab("Number of responses")
+  scale_x_continuous("Number of responses", breaks=seq(2, 12, by=2))
 ```
 
 
@@ -230,7 +229,7 @@ ggplot(df, aes(n_positive, AUPR, color=method)) +
   theme(aspect.ratio=1) +
   scale_color_brewer(palette = "Set1") +
   scale_y_continuous(limits=c(0, 1), expand=c(0,0)) +
-  xlab("Number of responses")
+  scale_x_continuous("Number of responses", breaks=seq(2, 12, by=2))
 ```
 
 
