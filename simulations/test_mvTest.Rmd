@@ -91,7 +91,7 @@ p = 2 # features
 m.max = 10 # responses
 rho = 0 # correlation between covariates
 rho_error = .5 # error correlation between responses
-n_reps = 1e3
+n_reps = 5e3
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
