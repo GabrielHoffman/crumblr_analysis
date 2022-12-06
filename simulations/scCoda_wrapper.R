@@ -33,6 +33,8 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 	})
 	res = df[[2]]
 
+	browser()
+	
 	dsgn = model.matrix(formula, info)
 
 	# add variable and response names
