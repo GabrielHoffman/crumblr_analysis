@@ -5,10 +5,10 @@
 
 library(reticulate)
 
-# Import library
-scoda = import("sccoda")
-scoda.utils = import("sccoda.util.cell_composition_data")
-scoda.analysis = import("sccoda.util.comp_ana")
+# # Import library
+# scoda = import("sccoda")
+# scoda.utils = import("sccoda.util.cell_composition_data")
+# scoda.analysis = import("sccoda.util.comp_ana")
 
 sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/python3'){
 
