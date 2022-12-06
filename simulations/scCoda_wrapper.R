@@ -17,7 +17,7 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 		scoda.analysis = import("sccoda.util.comp_ana")
 
 		# combine counts and metadata
-		df = cbind(counts, info)
+		df = cbind(counts, info[,all.vars(formula)])
 
 		# Create combine dataset
 		data = scoda.utils$from_pandas( r_to_py(as.data.frame(df)), r_to_py(array(all.vars(formula))))
@@ -33,8 +33,6 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 	})
 	res = df[[2]]
 
-	browser()
-	
 	dsgn = model.matrix(formula, info)
 
 	# add variable and response names
