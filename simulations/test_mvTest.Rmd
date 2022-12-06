@@ -90,7 +90,7 @@ n = 200 # samples
 p = 2 # features
 m.max = 10 # responses
 rho = 0 # correlation between covariates
-rho_error = .5 # error correlation between responses
+rho_error = .8 # error correlation between responses
 n_reps = 5e3
 
 Sigma = matrix(rho, p,p)
@@ -164,7 +164,9 @@ res = future_map_dfr( seq(n_reps), function(i){
 df = res %>%
   filter(n_positive==0) %>%
   group_by(method, n_features) %>%
-  summarize( FPR = sum(pvalue < 0.05) / length(pvalue))
+  summarize( count = sum(pvalue < 0.05), total=length(pvalue)) %>%
+  mutate(FPR = count / total) %>%
+  mutate( se = sqrt(FPR*(1-FPR)/ total))
 
 ggplot(df, aes(method, FPR, fill=method)) +
   geom_bar(stat="identity") +
