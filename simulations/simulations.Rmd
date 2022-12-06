@@ -411,6 +411,38 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), AUPR, fill=method)) +
 
 
 
+# Sample size
+```{r increase.clusters}
+n_sims = 1000
+mean_counts = 3000
+beta.true = .06
+n_clusters = 5 
+n_batches = floor(n_samples/2)
+var.batch = 0#0.01
+tau = 1
+ 
+df_res = lapply(c(20, 50, 100, 200), function(n_samples){
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau) 
+})
+df_res = do.call(rbind, df_res)
+```
+
+```{r plot.increase.clusters, cache=FALSE}
+CT = "CT_1"
+# AUPR
+aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), AUPR, fill=method)) +
+	geom_bar(stat="identity", position = "dodge") +
+	theme_classic() +
+	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+	 ggtitle("AUPR") + 
+	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
+	 xlab("Number of samples")
+```
+
+
+
 
 
 
