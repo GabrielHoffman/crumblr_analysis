@@ -8,8 +8,8 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 
 	stopifnot( is(formula, "formula") )
 
-	info = info[,all.vars(formula)]
-	
+	info = info[,all.vars(formula),drop=FALSE]
+
 	use_python(python_path)
 
 	tmp = py_capture_output({
