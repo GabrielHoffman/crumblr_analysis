@@ -126,7 +126,7 @@ res = future_map_dfr( seq(n_reps), function(i){
         beta = matrix(0, p,m)
       }else{    
         beta = matrnorm(p,m)/3
-        beta[p,] = .6
+        beta[p,] = .8
         # set to zero
         # beta[p,] = 0
         # beta[p,sample.int(m, n_positive)] = 1
