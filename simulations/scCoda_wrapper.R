@@ -3,21 +3,22 @@
 #
 # R wrapper for scCoda
 
+library(reticulate)
+use_python(python_path)
+
+# Import library
+scoda = import("sccoda")
+scoda.utils = import("sccoda.util.cell_composition_data")
+scoda.analysis = import("sccoda.util.comp_ana")
+
 sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/python3'){
-	library(reticulate)
 
 	stopifnot( is(formula, "formula") )
 
 	info = info[,all.vars(formula),drop=FALSE]
 
-	use_python(python_path)
-
 	tmp = py_capture_output({
-		# Import library
-		scoda = import("sccoda")
-		scoda.utils = import("sccoda.util.cell_composition_data")
-		scoda.analysis = import("sccoda.util.comp_ana")
-
+		
 		# combine counts and metadata
 		df = cbind(counts, info)
 
@@ -28,12 +29,13 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 		init = scoda.analysis$CompositionalAnalysis(data, as.character(formula)[2], colnames(counts)[1])
 
 		# Run MCMC
-		fit.mcmc = init$sample_hmc(as.integer(20000), as.integer(5000), verbose=FALSE)
+		fit.mcmc = init$sample_hmc(as.integer(2000), as.integer(500), verbose=FALSE)
 
 		# Extract results
 		df = fit.mcmc$summary_prepare()	
 	})
 	res = df[[2]]
+	rm(fit.mcmc)
 
 	dsgn = model.matrix(formula, info)
 
