@@ -412,7 +412,7 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), AUPR, fill=method)) +
 
 
 # Sample size
-```{r increase.clusters}
+```{r increase.samples}
 n_sims = 1000
 mean_counts = 3000
 beta.true = .06
@@ -427,7 +427,7 @@ df_res = lapply(c(20, 50, 100, 200), function(n_samples){
 df_res = do.call(rbind, df_res)
 ```
 
-```{r plot.increase.clusters, cache=FALSE}
+```{r plot.increase.samples, cache=FALSE}
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
