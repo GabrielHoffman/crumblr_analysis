@@ -80,6 +80,7 @@ sim_error = function(m, rho_error, error_var){
 }
 ```
 
+Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8 shared across responses, heteroskedastic mearsurement error, and an error correlation between response variables of 0.8. 
 
 # Multivariate hypothesis testing
 ```{r mvTest1}
@@ -182,7 +183,7 @@ ggplot(df, aes(method, FPR, fill=method)) +
 ```{r plot.FPR, fig.width=6, fig.height=5, cache=FALSE}
 ggplot(df, aes(n_features, FPR, color=method)) +
   geom_line(size=1) + 
-  geom_errorbar(aes(ymin=FPR-1.96*se, ymax=FPR+1.96*se)) +
+  geom_errorbar(aes(ymin=FPR-1.96*se, ymax=FPR+1.96*se), width=0) +
   geom_hline(yintercept=0.05, linetype="dashed") +
   theme_classic() +
   theme(aspect.ratio=1) +
