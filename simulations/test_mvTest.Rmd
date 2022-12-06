@@ -90,7 +90,7 @@ n = 200 # samples
 p = 2 # features
 m.max = 12 # responses
 rho = 0 # correlation between covariates
-rho_error = .8∂ # error correlation between responses
+rho_error = .8 # error correlation between responses
 n_reps = 1e4
 
 Sigma = matrix(rho, p,p)
@@ -175,7 +175,8 @@ ggplot(df, aes(method, FPR, fill=method)) +
   geom_hline(yintercept=0.05, linetype="dashed") +
   scale_fill_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
-  facet_wrap(~ n_features)
+  facet_wrap(~ n_features) +
+  scale_x_continuous()
 ```
 
 
