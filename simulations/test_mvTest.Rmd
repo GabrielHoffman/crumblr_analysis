@@ -113,7 +113,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 
     # Error variance
     error_var = matrix(runif(n*m, 1, 100), n, m)
-    error_var[] = 1
+    # error_var[] = 1
 
     Epsilon = sim_error(m, rho_error, error_var)
 
