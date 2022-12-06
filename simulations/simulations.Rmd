@@ -64,6 +64,7 @@ library(cowplot)
 library(HMP)
 library(gtools)
 
+library(reticulate)
 python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python"
 use_python(python_path)
 scoda = import("sccoda")
