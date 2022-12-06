@@ -181,7 +181,7 @@ ggplot(df, aes(method, FPR, fill=method)) +
 
 
 ```{r plot.FPR, fig.width=6, fig.height=5, cache=FALSE}
-ggplot(df, aes(n_features, FPR, color=method)) +
+fig_FPR = ggplot(df, aes(n_features, FPR, color=method)) +
   geom_line(size=1) + 
   geom_point() +
   # geom_errorbar(aes(ymin=FPR-1.96*se, ymax=FPR+1.96*se), width=0) +
@@ -224,7 +224,7 @@ ggplot(df, aes(method, AUPR, fill=method)) +
 ```
 
 ```{r plot.lines, fig.width=6, fig.height=5, cache=FALSE}
-ggplot(df, aes(n_positive, AUPR, color=method)) +
+fig_AUPR = ggplot(df, aes(n_positive, AUPR, color=method)) +
   geom_line(size=1) + 
   geom_point() +
   geom_hline(yintercept=0.1, linetype="dashed") +
@@ -235,6 +235,9 @@ ggplot(df, aes(n_positive, AUPR, color=method)) +
   scale_x_continuous("Number of responses", breaks=seq(2, 12, by=2))
 ```
 
+```{r combine, fig.height=4, fig.width=7}
+plot_grid(fig_AUPR, fig_FPR)
+```
 
 
 
