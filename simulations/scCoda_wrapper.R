@@ -42,7 +42,7 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 	res$response = rep(colnames(counts), length(colnames(dsgn)[-1]))
 
 	res
-# }
+}
 
 # library(variancePartition)
 # data(varPartDEdata)
