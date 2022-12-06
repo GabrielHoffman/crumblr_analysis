@@ -165,8 +165,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		if( use.sccoda){
 			res = sccoda_wrapper(counts, X, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
 
-			browser()
-
 			df_p$scCoda = 1 - res[res$variable == "trait",'Inclusion probability']
 		}
 
