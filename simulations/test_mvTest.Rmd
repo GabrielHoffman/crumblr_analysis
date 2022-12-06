@@ -90,7 +90,7 @@ n = 200 # samples
 p = 2 # features
 m.max = 10 # responses
 rho = 0 # correlation between covariates
-rho_error = .8 # error correlation between responses
+rho_error = .4 # error correlation between responses
 n_reps = 5e3
 
 Sigma = matrix(rho, p,p)
