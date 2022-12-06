@@ -31,7 +31,7 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 	})
 	res = df[[2]]
 
-	dsgn = model.matrix(formula, X)
+	dsgn = model.matrix(formula, info)
 
 	# add variable and response names
 	res$variable = unlist(lapply(colnames(dsgn)[-1], function(x) rep(x,ncol(counts))))
