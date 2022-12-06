@@ -279,7 +279,7 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 	df_res
 }
   
-n_samples = 100
+n_samples = 20
 n_clusters = 5
 mean_counts = 1000
 n_sims = 1000
