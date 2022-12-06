@@ -8,6 +8,8 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 
 	stopifnot( is(formula, "formula") )
 
+	info = info[,all.vars(formula)]
+	
 	use_python(python_path)
 
 	tmp = py_capture_output({
@@ -17,7 +19,7 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 		scoda.analysis = import("sccoda.util.comp_ana")
 
 		# combine counts and metadata
-		df = cbind(counts, info[,all.vars(formula)])
+		df = cbind(counts, info)
 
 		# Create combine dataset
 		data = scoda.utils$from_pandas( r_to_py(as.data.frame(df)), r_to_py(array(all.vars(formula))))
