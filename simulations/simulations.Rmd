@@ -228,6 +228,8 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 				score0 = -log10(df$p.value[!isZero])
 				score1 = -log10(df$p.value[isZero])
 
+				score0 = rnorm(length(score0), 0, 1e-6)
+
 				pr = pr.curve(score0, score1, curve=TRUE, rand.compute=TRUE)
 				roc = roc.curve(score0, score1, curve=TRUE, rand.compute=TRUE)
 
