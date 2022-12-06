@@ -98,7 +98,7 @@ rmultinomdir = function(n, size, alpha){
 	t(res)
 } 
 
-run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE){
+run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
 	# each batch is observed at last twice
 	X = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
@@ -200,7 +200,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
 
 		df
-	}, mc.cores=20)
+	}, mc.cores=mc.cores)
 	df_res = do.call(rbind, df_res)
 	
 	# small offset to fix error if p-value is exactly zero
@@ -254,20 +254,20 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 Linear mixed model matters when batch effect is small so rdf.merMod < rdf.fixed. rdf is most different for small sample size
 
 ```{r run_simulations, cache=TRUE}
-run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda){
+run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda, mc.cores){
 
 	RNGkind("L'Ecuyer-CMRG")
 
 	set.seed(1)
 	formula = ~ trait
-	res_none = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda)
+	res_none = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda, mc.cores)
 	res_none$Status = "none"
 
 	return(res_none)
 
 	set.seed(1)
 	formula = ~ trait + Batch
-	res_fixed = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda)
+	res_fixed = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda, mc.cores)
 	res_fixed$Status = "fixed"
 	  
 	df_res = rbind(res_none, res_fixed)
@@ -277,7 +277,7 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 	   
 	set.seed(1)
 	formula = ~ trait + (1|Batch)
-	res_random = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau)
+	res_random = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, FALSE, mc.cores)
 	res_random$Status = "random"
 
 	df_res = rbind(df_res, res_random)
@@ -291,14 +291,14 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 n_samples = 20
 n_clusters = 5
 mean_counts = 1000
-n_sims = 1000
+n_sims = 100
 beta.true = 0.1
 n_batches = floor(n_samples/2)
 var.batch = 0#.20
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
 methods = c( "lm", "poisson") 
        
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=5, use.sccoda=TRUE)  
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=5, use.sccoda=TRUE, mc.cores=1)  
 ```
 
 
@@ -320,7 +320,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 n_samples = 100
 n_clusters = 5
 mean_counts_max = 5000
-n_sims = 100
+n_sims = 1000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0#0.2 
