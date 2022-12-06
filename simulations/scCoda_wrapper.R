@@ -6,6 +6,8 @@
 sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/python3'){
 	library(reticulate)
 
+	stopifnot( is.formula(formula))
+
 	use_python(python_path)
 
 	tmp = py_capture_output({
