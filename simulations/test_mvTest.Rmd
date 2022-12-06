@@ -183,7 +183,7 @@ ggplot(df, aes(method, FPR, fill=method)) +
 ```{r plot.FPR, fig.width=6, fig.height=5, cache=FALSE}
 ggplot(df, aes(n_features, FPR, color=method)) +
   geom_line(size=1) + 
-  geom_errorbar(aes(ymin=FPR-1.96*se, ymax=FPR+1.96*se), width=0) +
+  # geom_errorbar(aes(ymin=FPR-1.96*se, ymax=FPR+1.96*se), width=0) +
   geom_hline(yintercept=0.05, linetype="dashed") +
   theme_classic() +
   theme(aspect.ratio=1) +
