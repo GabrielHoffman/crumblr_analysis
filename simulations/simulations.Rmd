@@ -68,6 +68,8 @@ source("scCoda_wrapper.R")
 source("cellTypeCompositionTest.R")
 
 python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python"
+
+use_python(python_path)
 ```
 
 # Simulations
@@ -134,7 +136,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 			a0 = (1-rhoSq) / rhoSq
 			alpha = probs*a0
 		}
-
+ 
 		# Multinomial-Dirichlet
 		counts = lapply( 1:length(totalCounts), function(i){
 			Dirichlet.multinomial(totalCounts[i], alpha[i,]) 

@@ -4,7 +4,6 @@
 # R wrapper for scCoda
 
 library(reticulate)
-use_python(python_path)
 
 # Import library
 scoda = import("sccoda")
