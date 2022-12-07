@@ -296,10 +296,10 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 }
    
 n_samples = 100
-n_clusters = 5
-mean_counts = 1000
+n_clusters = 12
+mean_counts = 2000
 n_sims = 1000
-beta.true = 0.02
+beta.true = 0.1
 n_batches = floor(n_samples/2)
 var.batch = 0#.20
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
