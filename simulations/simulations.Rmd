@@ -298,7 +298,9 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 
 	df_res
 }
-   
+
+knitr::knit_exit()  
+ 
 n_samples = 100
 n_clusters = 12
 mean_counts = 2000
