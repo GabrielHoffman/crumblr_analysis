@@ -295,17 +295,17 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 	df_res
 }
    
-n_samples = 20
+n_samples = 100
 n_clusters = 5
 mean_counts = 1000
 n_sims = 1000
-beta.true = 0.1
+beta.true = 0.02
 n_batches = floor(n_samples/2)
 var.batch = 0#.20
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
 methods = c( "lm", "poisson") 
        
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=5, use.sccoda=TRUE, mc.cores=1)  
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=5, use.sccoda=FALSE, mc.cores=12)  
 ```
 
 
