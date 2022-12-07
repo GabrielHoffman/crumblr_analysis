@@ -236,7 +236,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 				score1 = -log10(df$p.value[isZero])
 
 				if( method == "scCoda") score0 = rnorm(length(score0), 0, 1e-6)
-
+				browser()
 				pr = pr.curve(score0, score1, curve=TRUE, rand.compute=TRUE)
 				roc = roc.curve(score0, score1, curve=TRUE, rand.compute=TRUE)
 
@@ -302,7 +302,7 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 n_samples = 100
 n_clusters = 12
 mean_counts = 2000
-n_sims = 1000
+n_sims = 50
 beta.true = 0.25
 n_batches = floor(n_samples/2)
 var.batch = 0#.20
