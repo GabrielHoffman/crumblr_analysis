@@ -28,7 +28,7 @@ sccoda_wrapper = function(counts, info, formula, python_path='/usr/local/bin/pyt
 		init = scoda.analysis$CompositionalAnalysis(data, as.character(formula)[2], colnames(counts)[1])
 
 		# Run MCMC
-		fit.mcmc = init$sample_hmc(as.integer(20000), as.integer(5000), verbose=FALSE)
+		fit.mcmc = init$sample_hmc(as.integer(200), as.integer(50), verbose=FALSE)
 
 		# Extract results
 		df = fit.mcmc$summary_prepare()	
