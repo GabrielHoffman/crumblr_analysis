@@ -168,10 +168,13 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 			"crumblr" = tab.crumblr$P.Value, check.names=FALSE)
 
 		if( use.sccoda){
-			browser()
 			res = sccoda_wrapper(counts, X, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
 
-			df_p$scCoda = 1 - res[res$variable == "trait",'Inclusion probability'] 
+			res$score = 1 - res[,'Inclusion probability']  
+
+			df_p = merge(df_p, res[res$variable == "trait",c('score','response')], by.x="assay", by.y="response") 
+			rownames(df_p) = df_p$assay
+			df_p = df_p[rownames(tab_clr),]
 		}
 
 		df_methods = lapply( methods, function(method){
