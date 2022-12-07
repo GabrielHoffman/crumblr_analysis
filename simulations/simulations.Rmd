@@ -305,7 +305,7 @@ var.batch = 0#.20
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
 methods = c( "lm", "poisson") 
        
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=5, use.sccoda=FALSE, mc.cores=12)  
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2, use.sccoda=FALSE, mc.cores=1)  
 ```
 
 
