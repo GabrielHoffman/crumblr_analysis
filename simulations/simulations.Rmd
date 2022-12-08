@@ -236,7 +236,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 				score1 = -log10(df$p.value[isZero])
 
 				if( method == "scCoda") score0 = rnorm(length(score0), 0, 1e-6)
-				browser()
 				pr = pr.curve(score0, score1, curve=TRUE, rand.compute=TRUE)
 				roc = roc.curve(score0, score1, curve=TRUE, rand.compute=TRUE)
 
@@ -300,7 +299,7 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 }
 
 knitr::knit_exit()  
- 
+
 n_samples = 100
 n_clusters = 12
 mean_counts = 2000
