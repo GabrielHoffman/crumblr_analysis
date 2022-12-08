@@ -301,7 +301,7 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 n_samples = 100
 n_clusters = 12
 mean_counts = 2000
-n_sims = 500
+n_sims = 500 
 beta.true = 0.25
 n_batches = floor(n_samples/2)
 var.batch = 0#.20
@@ -324,6 +324,10 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Sta
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
+
+remove scCoda from FPR, add FDR panel
+
+
 
 # Increasing number of cells
 ```{r increase.cells}
