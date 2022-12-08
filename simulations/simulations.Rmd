@@ -296,9 +296,7 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 	df_res$Status = factor(df_res$Status, c("none", "fixed", "random"))
 
 	df_res
-}
-
-knitr::knit_exit()  
+} 
 
 n_samples = 100
 n_clusters = 12
