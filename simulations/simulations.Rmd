@@ -170,9 +170,9 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		if( use.sccoda){
 			res = sccoda_wrapper(counts, X, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
 
-			res$score = 1 - res[,'Inclusion probability']  
+			res$scCoda = 1 - res[,'Inclusion probability']  
 
-			df_p = merge(df_p, res[res$variable == "trait",c('score','response')], by.x="assay", by.y="response") 
+			df_p = merge(df_p, res[res$variable == "trait",c('scCoda','response')], by.x="assay", by.y="response") 
 			rownames(df_p) = df_p$assay
 			df_p = df_p[rownames(tab_clr),]
 		}
