@@ -476,62 +476,6 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), AUPR, fill=method)) +
 
 
 
-
-
-
-```{r exit2, cache=FALSE, eval=TRUE}
-knitr::knit_exit()
-```
-
-```{r plot.sims_ct, cache=FALSE, fig.height=12, fig.width=10}
-
-figList = lapply( unique(df_res$assay), function(CT){
-
-	# AUPR
-	aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-	fig1 = ggplot(df_res[df_res$assay == CT,], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey")
-
-	# FPR
-	ymax = max(max(df_res$FPR), .1)
-	fig2 = ggplot(df_res[df_res$assay == CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate")
-
-	plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
-})
-
-plot_grid(plotlist=figList, ncol=1)
-```
-
-
-# Test multiple settings
-```{r sim2}
-
-n_samples = 50
-n_clusters = 5
-# mean_counts = 300
-n_sims = 1000     
-beta.true = .06
-n_batches = floor(n_samples/2)
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-# methods = c( "lm", "lmlog") 
-  
-df_res2 = lapply(c(20, 50, 100, 300, 1000), function(mean_counts){  
-	df = lapply(c( 0, .1, .25, .5), function(var.batch){  
-		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2)  
-	})
-	do.call(rbind, df)
-})
-df_res2 = do.call(rbind, df_res2)
-```
-
-```{r sim2.plots, fig.height=12, fig.width=10, cache=FALSE}
-aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
-
-ymax = max(max(df_res2$FPR), .1)
-ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
-```
-
-
 # Method times
 ```{r times}
 RhpcBLASctl::omp_set_num_threads(1)
@@ -628,6 +572,62 @@ sessionInfo()
 
 
 
+
+
+
+
+
+```{r exit2, cache=FALSE, eval=TRUE}
+knitr::knit_exit()
+```
+
+```{r plot.sims_ct, cache=FALSE, fig.height=12, fig.width=10}
+
+figList = lapply( unique(df_res$assay), function(CT){
+
+	# AUPR
+	aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+	fig1 = ggplot(df_res[df_res$assay == CT,], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey")
+
+	# FPR
+	ymax = max(max(df_res$FPR), .1)
+	fig2 = ggplot(df_res[df_res$assay == CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate")
+
+	plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+})
+
+plot_grid(plotlist=figList, ncol=1)
+```
+
+
+# Test multiple settings
+```{r sim2}
+
+n_samples = 50
+n_clusters = 5
+# mean_counts = 300
+n_sims = 1000     
+beta.true = .06
+n_batches = floor(n_samples/2)
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+# methods = c( "lm", "lmlog") 
+  
+df_res2 = lapply(c(20, 50, 100, 300, 1000), function(mean_counts){  
+	df = lapply(c( 0, .1, .25, .5), function(var.batch){  
+		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2)  
+	})
+	do.call(rbind, df)
+})
+df_res2 = do.call(rbind, df_res2)
+```
+
+```{r sim2.plots, fig.height=12, fig.width=10, cache=FALSE}
+aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
+
+ymax = max(max(df_res2$FPR), .1)
+ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
+```
 
 
 
