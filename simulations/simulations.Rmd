@@ -512,7 +512,7 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), FPR, fill=method
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 0.1)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 ggtitle("AUPR") + 
-	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") + +
+	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") + 
 	 xlab("Number of samples")
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
