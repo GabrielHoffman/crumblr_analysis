@@ -351,7 +351,7 @@ df_res = lapply(c(100, 500,seq(1000, mean_counts_max, by=1000)), function(mean_c
 df_res = do.call(rbind, df_res)
 ```
 
-```{r plot.increasing, cache=FALSE}
+```{r plot.increasing, cache=FALSE, fig.width=9, fig.height=5}
 CT = "CT_1"
 
 # AUPR
