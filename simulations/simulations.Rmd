@@ -567,7 +567,7 @@ ggplot(df_time, aes(Method, pmax(2, Time) / 60, fill=Method)) +
 	geom_bar(stat="identity") +
 	theme_classic() +
 	theme(aspect.ratio=1, legend.position="none") +
-	scale_y_continuous(limits=c(NA, NA), expand=c(0,0), name="Time (minutes)") +
+	scale_y_continuous(limits=c(NA, NA), expand=c(0,0), name="Run time (minutes)") +
 	coord_flip()
 ```
 
