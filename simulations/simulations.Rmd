@@ -372,7 +372,7 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), FPR, fill=meth
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 0.1)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
-	 xlab("False positive rate")
+	 xlab("Mean counts per sample")
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -414,7 +414,7 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), FPR, fill=method)) +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 0.1)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
-	 xlab("False positive rate")
+	 xlab("Overdispersion (tau)")
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -457,7 +457,8 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), FPR, fill=metho
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 0.1)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
-	 xlab("Number of samples")
+	 xlab("Number of components")
+
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
