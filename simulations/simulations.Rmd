@@ -531,6 +531,94 @@ ymax = max(max(df_res2$FPR), .1)
 ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
 ```
 
+
+# Method times
+```{r times}
+RhpcBLASctl::omp_set_num_threads(1)
+
+# each batch is observed at last twice
+X = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
+rownames(X) = paste0("sample_", 1:nrow(X))
+
+value = beta.true
+beta = data.frame(mu = rep(0, n_clusters), b = c(0, value, rep(0, n_clusters-2)))
+a = n_clusters 
+b = nlevels(X$Batch)-1
+v = rgamma(1, var.batch, 1)
+beta_batch = matrix(rnorm(a*b, sd=sqrt(v)), a, b)
+beta = cbind(beta, beta_batch)
+
+eta = model.matrix(~., X) %*% t(beta)
+
+probs = exp(eta)
+
+totalCounts = rnegbin(nrow(probs), mu=mean_counts, theta = 3)
+
+if( tau == 1){
+	# large a0 corresponds to multinomial
+	alpha = probs * 1e9
+}else{
+	# convert tau overdispersion value to alpha from p
+	rhoSq = (tau - 1) / (mean(totalCounts)-1)
+	a0 = (1-rhoSq) / rhoSq
+	alpha = probs*a0
+}
+
+# Multinomial-Dirichlet
+counts = lapply( 1:length(totalCounts), function(i){
+	Dirichlet.multinomial(totalCounts[i], alpha[i,]) 
+})
+counts = do.call(rbind, counts)
+rownames(counts) = paste0("sample_", 1:nrow(counts))
+colnames(counts) = paste0("CT_", 1:ncol(counts))
+
+cellTypeFreq = rowMeans(apply(counts, 1, function(x) x/sum(x)))
+df_cellTypeFreq = data.frame(cellTypeFreq)
+
+formula = ~ trait + Batch
+
+df_time = data.frame()
+
+# CLR
+res = system.time({
+Y = t(as.data.frame(compositions::clr(counts)))
+fit_clr = suppressMessages(dream( Y, formula, X, BPPARAM=SerialParam(), useWeights=FALSE))
+fit_clr = eBayes(fit_clr)
+tab_clr = topTable(fit_clr, coef="trait", sort.by="none")
+})
+df_time = rbind(df_time, data.frame(Method = "CLR", Time = as.numeric(res[3])))
+
+
+
+# crumblr
+res = system.time({
+cobj = crumblr(counts)
+fit = suppressMessages(dream(cobj, formula, X, BPPARAM=SerialParam()))
+fit = eBayes(fit)
+tab.crumblr = topTable(fit, coef="trait", sort.by="none")
+})
+df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3])))
+
+# scCoda
+res = system.time({
+		a = sccoda_wrapper(counts, X, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
+})
+df_time = rbind(df_time, data.frame(Method = "scCoda", Time = as.numeric(res[3])))
+
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+df_time_multiple = lapply( methods, function(method){
+
+		res = system.time({
+			# keep only samples with at elast 10 reads
+			i = rowSums(counts) > 10
+			res = testComposition( counts[i,], formula, X[i,], coef="trait", eval="test", method = method)
+		})
+		data.frame(Method = method, Time = as.numeric(res[3]))
+})
+df_time = rbind(df_time, do.call(rbind, df_time_multiple))
+```
+
+
 # SessionInfo
 <details>
 ```{r session_info}
