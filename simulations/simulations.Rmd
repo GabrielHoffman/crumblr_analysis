@@ -399,11 +399,11 @@ df_res = lapply(c(1, 3, 6, 10), function(tau){
 df_res = do.call(rbind, df_res)
 ```
 
-```{r plot.increasing.tau, cache=FALSE}
+```{r plot.increasing.tau, cache=FALSE, fig.width=9, fig.height=5}
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
+fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
@@ -423,7 +423,6 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), FPR, fill=method)) +
 	 xlab("False positive rate")
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
-
 ```
 
 
@@ -446,7 +445,7 @@ df_res = lapply(c(5, 10, 20, 50), function(n_clusters){
 df_res = do.call(rbind, df_res)
 ```
 
-```{r plot.increase.clusters, cache=FALSE}
+```{r plot.increase.clusters, cache=FALSE, fig.width=9, fig.height=5}
 CT = "CT_1"
 
 # AUPR
@@ -462,7 +461,14 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), AUPR, fill=meth
 
 # FPR
 ymax = max(max(df_res$FPR), .1)
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate")
+fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), FPR, fill=method)) +
+	geom_bar(stat="identity", position = "dodge") +
+	theme_classic() +
+	scale_y_continuous(expand=c(0, 0), limits=c(0, 0.1)) +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+	 ggtitle("AUPR") + 
+	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
+	 xlab("Number of samples")
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -500,7 +506,14 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), AUPR, fill=metho
 
 # FPR
 ymax = max(max(df_res$FPR), .1)
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate")
+fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), FPR, fill=method)) +
+	geom_bar(stat="identity", position = "dodge") +
+	theme_classic() +
+	scale_y_continuous(expand=c(0, 0), limits=c(0, 0.1)) +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+	 ggtitle("AUPR") + 
+	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") + +
+	 xlab("Number of samples")
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
