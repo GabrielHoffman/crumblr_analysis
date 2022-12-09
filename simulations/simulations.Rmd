@@ -478,6 +478,7 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), AUPR, fill=method)) +
 
 # Method times
 ```{r times}
+n_samples = 200
 RhpcBLASctl::omp_set_num_threads(1)
 
 # each batch is observed at last twice
@@ -562,7 +563,7 @@ df_time_multiple = lapply( methods, function(method){
 df_time = rbind(df_time, do.call(rbind, df_time_multiple))
 ```
 
-```{r plot.time, fig.width=4, fig.height=4}
+```{r plot.time, fig.width=4, fig.height=4, cache=FALSE}
 ggplot(df_time, aes(Method, pmax(2, Time) / 60, fill=Method)) +
 	geom_bar(stat="identity") +
 	theme_classic() +
