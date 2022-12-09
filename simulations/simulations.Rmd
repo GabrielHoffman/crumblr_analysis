@@ -343,10 +343,7 @@ beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0#0.2 
 tau = 1
-# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-# methods = "lm"
- 
-# ceiling((mean_counts_max - 50) / 5)
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
        
 df_res = lapply(c(100, 500,seq(1000, mean_counts_max, by=1000)), function(mean_counts){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau) 
