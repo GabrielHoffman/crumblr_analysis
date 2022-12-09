@@ -325,6 +325,9 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Sta
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
+
+
+
 remove scCoda from FPR, add FDR panel
 Show FPR, FDR for each example
 
