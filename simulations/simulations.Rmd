@@ -562,6 +562,16 @@ df_time_multiple = lapply( methods, function(method){
 df_time = rbind(df_time, do.call(rbind, df_time_multiple))
 ```
 
+```{r plot.time, fig.width=4, fig.height=4}
+ggplot(df_time, aes(Method, pmax(2, Time) / 60, fill=Method)) +
+	geom_bar(stat="identity") +
+	theme_classic() +
+	theme(aspect.ratio=1, legend.position="none") +
+	scale_y_continuous(limits=c(NA, NA), expand=c(0,0), name="Time (minutes)") +
+	coord_flip()
+```
+
+
 
 # SessionInfo
 <details>
