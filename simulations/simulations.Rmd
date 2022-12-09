@@ -411,6 +411,19 @@ ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
 	 ggtitle("AUPR") + 
 	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
 	 xlab("Overdispersion (tau)")
+
+# FPR
+fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), FPR, fill=method)) +
+	geom_bar(stat="identity", position = "dodge") +
+	theme_classic() +
+	scale_y_continuous(expand=c(0, 0), limits=c(0, 0.1)) +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+	 ggtitle("AUPR") + 
+	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
+	 xlab("False positive rate")
+
+plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+
 ```
 
 
