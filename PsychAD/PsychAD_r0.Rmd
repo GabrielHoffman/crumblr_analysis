@@ -127,17 +127,18 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
 
 
 ## crumblr
-```{r crumblr, fig.height=9}
+```{r crumblr}
 cobj = crumblr(cellCounts(pb.subclass))
 
 form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD) + pH + PMI
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subclass))
 
-plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) 
+plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) + theme(aspect.ratio=1)
+```
 
+```{r plotPercentBars}
 fig.vp = plotPercentBars( sortCols(vp.c) )
-fig.vp
 
 # analysis with dream()
 form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD + pH + PMI
@@ -241,10 +242,11 @@ form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD) + pH + PMI
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subtype))
 
-plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) 
+plotVarPart(sortCols(vp.c), label.angle=60, ncol=4)  + theme(aspect.ratio=1)
+```
 
+```{r plotPercentBars.subtype}
 fig.vp = plotPercentBars( sortCols(vp.c) )
-fig.vp
 
 # analysis with dream()
 form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD + pH + PMI
