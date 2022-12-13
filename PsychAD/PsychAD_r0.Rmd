@@ -112,7 +112,7 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
 ```{r crumblr}
 cobj = crumblr(cellCounts(pb))
 
-form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + (1|AD)
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD)
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb))
 
@@ -122,7 +122,7 @@ fig.vp = plotPercentBars( sortCols(vp.c) )
 fig.vp
 
 # analysis with dream()
-form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + AD
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD
 fit = dream( cobj, form, colData(pb))
 fit = eBayes(fit)
 ```
