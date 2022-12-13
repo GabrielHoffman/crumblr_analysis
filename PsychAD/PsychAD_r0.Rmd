@@ -74,7 +74,7 @@ ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + 
 
 ```{r cca}
 form = ~ SubID + poolID + Sex + scale(Age) + AD
-C = canCorPairs(form, info )
+C = canCorPairs(form, colData(pb) )
 ggcorrplot(C, hc.order = TRUE)
 ```
 
@@ -131,11 +131,11 @@ fit = eBayes(fit)
 ```{r sd, fig.width=9}
 hc = buildClusterTreeFromPB(pb)
 
-res = treeTest( fit, cobj, hc, coef="diagnosisASD")
+res = treeTest( fit, cobj, hc, coef="AD")
 
 fig1 = plotTreeTest(res) + xlim(0, 9) + theme(legend.position="none")
 
-tab = topTable(fit, coef="diagnosisASD", number=Inf)
+tab = topTable(fit, coef="AD", number=Inf)
 
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
 tab$se = with(tab, logFC/t)
@@ -158,14 +158,14 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ## Correlation between coefficient estimates
 ```{r ggcorrplot}
 # get covariance matrix
-V = vcov(fit, cobj, coef="diagnosisASD")
+V = vcov(fit, cobj, coef="AD")
 
 # convert to correlation matrix
 V = cov2cor(V)
 
 # shorten names
-rownames(V) = gsub(":diagnosisASD", '', rownames(V))
-colnames(V) = gsub(":diagnosisASD", '', colnames(V))
+rownames(V) = gsub(":AD", '', rownames(V))
+colnames(V) = gsub(":AD", '', colnames(V))
 
 # sort to match tree
 i = match(rev(get_taxa_name(fig1)), rownames(V))
@@ -176,74 +176,6 @@ ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 
 
 
-
-
-
-
-```{r exit, cache=FALSE}
-knitr::knit_exit()
-```
-
-# Cell type composition
-```{r test.crumblr, fig.width=8}
-# Compute hierarchical clustering
-hcl = buildClusterTree(sce, "X_pca_regressed", "subtype")
-
-# Get cell counts
-counts = computeCellCounts(sce, "subtype", "Channel")
-
-idx = match( rownames(counts), sce$Channel)
-info = colData(sce)[idx,]
-rownames(info) = info$Channel
-
-cobj = crumblr(counts)
-```
-
-## Variance partitioning analysis
-```{r vp}
-form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + (1|AD)
-
-vp = fitExtractVarPartModel(cobj, form, info)
-
-plotVarPart(sortCols(vp)) + theme(aspect.ratio=1)
-```
-
-## Differential testing
-```{r diff.test}
-form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + AD
-
-fit = dream(cobj, form, info)
-fit = eBayes(fit)
-
-topTable(fit, coef='AD1', number=Inf) %>%   
-  select(logFC, AveExpr, t, P.Value, adj.P.Val) %>% 
-  kbl() %>%  
-  kable_classic(full_width = FALSE)
-
-
-## Differential testing using hierarchical clustering
-```{r tree.test, fig.width=9}
-res1 = treeTest( fit, cobj, hcl, coef="AD1", method="FE")
-fig.tree = plotTreeTest(res1) + xlim(0, 13) + ggtitle("FE")
-
-# plot of LogFC
-tab = topTable(fit, "AD1", number=Inf, sort.by="none")
-
-# sort based on tree
-df = data.frame(ID = rownames(tab), tab)
-df$se = with(df, logFC/ t)
-
-fig.logFC = ggplot(df, aes(ID, logFC)) +
-  geom_hline(yintercept=0, linetype="dashed", color="grey50") + 
-  geom_errorbar(aes(ymin=logFC - 1.96*se, ymax=logFC + 1.96*se), width=0) +
-  geom_point(color="dodgerblue") +
-  coord_flip() +
-  theme_classic() +
-  xlab('') +
-  theme(aspect.ratio=4, axis.text.y = element_blank())
-
-fig.logFC %>% insert_left(fig.tree)
-```
 
 # Session Info
 <details>
