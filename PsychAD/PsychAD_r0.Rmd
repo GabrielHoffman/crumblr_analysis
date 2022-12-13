@@ -92,12 +92,12 @@ fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 i = pb$AD == 0
 fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
-  theme(legend.position = "none", axis.text.y=element_blank(),
+  theme(legend.position = "none", axis.text.y=element_blank())
 
 i = pb$AD == 1
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
-  theme(legend.position = "none", axis.text.y=element_blank(),
+  theme(legend.position = "none", axis.text.y=element_blank())
 
 plot_grid(fig1, fig2, rel_widths=c(.75,1))
 ```
