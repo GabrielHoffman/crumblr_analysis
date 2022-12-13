@@ -88,6 +88,7 @@ ggcorrplot(C, hc.order = TRUE)
 # Plots of cell fractions
 ```{r fractions, fig.width=9}
 fracs = cellCounts(pb) / rowSums(cellCounts(pb))
+rownames(fracs) = c()
 
 i = pb$AD == 0
 fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions") + theme(legend.position = "none")
@@ -101,7 +102,7 @@ plot_grid(fig1, fig2, rel_widths=c(.75,1))
 ```{r plot.fracs}
 df = data.frame(fracs, diagnosis = pb$AD, check.names=FALSE)
 df = reshape2::melt(df, id.vars="diagnosis")
-
+ 
 ggplot(df, aes(diagnosis, value, fill=variable)) + 
   geom_violin() +
   geom_boxplot(fill="grey50", width=.1) + 
@@ -140,7 +141,7 @@ hc = buildClusterTreeFromPB(pb)
 
 res = treeTest( fit, cobj, hc, coef="AD1")
 
-fig1 = plotTreeTest(res) + xlim(0, 9) + theme(legend.position="none")
+fig1 = plotTreeTest(res) + xlim(0, 12) + theme(legend.position="none")
 
 tab = topTable(fit, coef="AD1", number=Inf)
 
