@@ -65,6 +65,7 @@ pb.subtype <- aggregateToPseudoBulk(sce,
 
 ```{r ph, cache=FALSE}
 pb.subclass$pH[is.na(pb.subclass$pH)] = mean(pb.subclass$pH, na.rm=TRUE)
+pb.subtype$pH[is.na(pb.subtype$pH)] = mean(pb.subtype$pH, na.rm=TRUE)
 ```
 
 Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table(sce$round_num))` rounds, `r length(table(sce$poolID))` 10X batches, `r length(table(sce$SubID))` donors, and `r format(ncol(sce), big.mark=',')` cells passing QC.
@@ -147,7 +148,7 @@ fit = eBayes(fit)
 
 
 ### Multivariate test along hierarchy
-```{r sd, fig.width=15, fig.height=9}
+```{r sd, fig.width=12, fig.height=7}
 hc = buildClusterTreeFromPB(pb.subclass)
 
 res = treeTest( fit, cobj, hc, coef="AD1")
@@ -254,7 +255,7 @@ fit = eBayes(fit)
 
 
 ### Multivariate test along hierarchy
-```{r sd.subtype, fig.width=9}
+```{r sd.subtype, fig.width=12, fig.height=7}
 hc = buildClusterTreeFromPB(pb.subtype)
 
 res = treeTest( fit, cobj, hc, coef="AD1")
