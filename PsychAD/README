@@ -1,5 +1,5 @@
 
-cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/PsychAD_r0
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/PsychAD
 ml python git
 git pull
 R --vanilla
@@ -8,7 +8,7 @@ R --vanilla
 system("git pull"); rmarkdown::render("PsychAD_r0.Rmd");
 
 
-# https://hoffmg01.hpc.mssm.edu/dreamlet_analysis/
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/
 
 # rm -rf PsychAD_r0_analysis_cache
 

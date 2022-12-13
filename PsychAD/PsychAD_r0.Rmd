@@ -40,10 +40,9 @@ library(scattermore)
 
 
 ```{r load.data}
-folder = "/sc/arion/projects/psychAD/NPS-AD/public_release_0/" 
-file = paste0(folder, "PsychAD_r0_Oct_06_2022.h5ad")
-sce = readH5AD(file, use_hdf5=TRUE, verbose=TRUE)
-assayNames(sce)[1] = "counts"
+ # Public freeze 0
+h5ad_file = "/sc/arion/projects/psychAD/NPS-AD/freeze2_rc/h5ad/221202_NPS-AD_public0_pass3_anno_clean.h5ad"
+sce = readH5AD(file, use_hdf5=TRUE, raw=TRUE, verbose=TRUE, uns=FALSE)
 
 # drop cells with annotation "Unknown"
 sce = sce[,sce$celltype != "Unknown"]
@@ -102,6 +101,8 @@ topTable(fit, coef='AD1', number=Inf) %>%
   kbl() %>%  
   kable_classic(full_width = FALSE)
 
+
+## Differential testing using hierarchical clustering
 ```{r tree.test, fig.width=9}
 res1 = treeTest( fit, cobj, hcl, coef="AD1", method="FE")
 fig.tree = plotTreeTest(res1) + xlim(0, 13) + ggtitle("FE")
