@@ -63,6 +63,10 @@ pb.subtype <- aggregateToPseudoBulk(sce,
     BPPARAM = SnowParam(6, progressbar=TRUE))
 ```
 
+```{r ph, cache=FALSE}
+pb.subclass$pH[is.na(pb.subclass$pH)] = mean(pb.subclass$pH, na.rm=TRUE)
+```
+
 Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table(sce$round_num))` rounds, `r length(table(sce$poolID))` 10X batches, `r length(table(sce$SubID))` donors, and `r format(ncol(sce), big.mark=',')` cells passing QC.
 
 
@@ -84,7 +88,7 @@ ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + 
 
 # Subclass
 ```{r cca}
-form = ~ SubID + poolID + Sex + scale(Age) + AD
+form = ~ SubID + poolID + Sex + scale(Age) + AD + pH + PMI
 C = canCorPairs(form, colData(pb.subclass) )
 ggcorrplot(C, hc.order = TRUE)
 ```
@@ -125,7 +129,7 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
 ```{r crumblr, fig.height=9}
 cobj = crumblr(cellCounts(pb.subclass))
 
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD)
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD) + pH + PMI
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subclass))
 
@@ -135,7 +139,7 @@ fig.vp = plotPercentBars( sortCols(vp.c) )
 fig.vp
 
 # analysis with dream()
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD + pH + PMI
 fit = dream( cobj, form, colData(pb.subclass))
 fit = eBayes(fit)
 ```
@@ -143,7 +147,7 @@ fit = eBayes(fit)
 
 
 ### Multivariate test along hierarchy
-```{r sd, fig.width=12, fig.height=9}
+```{r sd, fig.width=15, fig.height=9}
 hc = buildClusterTreeFromPB(pb.subclass)
 
 res = treeTest( fit, cobj, hc, coef="AD1")
@@ -191,7 +195,7 @@ ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 
 # Subtype
 ```{r cca.subtype}
-form = ~ SubID + poolID + Sex + scale(Age) + AD
+form = ~ SubID + poolID + Sex + scale(Age) + AD + pH + PMI
 C = canCorPairs(form, colData(pb.subtype) )
 ggcorrplot(C, hc.order = TRUE)
 ```
@@ -232,7 +236,7 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
 ```{r crumblr.subtype}
 cobj = crumblr(cellCounts(pb.subtype))
 
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD)
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD) + pH + PMI
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subtype))
 
@@ -242,7 +246,7 @@ fig.vp = plotPercentBars( sortCols(vp.c) )
 fig.vp
 
 # analysis with dream()
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD + pH + PMI
 fit = dream( cobj, form, colData(pb.subtype))
 fit = eBayes(fit)
 ```
