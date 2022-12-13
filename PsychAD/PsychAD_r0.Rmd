@@ -40,30 +40,149 @@ library(scattermore)
 
 
 ```{r load.data}
- # Public freeze 0
-h5ad_file = "/sc/arion/projects/psychAD/NPS-AD/freeze2_rc/h5ad/221202_NPS-AD_public0_pass3_anno_clean.h5ad"
-sce = readH5AD(file, use_hdf5=TRUE, raw=TRUE, verbose=TRUE, uns=FALSE)
+outfolder = "/sc/arion/projects/CommonMind/hoffman/NPS-AD/work/nps_ad/public_freeze_0_results/"
+datafile = paste0(outfolder, "sceCombine_pf0.RDS")
 
-# drop cells with annotation "Unknown"
-sce = sce[,sce$celltype != "Unknown"]
-colData(sce) = droplevels(colData(sce)) 
+sce = readRDS( datafile )
 
-# AD status as factor
-sce$AD = factor(sce$AD, 0:1)
+pb <- aggregateToPseudoBulk(sce,
+    assay = "counts",     
+    cluster_id = "subclass",  
+    sample_id = "Channel", 
+    BPPARAM = SnowParam(6, progressbar=TRUE))
 ```
 
-Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table(sce$round_num))` rounds, `r length(table(sce$batch))` 10X batches, `r length(table(sce$SubID))` donors, and `r format(ncol(sce), big.mark=',')` cells passing QC.
+Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table(sce$round_num))` rounds, `r length(table(sce$poolID))` 10X batches, `r length(table(sce$SubID))` donors, and `r format(ncol(sce), big.mark=',')` cells passing QC.
 
 
-```{r umap9, dev="png"}
+```{r umap.subclass}
 # extract UMAP coordinates and annotations
 df = cbind(reducedDim(sce, "X_umap"), 
-    colData(sce)[,c("anno", "celltype", "class", "subtype")]) %>% 
+    colData(sce)[,c("subclass", "subtype")]) %>% 
     as.data.frame
 
+ggplot(df, aes(V1, V2, color=subclass)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
+```
+
+```{r umap.subtype}
 ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
 ```
 
+
+
+
+
+```{r cca}
+form = ~ SubID + poolID + Sex + scale(Age) + AD
+C = canCorPairs(form, info )
+ggcorrplot(C, hc.order = TRUE)
+```
+
+# Plots of cell fractions
+```{r fractions, fig.width=9}
+fracs = cellCounts(pb) / rowSums(cellCounts(pb))
+
+i = info$AD == 0
+fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions") + theme(legend.position = "none")
+
+i = info$AD == 1
+fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
+
+plot_grid(fig1, fig2, rel_widths=c(.75,1))
+```
+
+```{r plot.fracs}
+df = data.frame(fracs, diagnosis = pb$AD, check.names=FALSE)
+df = reshape2::melt(df, id.vars="diagnosis")
+
+ggplot(df, aes(diagnosis, value, fill=variable)) + 
+  geom_violin() +
+  geom_boxplot(fill="grey50", width=.1) + 
+  facet_wrap(~ variable) +
+  theme_classic() +
+  theme(aspect.ratio=1, legend.position="none") +
+  ylab("Fraction")
+```
+
+
+
+# crumblr
+```{r crumblr}
+cobj = crumblr(cellCounts(pb))
+
+form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + (1|AD)
+
+vp.c = fitExtractVarPartModel(cobj, form, info)
+
+plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) 
+
+fig.vp = plotPercentBars( sortCols(vp.c) )
+fig.vp
+
+# analysis with dream()
+form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + AD
+fit = dream( cobj, form, info)
+fit = eBayes(fit)
+```
+
+
+
+## Multivariate test along hierarchy
+```{r sd, fig.width=9}
+hc = buildClusterTreeFromPB(pb)
+
+res = treeTest( fit, cobj, hc, coef="diagnosisASD")
+
+fig1 = plotTreeTest(res) + xlim(0, 9) + theme(legend.position="none")
+
+tab = topTable(fit, coef="diagnosisASD", number=Inf)
+
+tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
+tab$se = with(tab, logFC/t)
+
+fig2 = ggplot(tab, aes(celltype, logFC)) + 
+  geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
+  geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
+  geom_point(color="dodgerblue") +
+  theme_classic() +
+  coord_flip() +
+  xlab('') + 
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
+# combine plots
+fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
+```
+
+
+## Correlation between coefficient estimates
+```{r ggcorrplot}
+# get covariance matrix
+V = vcov(fit, cobj, coef="diagnosisASD")
+
+# convert to correlation matrix
+V = cov2cor(V)
+
+# shorten names
+rownames(V) = gsub(":diagnosisASD", '', rownames(V))
+colnames(V) = gsub(":diagnosisASD", '', colnames(V))
+
+# sort to match tree
+i = match(rev(get_taxa_name(fig1)), rownames(V))
+
+ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
+```
+
+
+
+
+
+
+
+
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
 
 # Cell type composition
 ```{r test.crumblr, fig.width=8}
