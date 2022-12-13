@@ -121,12 +121,14 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
   facet_wrap(~ variable) +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
-  ylab("Fraction")
+  ylab(bquote(Fraction~(log[10]))) +
+  scale_y_log10()
 ```
 
 
 
 ## crumblr
+### Variance partitioning analysis
 ```{r crumblr}
 cobj = crumblr(cellCounts(pb.subclass))
 
@@ -219,6 +221,9 @@ fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) +
 plot_grid(fig1, fig2, rel_widths=c(.75,1))
 ```
 
+
+
+
 ```{r plot.fracs.subtype, fig.width=8, fig.height=9}
 df = data.frame(fracs, diagnosis = pb.subtype$AD, check.names=FALSE)
 df = reshape2::melt(df, id.vars="diagnosis")
@@ -229,12 +234,17 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
   facet_wrap(~ variable) +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
-  ylab("Fraction")
+  ylab(bquote(Fraction~(log[10]))) +
+  scale_y_log10()
 ```
 
 
 
+
+
+
 ## crumblr
+### Variance partitioning analysis
 ```{r crumblr.subtype}
 cobj = crumblr(cellCounts(pb.subtype))
 
