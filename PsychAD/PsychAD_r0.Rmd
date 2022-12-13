@@ -83,10 +83,10 @@ ggcorrplot(C, hc.order = TRUE)
 ```{r fractions, fig.width=9}
 fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 
-i = info$AD == 0
+i = pb$AD == 0
 fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions") + theme(legend.position = "none")
 
-i = info$AD == 1
+i = pb$AD == 1
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
 
 plot_grid(fig1, fig2, rel_widths=c(.75,1))
@@ -113,7 +113,7 @@ cobj = crumblr(cellCounts(pb))
 
 form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + (1|AD)
 
-vp.c = fitExtractVarPartModel(cobj, form, info)
+vp.c = fitExtractVarPartModel(cobj, form, colData(pb))
 
 plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) 
 
@@ -122,7 +122,7 @@ fig.vp
 
 # analysis with dream()
 form = ~ (1|SubID) + (1|batch) + (1|Sex) + scale(Age) + AD
-fit = dream( cobj, form, info)
+fit = dream( cobj, form, colData(pb))
 fit = eBayes(fit)
 ```
 
