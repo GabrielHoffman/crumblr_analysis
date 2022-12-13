@@ -54,6 +54,10 @@ pb <- aggregateToPseudoBulk(sce,
     BPPARAM = SnowParam(6, progressbar=TRUE))
 ```
 
+```{r factor}
+pb$AD = factor(pb$AD, c(0,1))
+```
+
 Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table(sce$round_num))` rounds, `r length(table(sce$poolID))` 10X batches, `r length(table(sce$SubID))` donors, and `r format(ncol(sce), big.mark=',')` cells passing QC.
 
 
