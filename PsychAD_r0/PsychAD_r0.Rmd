@@ -1,0 +1,72 @@
+---
+title: "Analysis of PsychAD"
+subtitle: 'Public Freeze 0'
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+output: 
+  html_document:
+    toc: true
+    smart: true
+---
+
+
+<!--- 
+
+cd /sc/arion/projects/CommonMind/hoffman/NPS-AD/work/nps_ad/public_freeze_0
+ml python git pandoc
+git pull
+R --vanilla
+
+system("git pull origin master"); rmarkdown::render("PsychAD_r0.Rmd");
+
+
+# https://hoffmg01.u.hpc.mssm.edu/nps_ad/
+
+bsub -Is -q premium -R span[hosts=1] -R rusage[mem=60000] -W 12:00 -P acc_CommonMind -n 12 bash
+
+
+
+--->
+
+# Load packages
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  dev = c("png", "pdf"),
+  package.startup.message = FALSE,
+  cache = FALSE,
+  cache.lazy = FALSE)
+```
+
+```{r load.packages, cache=FALSE}
+library(SingleCellExperiment)
+library(zellkonverter)
+library(DelayedArray)
+library(dreamlet)
+library(tidyverse)
+library(kableExtra)
+
+# update block size for reading h5ad file from disk
+setAutoBlockSize(1e9)
+```
+
+``{r read.table}
+ # Public freeze 0
+h5ad_file = "/sc/arion/projects/psychAD/NPS-AD/freeze2_rc/h5ad/221202_NPS-AD_public0_pass3_anno_clean.h5ad"
+
+# read raw/* from h5ad file
+sce = readH5AD(h5ad_file, use_hdf5=TRUE, raw=TRUE, verbose=TRUE, uns=FALSE)
+```
+
+
+
+
+
+
+
+
+
