@@ -151,7 +151,7 @@ fit = eBayes(fit)
 
 
 ### Multivariate test along hierarchy
-```{r sd, fig.width=12, fig.height=7}
+```{r sd, fig.width=10, fig.height=6}
 hc = buildClusterTreeFromPB(pb.subclass)
 
 res = treeTest( fit, cobj, hc, coef="AD1")
