@@ -48,15 +48,19 @@ datafile = paste0(outfolder, "sceCombine_pf0.RDS")
 
 sce = readRDS( datafile )
 
-pb <- aggregateToPseudoBulk(sce,
+sce$AD = factor(sce$AD, c(0,1))
+
+pb.subclass <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subclass",  
     sample_id = "Channel", 
     BPPARAM = SnowParam(6, progressbar=TRUE))
-```
 
-```{r factor, cache=FALSE}
-pb$AD = factor(pb$AD, c(0,1))
+pb.subtype <- aggregateToPseudoBulk(sce,
+    assay = "counts",     
+    cluster_id = "subtype",  
+    sample_id = "Channel", 
+    BPPARAM = SnowParam(6, progressbar=TRUE))
 ```
 
 Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table(sce$round_num))` rounds, `r length(table(sce$poolID))` 10X batches, `r length(table(sce$SubID))` donors, and `r format(ncol(sce), big.mark=',')` cells passing QC.
@@ -78,23 +82,23 @@ ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + 
 
 
 
-
+# Subclass
 ```{r cca}
 form = ~ SubID + poolID + Sex + scale(Age) + AD
-C = canCorPairs(form, colData(pb) )
+C = canCorPairs(form, colData(pb.subclass) )
 ggcorrplot(C, hc.order = TRUE)
 ```
 
-# Plots of cell fractions
+## Plots of cell fractions
 ```{r fractions, fig.width=9}
-fracs = cellCounts(pb) / rowSums(cellCounts(pb))
+fracs = cellCounts(pb.subclass) / rowSums(cellCounts(pb.subclass))
 
-i = pb$AD == 0
+i = pb.subclass$AD == 0
 fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
 
-i = pb$AD == 1
+i = pb.subclass$AD == 1
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
@@ -102,8 +106,8 @@ fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) +
 plot_grid(fig1, fig2, rel_widths=c(.75,1))
 ```
 
-```{r plot.fracs}
-df = data.frame(fracs, diagnosis = pb$AD, check.names=FALSE)
+```{r plot.fracs, fig.width=8, fig.height=9}
+df = data.frame(fracs, diagnosis = pb.subclass$AD, check.names=FALSE)
 df = reshape2::melt(df, id.vars="diagnosis")
  
 ggplot(df, aes(diagnosis, value, fill=variable)) + 
@@ -117,13 +121,13 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
 
 
 
-# crumblr
+## crumblr
 ```{r crumblr}
-cobj = crumblr(cellCounts(pb))
+cobj = crumblr(cellCounts(pb.subclass))
 
 form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD)
 
-vp.c = fitExtractVarPartModel(cobj, form, colData(pb))
+vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subclass))
 
 plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) 
 
@@ -132,19 +136,19 @@ fig.vp
 
 # analysis with dream()
 form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD
-fit = dream( cobj, form, colData(pb))
+fit = dream( cobj, form, colData(pb.subclass))
 fit = eBayes(fit)
 ```
 
 
 
-## Multivariate test along hierarchy
+### Multivariate test along hierarchy
 ```{r sd, fig.width=9}
-hc = buildClusterTreeFromPB(pb)
+hc = buildClusterTreeFromPB(pb.subclass)
 
 res = treeTest( fit, cobj, hc, coef="AD1")
 
-fig1 = plotTreeTest(res) + xlim(0, 12) + theme(legend.position="none")
+fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
 
 tab = topTable(fit, coef="AD1", number=Inf)
 
@@ -166,7 +170,7 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 
-## Correlation between coefficient estimates
+### Correlation between coefficient estimates
 ```{r ggcorrplot}
 # get covariance matrix
 V = vcov(fit, cobj, coef="AD1")
@@ -184,6 +188,112 @@ i = match(rev(get_taxa_name(fig1)), rownames(V))
 ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 ```
 
+
+# Subtype
+```{r cca.subtype}
+form = ~ SubID + poolID + Sex + scale(Age) + AD
+C = canCorPairs(form, colData(pb.subtype) )
+ggcorrplot(C, hc.order = TRUE)
+```
+
+## Plots of cell fractions
+```{r fractions.subtype, fig.width=9}
+fracs = cellCounts(pb.subtype) / rowSums(cellCounts(pb.subtype))
+
+i = pb.subtype$AD == 0
+fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
+  ylab("Cell fractions") + 
+  theme(legend.position = "none", axis.text.y=element_blank())
+
+i = pb.subtype$AD == 1
+fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
+  ylab("Cell fractions") + 
+  theme(legend.position = "none", axis.text.y=element_blank())
+
+plot_grid(fig1, fig2, rel_widths=c(.75,1))
+```
+
+```{r plot.fracs.subtype, fig.width=8, fig.height=9}
+df = data.frame(fracs, diagnosis = pb.subtype$AD, check.names=FALSE)
+df = reshape2::melt(df, id.vars="diagnosis")
+ 
+ggplot(df, aes(diagnosis, value, fill=variable)) + 
+  geom_violin() +
+  geom_boxplot(fill="grey50", width=.1) + 
+  facet_wrap(~ variable) +
+  theme_classic() +
+  theme(aspect.ratio=1, legend.position="none") +
+  ylab("Fraction")
+```
+
+
+
+## crumblr
+```{r crumblr.subtype}
+cobj = crumblr(cellCounts(pb.subtype))
+
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD)
+
+vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subtype))
+
+plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) 
+
+fig.vp = plotPercentBars( sortCols(vp.c) )
+fig.vp
+
+# analysis with dream()
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD
+fit = dream( cobj, form, colData(pb.subtype))
+fit = eBayes(fit)
+```
+
+
+
+### Multivariate test along hierarchy
+```{r sd.subtype, fig.width=9}
+hc = buildClusterTreeFromPB(pb.subtype)
+
+res = treeTest( fit, cobj, hc, coef="AD1")
+
+fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
+
+tab = topTable(fit, coef="AD1", number=Inf)
+
+tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
+tab$se = with(tab, logFC/t)
+
+fig2 = ggplot(tab, aes(celltype, logFC)) + 
+  geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
+  geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
+  geom_point(color="dodgerblue") +
+  theme_classic() +
+  coord_flip() +
+  xlab('') + 
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
+# combine plots
+fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
+```
+
+
+### Correlation between coefficient estimates
+```{r ggcorrplot.subtype}
+# get covariance matrix
+V = vcov(fit, cobj, coef="AD1")
+
+# convert to correlation matrix
+V = cov2cor(V)
+
+# shorten names
+rownames(V) = gsub(":AD1", '', rownames(V))
+colnames(V) = gsub(":AD1", '', colnames(V))
+
+# sort to match tree
+i = match(rev(get_taxa_name(fig1)), rownames(V))
+
+ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
+```
 
 
 
