@@ -54,7 +54,7 @@ pb <- aggregateToPseudoBulk(sce,
     BPPARAM = SnowParam(6, progressbar=TRUE))
 ```
 
-```{r factor}
+```{r factor, cache=FALSE}
 pb$AD = factor(pb$AD, c(0,1))
 ```
 
