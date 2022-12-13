@@ -88,13 +88,16 @@ ggcorrplot(C, hc.order = TRUE)
 # Plots of cell fractions
 ```{r fractions, fig.width=9}
 fracs = cellCounts(pb) / rowSums(cellCounts(pb))
-rownames(fracs) = c()
 
 i = pb$AD == 0
-fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions") + theme(legend.position = "none")
+fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
+  ylab("Cell fractions") + 
+  theme(legend.position = "none", axis.text.y=element_blank(),
 
 i = pb$AD == 1
-fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + ylab("Cell fractions")
+fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
+  ylab("Cell fractions") + 
+  theme(legend.position = "none", axis.text.y=element_blank(),
 
 plot_grid(fig1, fig2, rel_widths=c(.75,1))
 ```
