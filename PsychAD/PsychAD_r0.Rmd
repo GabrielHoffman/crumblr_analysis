@@ -137,11 +137,11 @@ fit = eBayes(fit)
 ```{r sd, fig.width=9}
 hc = buildClusterTreeFromPB(pb)
 
-res = treeTest( fit, cobj, hc, coef="AD")
+res = treeTest( fit, cobj, hc, coef="AD1")
 
 fig1 = plotTreeTest(res) + xlim(0, 9) + theme(legend.position="none")
 
-tab = topTable(fit, coef="AD", number=Inf)
+tab = topTable(fit, coef="AD1", number=Inf)
 
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
 tab$se = with(tab, logFC/t)
@@ -164,14 +164,14 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ## Correlation between coefficient estimates
 ```{r ggcorrplot}
 # get covariance matrix
-V = vcov(fit, cobj, coef="AD")
+V = vcov(fit, cobj, coef="AD1")
 
 # convert to correlation matrix
 V = cov2cor(V)
 
 # shorten names
-rownames(V) = gsub(":AD", '', rownames(V))
-colnames(V) = gsub(":AD", '', colnames(V))
+rownames(V) = gsub(":AD1", '', rownames(V))
+colnames(V) = gsub(":AD1", '', colnames(V))
 
 # sort to match tree
 i = match(rev(get_taxa_name(fig1)), rownames(V))
