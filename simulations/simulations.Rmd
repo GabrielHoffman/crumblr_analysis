@@ -653,6 +653,14 @@ ggplot(df_time, aes(Method, pmax(1.5, Time), fill=Method)) +
 
 
 
+```{r exit2, cache=FALSE, eval=TRUE}
+knitr::knit_exit()
+```
+
+
+
+
+
 # Test multiple settings
 ```{r sim2}
 
@@ -667,7 +675,7 @@ methods = c( "lm", "lmlog")
   
 df_res2 = lapply(c(20, 50, 100, 300, 1000), function(mean_counts){  
 	df = lapply(c( 0, .1, .25, .5), function(var.batch){  
-		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2)  
+		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2, use.sccoda=FALSE, mc.cores=36)  
 	})
 	do.call(rbind, df)
 })
@@ -681,14 +689,6 @@ ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, AUPR, fill=method, alpha=S
 ymax = max(max(df_res2$FPR), .1)
 ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
 ```
-
-
-
-
-```{r exit2, cache=FALSE, eval=TRUE}
-knitr::knit_exit()
-```
-
 
 
 # SessionInfo
