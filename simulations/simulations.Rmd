@@ -583,24 +583,23 @@ formula = ~ trait + Batch
 df_time = data.frame()
 
 # CLR
-res = system.time({
+res = system.time(replicate(100, {
 Y = t(as.data.frame(compositions::clr(counts)))
 fit_clr = suppressMessages(dream( Y, formula, X, BPPARAM=SerialParam(), useWeights=FALSE))
 fit_clr = eBayes(fit_clr)
 tab_clr = topTable(fit_clr, coef="trait", sort.by="none")
-})
-df_time = rbind(df_time, data.frame(Method = "CLR", Time = as.numeric(res[3])))
-
+}))
+df_time = rbind(df_time, data.frame(Method = "CLR", Time = as.numeric(res[3]) / 100))
 
 
 # crumblr
-res = system.time({
+res = system.time(replicate(100,{
 cobj = crumblr(counts)
 fit = suppressMessages(dream(cobj, formula, X, BPPARAM=SerialParam()))
 fit = eBayes(fit)
 tab.crumblr = topTable(fit, coef="trait", sort.by="none")
 })
-df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3])))
+df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3]) / 100))
 
 # scCoda
 res = system.time({
@@ -611,23 +610,37 @@ df_time = rbind(df_time, data.frame(Method = "scCoda", Time = as.numeric(res[3])
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
 df_time_multiple = lapply( methods, function(method){
 
-		res = system.time({
+		res = system.time(replicate(100, {
 			# keep only samples with at elast 10 reads
 			i = rowSums(counts) > 10
 			res = testComposition( counts[i,], formula, X[i,], coef="trait", eval="test", method = method)
-		})
-		data.frame(Method = method, Time = as.numeric(res[3]))
+		}))
+		data.frame(Method = method, Time = as.numeric(res[3])/100)
 })
 df_time = rbind(df_time, do.call(rbind, df_time_multiple))
 ```
 
 ```{r plot.time, fig.width=4, fig.height=4, cache=FALSE}
-ggplot(df_time, aes(Method, pmax(2, Time) / 60, fill=Method)) +
+
+
+fig = ggplot(df_time, aes(Method, pmax(2, Time) / 60, fill=Method)) +
 	geom_bar(stat="identity") +
 	theme_classic() +
 	theme(aspect.ratio=1, legend.position="none") +
 	scale_y_continuous(limits=c(NA, NA), expand=c(0,0), name="Run time (minutes)") +
 	coord_flip()
+
+
+fig = ggplot(df_time, aes(Method, pmax(1.5, Time), fill=Method)) +
+	geom_bar(stat="identity") +
+	theme_classic() +
+	theme(aspect.ratio=1, legend.position="none") +
+	scale_y_log10("Run time (seconds)", limits=c(NA, NA), expand=c(0,0))  + 
+	coord_flip() 
+
+ggsave(file="~/www/test.pdf", fig)
+
+
 ```
 
 
