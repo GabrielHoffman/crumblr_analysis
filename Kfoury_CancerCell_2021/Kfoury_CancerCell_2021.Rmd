@@ -102,9 +102,6 @@ C = canCorPairs(form, colData(pb) )
 ggcorrplot(C, hc.order = TRUE)
 ```
 
-```{r exit, cache=FALSE}
-knitr::knit_exit(1)
-```
 
 ## Plots of cell fractions
 ```{r fractions, fig.width=9}
@@ -154,6 +151,9 @@ df %>%
 
 
 
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
 
 
 
