@@ -312,7 +312,7 @@ df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.tr
 
 ```{r plot.sims, cache=FALSE, fig.height=4, fig.width=16}
 cols = brewer.pal(9, "Set1")
-cols[cols=="#FFFF33"] = "FFED4A"
+cols[cols=="#FFFF33"] = "#FFED4A"
 names(cols) = c("crumblr", "CLR", "lm", "lmlog", "binomial", "betabinomial", "nb", "poisson", "scCoda")
 
 CT = "CT_1"
