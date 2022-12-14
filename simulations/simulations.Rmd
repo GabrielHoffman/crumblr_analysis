@@ -91,6 +91,7 @@ Power and false positive rate
 2) crumblr can handle high dimension batch effect
 
 
+Show FPR for nb with mixed model
 
 
 
@@ -643,25 +644,14 @@ df_time = rbind(df_time, do.call(rbind, df_time_multiple))
 ```
 
 ```{r plot.time, fig.width=4, fig.height=4, cache=FALSE}
-ggplot(df_time, aes(Method, pmax(1.5, Time), fill=Method)) +
+ymax = log10(max(df_time$Time)) + 2
+ ggplot(df_time, aes(Method, log10(Time)+2, fill=Method)) +
 	geom_bar(stat="identity") +
-	theme_classic() +
-	theme(aspect.ratio=1, legend.position="none") +
-	scale_y_log10("Run time (seconds)", limits=c(NA, NA), expand=c(0,0))  + 
+	theme_bw() +
+	theme(aspect.ratio=1, legend.position="none", panel.grid.minor = element_blank(), panel.grid.major.y = element_blank()) +
+	scale_y_continuous(bquote(Run~time~(seconds~log[10]~scale)), limits=c(0, ymax*1.05), expand=c(0,0), breaks=(0:5), labels=10^(0:5  -2))  + 
 	coord_flip() + 
 	scale_fill_manual(values=cols)
-
-ymax = log10(max(df_time$Time)) + 3
-ggplot(df_time, aes(Method, log10(Time)+2, color=Method)) +
-	geom_bar(stat="identity") +
-	geom_point() +
-	theme_classic() +
-	theme(aspect.ratio=1, legend.position="none") +
-	scale_y_continuous("Run time (seconds)", limits=c(0, ymax*1.05), expand=c(0,0), breaks=(0:5), labels=10^(0:5  -2))  + 
-	coord_flip() + 
-	scale_color_manual(values=cols)
-
-# ggsave(file="~/www/test.png", fig)
 ```
 
 
