@@ -37,6 +37,7 @@ library(scattermore)
 library(cowplot)
 library(ggplot2)
 library(tidyverse)
+library(ggcorrplot)
 library(DelayedArray)
 
 # set block size for reading DelayedMatrix in H5AD file
@@ -107,14 +108,14 @@ knitr::knit_exit(1)
 
 ## Plots of cell fractions
 ```{r fractions, fig.width=9}
-fracs = cellCounts(pb.subclass) / rowSums(cellCounts(pb.subclass))
+fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 
-i = pb.subclass$AD == 0
+i = pb$AD == 0
 fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
 
-i = pb.subclass$AD == 1
+i = pb$AD == 1
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
@@ -123,7 +124,7 @@ plot_grid(fig1, fig2, rel_widths=c(.75,1))
 ```
 
 ```{r plot.fracs, fig.width=8, fig.height=9}
-df = data.frame(fracs, diagnosis = pb.subclass$AD, check.names=FALSE)
+df = data.frame(fracs, diagnosis = pb$AD, check.names=FALSE)
 df = reshape2::melt(df, id.vars="diagnosis")
  
 ggplot(df, aes(diagnosis, value, fill=variable)) + 
@@ -154,11 +155,11 @@ df %>%
 ## crumblr
 ### Variance partitioning analysis
 ```{r crumblr}
-cobj = crumblr(cellCounts(pb.subclass))
+cobj = crumblr(cellCounts(pb))
 
 form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD) + pH + PMI
 
-vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subclass))
+vp.c = fitExtractVarPartModel(cobj, form, colData(pb))
 
 plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) + theme(aspect.ratio=1)
 ```
@@ -168,7 +169,7 @@ fig.vp = plotPercentBars( sortCols(vp.c) )
 
 # analysis with dream()
 form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD + pH + PMI
-fit = dream( cobj, form, colData(pb.subclass))
+fit = dream( cobj, form, colData(pb))
 fit = eBayes(fit)
 ```
 
@@ -176,7 +177,7 @@ fit = eBayes(fit)
 
 ### Multivariate test along hierarchy
 ```{r sd, fig.width=10, fig.height=5}
-hc = buildClusterTreeFromPB(pb.subclass)
+hc = buildClusterTreeFromPB(pb)
 
 res = treeTest( fit, cobj, hc, coef="AD1")
 
