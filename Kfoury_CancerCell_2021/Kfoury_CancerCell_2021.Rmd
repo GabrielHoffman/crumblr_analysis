@@ -107,22 +107,15 @@ ggcorrplot(C, hc.order = TRUE)
 ```{r fractions, fig.width=9}
 fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 
-i = pb$Status == levels(pb$Status)[1]
-fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
-  ylab("Cell fractions") + 
-  theme(legend.position = "none", axis.text.y=element_blank())
+figList = lapply(levels(pb$Status), function(lvl){
+  i = pb$Status == lvl
+  plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
+    ylab("Cell fractions") + 
+    theme(legend.position = "none", axis.text.y=element_blank()) +
+    ggtitle(lvl)
+})
 
-i = pb$Status == levels(pb$Status)[2]
-fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
-  ylab("Cell fractions") + 
-  theme(legend.position = "none", axis.text.y=element_blank())
-
-i = pb$Status == levels(pb$Status)[3]
-fig3 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
-  ylab("Cell fractions") + 
-  theme(legend.position = "none", axis.text.y=element_blank())
-
-plot_grid(fig1, fig2, rel_widths=c(.75,1, 1))
+plot_grid(plotlist = figList)
 ```
 
 ```{r plot.fracs, fig.width=8, fig.height=9}
@@ -134,9 +127,9 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
   geom_boxplot(fill="grey50", width=.1) + 
   facet_wrap(~ variable) +
   theme_classic() +
-  theme(aspect.ratio=1, legend.position="none") +
+  theme(aspect.ratio=1, legend.position="none", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   ylab(bquote(Fraction~(log[10]))) +
-  scale_y_log10()
+  scale_y_log10() 
 ```
 
 ```{r fraction.table}
