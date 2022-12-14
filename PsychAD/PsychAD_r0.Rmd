@@ -178,6 +178,7 @@ fig2 = ggplot(tab, aes(celltype, logFC)) +
   theme_classic() +
   coord_flip() +
   xlab('') + 
+  ylab("Effect size") +
   theme(axis.text.y=element_blank(),
         axis.ticks.y=element_blank())
 
@@ -316,6 +317,7 @@ fig2 = ggplot(tab, aes(celltype, logFC)) +
   theme_classic() +
   coord_flip() +
   xlab('') + 
+  ylab("Effect size") +
   theme(axis.text.y=element_blank(),
         axis.ticks.y=element_blank())
 
