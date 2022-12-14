@@ -538,6 +538,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```{r times}
 n_samples = 200
 RhpcBLASctl::omp_set_num_threads(1)
+RhpcBLASctl::blas_set_num_threads(1)
 
 # each batch is observed at last twice
 X = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
@@ -598,7 +599,7 @@ cobj = crumblr(counts)
 fit = suppressMessages(dream(cobj, formula, X, BPPARAM=SerialParam()))
 fit = eBayes(fit)
 tab.crumblr = topTable(fit, coef="trait", sort.by="none")
-})
+}))
 df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3]) / 100))
 
 # scCoda
@@ -621,26 +622,12 @@ df_time = rbind(df_time, do.call(rbind, df_time_multiple))
 ```
 
 ```{r plot.time, fig.width=4, fig.height=4, cache=FALSE}
-
-
-fig = ggplot(df_time, aes(Method, pmax(2, Time) / 60, fill=Method)) +
-	geom_bar(stat="identity") +
-	theme_classic() +
-	theme(aspect.ratio=1, legend.position="none") +
-	scale_y_continuous(limits=c(NA, NA), expand=c(0,0), name="Run time (minutes)") +
-	coord_flip()
-
-
-fig = ggplot(df_time, aes(Method, pmax(1.5, Time), fill=Method)) +
+ggplot(df_time, aes(Method, pmax(1.5, Time), fill=Method)) +
 	geom_bar(stat="identity") +
 	theme_classic() +
 	theme(aspect.ratio=1, legend.position="none") +
 	scale_y_log10("Run time (seconds)", limits=c(NA, NA), expand=c(0,0))  + 
 	coord_flip() 
-
-ggsave(file="~/www/test.pdf", fig)
-
-
 ```
 
 
