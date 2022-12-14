@@ -80,11 +80,6 @@ df = cbind(reducedDim(sce, "X_umap"),
 ggplot(df, aes(V1, V2, color=subclass)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
 ```
 
-```{r umap.subtype}
-ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
-```
-
-
 
 
 # Subclass
@@ -211,6 +206,17 @@ ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 
 
 # Subtype
+
+```{r umap.subtype}
+# extract UMAP coordinates and annotations
+df = cbind(reducedDim(sce, "X_umap"), 
+    colData(sce)[,c("subclass", "subtype")]) %>% 
+    as.data.frame
+
+ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
+```
+
+
 ```{r cca.subtype}
 form = ~ SubID + poolID + Sex + scale(Age) + AD + pH + PMI
 C = canCorPairs(form, colData(pb.subtype) )
