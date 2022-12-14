@@ -314,7 +314,6 @@ df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.tr
 cols = brewer.pal(9, "Set1")
 names(cols) = c("crumblr", "CLR", "lm", "lmlog", "binomial", "betabinomial", "nb", "poisson", "scCoda")
 
-
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -326,23 +325,15 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(method, AUPR, fill=method, alpha=St
 	theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + 
 	scale_alpha_discrete( range = c(.3, 1)) + 
 	ggtitle("AUPR") + 
-	geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey")
-
-ggsave(file="~/www/test.png", fig1)
-
-
-
+	geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
+	scale_fill_manual(values=cols)
 
 # FPR
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate")
+fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate") +
+	scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
-
-```{r sdf, cache=FALSE}
-knitr::knit_exit()
-```
-
 
 remove scCoda from FPR, add FDR panel
 Show FPR, FDR for each example
@@ -370,10 +361,10 @@ df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.tr
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-fig1 = ggplot(df_res[df_res$assay==CT,], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey")
+fig1 = ggplot(df_res[df_res$assay==CT,], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") + scale_fill_manual(values=cols)
 
 # FPR
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate")
+fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + ylab("False positive rate") + scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -410,7 +401,8 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=met
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
-	 xlab("Mean counts per sample")
+	 xlab("Mean counts per sample") + 
+	 scale_fill_manual(values=cols)
 
 # FPR
 fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), FPR, fill=method)) +
@@ -419,7 +411,8 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), FPR, fill=meth
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
-	 xlab("Mean counts per sample")
+	 xlab("Mean counts per sample") + 
+	 scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -452,7 +445,8 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
-	 xlab("Overdispersion (tau)")
+	 xlab("Overdispersion (tau)") + 
+	 scale_fill_manual(values=cols)
 
 # FPR
 fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), FPR, fill=method)) +
@@ -461,7 +455,8 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), FPR, fill=method)) +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
-	 xlab("Overdispersion (tau)")
+	 xlab("Overdispersion (tau)") + 
+	 scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -494,7 +489,8 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), AUPR, fill=meth
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
-	 xlab("Number of components")
+	 xlab("Number of components") + 
+	 scale_fill_manual(values=cols)
 
 # FPR
 fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), FPR, fill=method)) +
@@ -503,8 +499,8 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), FPR, fill=metho
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
-	 xlab("Number of components")
-
+	 xlab("Number of components") + 
+	 scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -536,7 +532,8 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), AUPR, fill=metho
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
-	 xlab("Number of samples")
+	 xlab("Number of samples") + 
+	 scale_fill_manual(values=cols)
 
 # FPR
 fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), FPR, fill=method)) +
@@ -545,7 +542,8 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), FPR, fill=method
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") + 
-	 xlab("Number of samples")
+	 xlab("Number of samples") + 
+	 scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -645,7 +643,8 @@ ggplot(df_time, aes(Method, pmax(1.5, Time), fill=Method)) +
 	theme_classic() +
 	theme(aspect.ratio=1, legend.position="none") +
 	scale_y_log10("Run time (seconds)", limits=c(NA, NA), expand=c(0,0))  + 
-	coord_flip() 
+	coord_flip() + 
+	scale_fill_manual(values=cols)
 ```
 
 
