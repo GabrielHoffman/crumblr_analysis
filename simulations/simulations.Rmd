@@ -469,10 +469,15 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 
 
+```{r exit2, cache=FALSE, eval=TRUE}
+knitr::knit_exit()
+```
+
+
 # Number of components
 ```{r increase.clusters}
 n_samples = 200
-n_sims = 5000
+n_sims = 500
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
@@ -658,11 +663,6 @@ ymax = log10(max(df_time$Time)) + 2
 
 
 
-
-
-```{r exit2, cache=FALSE, eval=TRUE}
-knitr::knit_exit()
-```
 
 
 
