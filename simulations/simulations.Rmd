@@ -92,6 +92,9 @@ Power and false positive rate
 
 
 
+
+
+
 ```{r sim.functions}
 rmultinomdir = function(n, size, alpha){
 
@@ -376,9 +379,9 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 # Increasing number of cells
 ```{r increase.cells}
 n_samples = 100
-n_clusters = 5
+n_clusters = 12
 mean_counts_max = 5000
-n_sims = 1000
+n_sims = 5000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0#0.2 
@@ -423,9 +426,9 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 # Increasing overdispersion
 ```{r increase.tau}
 n_samples = 100
-n_clusters = 5
+n_clusters = 12
 mean_counts = 3000
-n_sims = 1000
+n_sims = 5000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
@@ -468,7 +471,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 # Number of components
 ```{r increase.clusters}
 n_samples = 200
-n_sims = 1000
+n_sims = 5000
 beta.true = .06
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
@@ -510,7 +513,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 # Sample size
 ```{r increase.samples}
-n_sims = 1000
+n_sims = 5000
 mean_counts = 3000
 beta.true = .06
 n_clusters = 5 
@@ -647,7 +650,6 @@ ggplot(df_time, aes(Method, pmax(1.5, Time), fill=Method)) +
 	scale_y_log10("Run time (seconds)", limits=c(NA, NA), expand=c(0,0))  + 
 	coord_flip() + 
 	scale_fill_manual(values=cols)
-
 
 ymax = log10(max(df_time$Time)) + 3
 ggplot(df_time, aes(Method, log10(Time)+2, color=Method)) +
