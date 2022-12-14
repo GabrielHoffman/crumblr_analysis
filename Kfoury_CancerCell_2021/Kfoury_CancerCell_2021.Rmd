@@ -110,21 +110,26 @@ knitr::knit_exit(1)
 ```{r fractions, fig.width=9}
 fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 
-i = pb$AD == 0
+i = pb$Status == levels(pb$Status)[1]
 fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
 
-i = pb$AD == 1
+i = pb$Status == levels(pb$Status)[2]
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
 
-plot_grid(fig1, fig2, rel_widths=c(.75,1))
+i = pb$Status == levels(pb$Status)[3]
+fig3 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
+  ylab("Cell fractions") + 
+  theme(legend.position = "none", axis.text.y=element_blank())
+
+plot_grid(fig1, fig2, rel_widths=c(.75,1, 1))
 ```
 
 ```{r plot.fracs, fig.width=8, fig.height=9}
-df = data.frame(fracs, diagnosis = pb$AD, check.names=FALSE)
+df = data.frame(fracs, diagnosis = pb$Status, check.names=FALSE)
 df = reshape2::melt(df, id.vars="diagnosis")
  
 ggplot(df, aes(diagnosis, value, fill=variable)) + 
