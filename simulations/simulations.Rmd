@@ -383,7 +383,7 @@ n_samples = 100
 n_clusters = 12
 mean_counts_max = 5000
 n_sims = 500
-beta.true = 0.1
+beta.true = 0.2
 n_batches = floor(n_samples/2)
 var.batch = 0#0.2 
 tau = 3
@@ -431,7 +431,7 @@ n_samples = 100
 n_clusters = 12
 mean_counts = 3000
 n_sims = 500
-beta.true = 0.1
+beta.true = 0.2
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
  
