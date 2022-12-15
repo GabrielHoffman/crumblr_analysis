@@ -389,7 +389,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 n_samples = 100
 n_clusters = 12
 mean_counts_max = 5000
-n_sims = 500
+n_sims = 10000
 beta.true = 0.3
 n_batches = floor(n_samples/2)
 var.batch = 0#0.2 
@@ -445,7 +445,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 n_samples = 100
 n_clusters = 12
 mean_counts = 2000
-n_sims = 100
+n_sims = 10000
 beta.true = 0.3
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
@@ -497,7 +497,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 # Number of components
 ```{r increase.clusters}
 n_samples = 100
-n_sims = 100
+n_sims = 10000
 beta.true = 0.1
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
@@ -548,7 +548,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 # Sample size
 ```{r increase.samples}
-n_sims = 50
+n_sims = 10000
 mean_counts = 3000
 n_clusters = 12
 beta.true = 0.25
@@ -602,7 +602,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 # Increasing batch effect
 ```{r sim2}
-n_samples = 100
+n_samples = 10000
 n_clusters = 12
 n_sims = 100     
 beta.true = 0.3
