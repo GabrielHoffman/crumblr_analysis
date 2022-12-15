@@ -479,7 +479,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 # Number of components
 ```{r increase.clusters}
 n_samples = 100
-n_sims = 50
+n_sims = 100
 beta.true = 0.2
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
