@@ -651,7 +651,8 @@ fig1 = ggplot(df_res2[df_res2$assay==CT,], aes(factor(var.batch), AUPR, fill=met
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
 	 xlab("Batch effect") + 
-	 scale_fill_manual(values=cols)
+	 scale_fill_manual(values=cols) +
+	 facet_wrap(~Status)
 
 # FPR
 fig2 = ggplot(df_res2[df_res2$assay==CT,], aes(factor(var.batch), FPR, fill=method, alpha=Status)) +
@@ -661,7 +662,8 @@ fig2 = ggplot(df_res2[df_res2$assay==CT,], aes(factor(var.batch), FPR, fill=meth
 	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") + 
 	 xlab("Batch effect") + 
-	 scale_fill_manual(values=cols)
+	 scale_fill_manual(values=cols)+
+	 facet_wrap(~Status)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
