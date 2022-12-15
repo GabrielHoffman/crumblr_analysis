@@ -181,10 +181,6 @@ fit = eBayes(fit)
 
 
 
-```{r exit, cache=FALSE}
-knitr::knit_exit()
-```
-
 ### Multivariate test along hierarchy
 ```{r sd, fig.width=10, fig.height=5}
 coef = "Tumor_Involved"
