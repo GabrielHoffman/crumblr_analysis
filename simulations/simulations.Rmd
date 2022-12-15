@@ -602,9 +602,9 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 # Increasing batch effect
 ```{r sim2}
-n_samples = 10000
+n_samples = 100
 n_clusters = 12
-n_sims = 100     
+n_sims = 1000     
 beta.true = 0.3
 n_batches = floor(n_samples/2)
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
