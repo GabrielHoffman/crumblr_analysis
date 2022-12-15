@@ -367,6 +367,7 @@ Parameters:
  - mean_counts: `r mean_counts`
  - beta.true: `r beta.true`
  - var.batch: `r var.batch`
+ - tau: 3
 
 ```{r plot.sims.mixed, cache=FALSE, fig.height=4, fig.width=16}
 CT = "CT_1"
@@ -401,6 +402,14 @@ df_res = lapply( c(100, 500,1000, 2000, 4000), function(mean_counts){
 })
 df_res = do.call(rbind, df_res)
 ```
+
+Parameters:
+
+ - n_samples: `r n_samples`
+ - n_clusters: `r n_clusters`
+ - beta.true: `r beta.true`
+ - var.batch: `r var.batch`
+ - tau: `r tau`
 
 ```{r plot.increasing, cache=FALSE, fig.width=9, fig.height=4}
 CT = "CT_1"
@@ -447,6 +456,15 @@ df_res = lapply(c(1, 5, 10, 20), function(tau){
 df_res = do.call(rbind, df_res)
 ```
 
+
+Parameters:
+
+ - n_samples: `r n_samples`
+ - n_clusters: `r n_clusters`
+ - mean_counts: `r mean_counts`
+ - beta.true: `r beta.true`
+ - var.batch: `r var.batch`
+
 ```{r plot.increasing.tau, cache=FALSE, fig.width=9, fig.height=4}
 CT = "CT_1"
 # AUPR
@@ -480,7 +498,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```{r increase.clusters}
 n_samples = 100
 n_sims = 100
-beta.true = 0.2
+beta.true = 0.1
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
  
@@ -489,6 +507,15 @@ df_res = lapply(c(5, 10, 20, 50), function(n_clusters){
 })
 df_res = do.call(rbind, df_res)
 ```
+
+
+Parameters:
+
+ - n_samples: `r n_samples`
+ - mean_counts: `r mean_counts`
+ - beta.true: `r beta.true`
+ - var.batch: `r var.batch`
+ - tau: `r tau`
 
 ```{r plot.increase.clusters, cache=FALSE, fig.width=9, fig.height=4}
 CT = "CT_1"
@@ -534,6 +561,16 @@ df_res = lapply(c(20, 50, 100, 200), function(n_samples){
 df_res = do.call(rbind, df_res)
 ```
 
+
+Parameters:
+
+ - n_clusters: `r n_clusters`
+ - mean_counts: `r mean_counts`
+ - beta.true: `r beta.true`
+ - var.batch: `r var.batch`
+ - tau: `r tau`
+
+
 ```{r plot.increase.samples, cache=FALSE, fig.width=9, fig.height=4}
 CT = "CT_1"
 # AUPR
@@ -567,8 +604,8 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```{r sim2}
 n_samples = 100
 n_clusters = 12
-n_sims = 500     
-beta.true = 0.1
+n_sims = 100     
+beta.true = 0.3
 n_batches = floor(n_samples/2)
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
 methods = c( "lm", "lmlog") 
@@ -581,6 +618,17 @@ df_res2 = lapply(c(5000), function(mean_counts){
 })
 df_res2 = do.call(rbind, df_res2)
 ```
+
+
+Parameters:
+
+ - n_samples: `r n_samples`
+ - n_clusters: `r n_clusters`
+ - mean_counts: `r mean_counts`
+ - beta.true: `r beta.true`
+ - var.batch: `r var.batch`
+ - tau: `r tau`
+
 
 ```{r sim2.plots, fig.height=4, fig.width=10, cache=FALSE}
 aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
