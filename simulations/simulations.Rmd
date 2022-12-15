@@ -435,7 +435,7 @@ beta.true = 0.3
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
  
-df_res = lapply(c(1, 3, 6, 10), function(tau){
+df_res = lapply(c(1, 5, 10, 20), function(tau){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=36) 
 })
 df_res = do.call(rbind, df_res)
