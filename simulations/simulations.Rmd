@@ -607,8 +607,8 @@ n_clusters = 12
 n_sims = 100     
 beta.true = 0.3
 n_batches = floor(n_samples/2)
-# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-methods = c( "lm", "lmlog") 
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+# methods = c( "lm", "lmlog") 
   
 df_res2 = lapply(c(5000), function(mean_counts){  
 	df = lapply(c( 0, .1, .25, .5), function(var.batch){  
