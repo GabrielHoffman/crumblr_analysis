@@ -556,6 +556,35 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 
 
+
+# Increasing batch effect
+```{r sim2}
+n_samples = 100
+n_clusters = 12
+n_sims = 500     
+beta.true = 0.3
+n_batches = floor(n_samples/2)
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = c( "lm", "lmlog") 
+  
+df_res2 = lapply(c(5000), function(mean_counts){  
+	df = lapply(c( 0, .1, .25, .5), function(var.batch){  
+		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2, use.sccoda=FALSE, mc.cores=36)  
+	})
+	do.call(rbind, df)
+})
+df_res2 = do.call(rbind, df_res2)
+```
+
+```{r sim2.plots, fig.height=12, fig.width=10, cache=FALSE}
+aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
+
+ymax = max(max(df_res2$FPR), .1)
+ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
+```
+
+
 # Method times
 ```{r times}
 n_samples = 500
@@ -661,42 +690,7 @@ ymax = log10(max(df_time$Time)) + 2
 
 
 
-```{r exit2, cache=FALSE, eval=TRUE}
-knitr::knit_exit()
-```
 
-
-
-
-
-# Test multiple settings
-```{r sim2}
-
-n_samples = 50
-n_clusters = 5
-# mean_counts = 300
-n_sims = 1000     
-beta.true = .06
-n_batches = floor(n_samples/2)
-# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-methods = c( "lm", "lmlog") 
-  
-df_res2 = lapply(c(20, 50, 100, 300, 1000), function(mean_counts){  
-	df = lapply(c( 0, .1, .25, .5), function(var.batch){  
-		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2, use.sccoda=FALSE, mc.cores=36)  
-	})
-	do.call(rbind, df)
-})
-df_res2 = do.call(rbind, df_res2)
-```
-
-```{r sim2.plots, fig.height=12, fig.width=10, cache=FALSE}
-aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
-
-ymax = max(max(df_res2$FPR), .1)
-ggplot(df_res2[df_res2$assay == "CT_2",], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="grey") + scale_alpha_discrete( range = c(.3, 1))
-```
 
 
 # SessionInfo
