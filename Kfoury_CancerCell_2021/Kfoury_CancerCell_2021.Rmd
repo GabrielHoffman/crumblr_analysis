@@ -29,6 +29,7 @@ knitr::opts_chunk$set(
 
 # Load packages
 ```{r load.packages, cache=FALSE}
+library(crumblr)
 library(SingleCellExperiment)
 library(zellkonverter)
 library(dreamlet)
@@ -144,10 +145,6 @@ df %>%
 
 
 
-```{r exit, cache=FALSE}
-knitr::knit_exit()
-```
-
 
 
 ## crumblr
@@ -155,7 +152,7 @@ knitr::knit_exit()
 ```{r crumblr}
 cobj = crumblr(cellCounts(pb))
 
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD) + pH + PMI
+form = ~ (1|subject.id) + (1|Status) + (1|subject.status) 
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb))
 
@@ -166,22 +163,38 @@ plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) + theme(aspect.ratio=1)
 fig.vp = plotPercentBars( sortCols(vp.c) )
 
 # analysis with dream()
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD + pH + PMI
-fit = dream( cobj, form, colData(pb))
+form = ~ 0 + Status + (1|subject.id) + (1|subject.status)
+
+# Specify contrasts to compare regression coefficients
+# For example, 
+# Tumor_Involved = 'StatusTumor - StatusInvolved' tests if 
+# expression in Tumor is different that in Involved samples
+contrasts = c(Tumor_Involved  = 'StatusTumor - StatusInvolved',
+              Tumor_Distal    = 'StatusTumor - StatusDistal',
+              Involved_Distal = 'StatusInvolved - StatusDistal')
+
+L = makeContrastsDream(form, colData(pb), contrasts=contrasts)
+
+fit = dream( cobj, form, colData(pb), L=L)
 fit = eBayes(fit)
 ```
 
 
 
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
+
 ### Multivariate test along hierarchy
 ```{r sd, fig.width=10, fig.height=5}
+coef = "Tumor_Involved"
 hc = buildClusterTreeFromPB(pb)
 
-res = treeTest( fit, cobj, hc, coef="AD1")
+res = treeTest( fit, cobj, hc, coef=coef)
 
 fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
 
-tab = topTable(fit, coef="AD1", number=Inf)
+tab = topTable(fit, coef=coef, number=Inf)
 
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
 tab$se = with(tab, logFC/t)
@@ -201,24 +214,6 @@ fig2 = ggplot(tab, aes(celltype, logFC)) +
 fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
-
-### Correlation between coefficient estimates
-```{r ggcorrplot}
-# get covariance matrix
-V = vcov(fit, cobj, coef="AD1")
-
-# convert to correlation matrix
-V = cov2cor(V)
-
-# shorten names
-rownames(V) = gsub(":AD1", '', rownames(V))
-colnames(V) = gsub(":AD1", '', colnames(V))
-
-# sort to match tree
-i = match(rev(get_taxa_name(fig1)), rownames(V))
-
-ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
-```
 
 
 
