@@ -436,7 +436,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 n_samples = 100
 n_clusters = 12
 mean_counts = 2000
-n_sims = 500
+n_sims = 100
 beta.true = 0.3
 n_batches = floor(n_samples/2)
 var.batch = 0#0.01
