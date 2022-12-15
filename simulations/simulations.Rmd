@@ -665,7 +665,9 @@ fig2 = ggplot(df_res2[df_res2$assay==CT,], aes(factor(var.batch), FPR, fill=meth
 	 scale_fill_manual(values=cols)+
 	 facet_wrap(~Status)
 
-plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+fig1
+fig2
+# plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
 
