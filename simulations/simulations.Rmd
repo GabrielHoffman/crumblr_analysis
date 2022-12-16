@@ -675,7 +675,6 @@ fig2 = df_res2 %>%
 
 fig1
 fig2
-# plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
 
