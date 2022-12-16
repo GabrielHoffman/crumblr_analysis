@@ -660,7 +660,10 @@ fig1 = df_res2 %>%
 	 facet_wrap(~Status)
 
 # FPR
-fig2 = ggplot(df_res2[df_res2$assay==CT,], aes(factor(var.batch), FPR, fill=method)) +
+fig2 = df_res2 %>%
+	filter(assay==CT) %>%
+	filter(Status != "none")  %>%
+	ggplot(aes(factor(var.batch), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
