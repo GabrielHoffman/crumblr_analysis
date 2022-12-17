@@ -418,7 +418,7 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), FPR, fill=meth
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
-	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)") +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
 	 geom_hline(yintercept=0.05, linetype="dashed", color="grey") +
 	 xlab("Mean counts per sample") + 
 	 scale_fill_manual(values=cols)
