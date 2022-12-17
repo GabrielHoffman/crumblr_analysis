@@ -628,7 +628,7 @@ ggplot(df_res2[df_res2$assay == CT,], aes(method, FPR, fill=method, alpha=Status
 
 
 
-```{r plot.batch.effect, cache=FALSE, fig.width=9, fig.height=4}
+```{r plot.batch.effect, cache=FALSE, fig.width=9, fig.height=8}
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
