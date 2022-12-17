@@ -80,23 +80,6 @@ source("cellTypeCompositionTest.R")
 # Simulations
 
 
-Power and false positive rate
-
- - sample size
- - read count
- - batch effect
- - number of components
- - number of non-zero components
-
-1) crumblr is best when alpha 1 and there is no batch effect
-2) crumblr can handle high dimension batch effect
-
-
-Show FPR for nb with mixed model
-
-
-
-
 ```{r sim.functions}
 rmultinomdir = function(n, size, alpha){
 
@@ -315,6 +298,16 @@ df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.tr
 ```
 
 
+Parameters:
+
+ - n_samples: `r n_samples`
+ - n_clusters: `r n_clusters`
+ - mean_counts: `r mean_counts`
+ - beta.true: `r beta.true`
+ - var.batch: `r var.batch`
+ - tau: 3
+
+
 ```{r plot.sims, cache=FALSE, fig.height=4, fig.width=16}
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
@@ -340,12 +333,6 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method)) + geom_b
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
-
-remove scCoda from FPR, add FDR panel
-Show FPR, FDR for each example
-
-If test with FDR < 0.05, how many are false?
-
 
 # Mixed model
 ```{r run.mixed}
