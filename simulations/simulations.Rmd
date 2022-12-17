@@ -423,7 +423,7 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), FPR, fill=meth
 	 xlab("Mean counts per sample") + 
 	 scale_fill_manual(values=cols)
 
-plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
 
 
@@ -476,7 +476,7 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), FPR, fill=method)) +
 	 xlab("Overdispersion (tau)") + 
 	 scale_fill_manual(values=cols)
 
-plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
 
 
@@ -529,7 +529,7 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), FPR, fill=metho
 	 xlab("Number of components") + 
 	 scale_fill_manual(values=cols)
 
-plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
 
 
@@ -582,7 +582,7 @@ fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), FPR, fill=method
 	 xlab("Number of samples") + 
 	 scale_fill_manual(values=cols)
 
-plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
 
 
@@ -660,8 +660,8 @@ fig2 = df_res2 %>%
 	 scale_fill_manual(values=cols)+
 	 facet_wrap(~Status)
 
-fig1
-fig2
+
+plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
 
 
