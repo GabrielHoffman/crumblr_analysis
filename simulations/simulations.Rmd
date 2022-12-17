@@ -567,7 +567,7 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), AUPR, fill=metho
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
-	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+	 theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") +
 	 geom_hline(yintercept=aupr.rand, linetype="dashed", color="grey") +
 	 xlab("Number of samples") + 
 	 scale_fill_manual(values=cols)
