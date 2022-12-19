@@ -840,7 +840,7 @@ df_time %>%
 
 
 
-# SessionInfo
+# Session Info
 <details>
 ```{r session_info}
 sessionInfo()
