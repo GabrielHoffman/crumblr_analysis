@@ -337,7 +337,7 @@ fig2 = df_res %>%
 		ggplot( aes(method, FPR, fill=method)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + ylab("False positive rate") +
 	scale_fill_manual(values=cols)
 
-plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+plot_grid(fig1, fig2, nrow=1, align="hv", axis="tb")
 ```
 
 # Mixed model
@@ -367,10 +367,18 @@ Parameters:
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-fig1 = ggplot(df_res[df_res$assay==CT,], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + scale_fill_manual(values=cols)
+fig1 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + scale_fill_manual(values=cols)
 
 # FPR
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + ylab("False positive rate") + scale_fill_manual(values=cols)
+fig2 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		ggplot(aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + ylab("False positive rate") + scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -410,7 +418,11 @@ CT = "CT_1"
 
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=method)) +
+fig1 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(factor(mean_counts), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
@@ -420,7 +432,11 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), AUPR, fill=met
 	 scale_fill_manual(values=cols)
 
 # FPR
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(mean_counts), FPR, fill=method)) +
+fig2 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(factor(mean_counts), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
@@ -463,7 +479,11 @@ Parameters:
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
+fig1 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(factor(tau), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
@@ -473,7 +493,11 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), AUPR, fill=method)) +
 	 scale_fill_manual(values=cols)
 
 # FPR
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(tau), FPR, fill=method)) +
+fig2 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(factor(tau), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
@@ -516,7 +540,11 @@ CT = "CT_1"
 
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), AUPR, fill=method)) +
+fig1 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(factor(n_clusters), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
@@ -526,7 +554,11 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), AUPR, fill=meth
 	 scale_fill_manual(values=cols)
 
 # FPR
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_clusters), FPR, fill=method)) +
+fig2 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(factor(n_clusters), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
@@ -569,7 +601,11 @@ Parameters:
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), AUPR, fill=method)) +
+fig1 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(factor(n_samples), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
@@ -579,7 +615,11 @@ fig1 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), AUPR, fill=metho
 	 scale_fill_manual(values=cols)
 
 # FPR
-fig2 = ggplot(df_res[df_res$assay==CT,], aes(factor(n_samples), FPR, fill=method)) +
+fig2 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(factor(n_samples), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
@@ -626,11 +666,24 @@ Parameters:
 
 ```{r sim2.plots, fig.height=4, fig.width=10, cache=FALSE, eval=FALSE}
 aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-ggplot(df_res2[df_res2$assay == CT,], aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
+df_res2 %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
 
 ymax = max(max(df_res2$FPR), .1)
-ggplot(df_res2[df_res2$assay == CT,], aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
+df_res2 %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		ggplot(aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
 ```
+
+df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 
 
 
@@ -641,7 +694,8 @@ aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
 
 fig1 = df_res2 %>%
 	filter(assay==CT) %>%
-	filter(Status != "none")  %>%
+	filter(Status != "none") %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
  	ggplot(aes(factor(var.batch), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -655,7 +709,8 @@ fig1 = df_res2 %>%
 # FPR
 fig2 = df_res2 %>%
 	filter(assay==CT) %>%
-	filter(Status != "none")  %>%
+	filter(Status != "none") %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial"))%>%
 	ggplot(aes(factor(var.batch), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
