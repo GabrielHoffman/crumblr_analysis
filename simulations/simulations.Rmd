@@ -680,11 +680,6 @@ df_res2 %>%
 		ggplot(aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
 ```
 
-df_res %>%
-		as_tibble %>%
-		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-
 
 
 ```{r plot.batch.effect, cache=FALSE, fig.width=9, fig.height=8}
@@ -720,7 +715,6 @@ fig2 = df_res2 %>%
 	 xlab("Batch effect") + 
 	 scale_fill_manual(values=cols)+
 	 facet_wrap(~Status)
-
 
 plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
