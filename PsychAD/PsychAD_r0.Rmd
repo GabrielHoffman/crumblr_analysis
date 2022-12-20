@@ -43,10 +43,10 @@ library(scattermore)
 
 
 ```{r load.data}
-outfolder = "/sc/arion/projects/CommonMind/hoffman/NPS-AD/work/nps_ad/public_freeze_0_results/"
-datafile = paste0(outfolder, "sceCombine_pf0.RDS")
-
-sce = readRDS( datafile )
+folder = "/sc/arion/projects/psychAD/NPS-AD/public_release_0/" 
+file = paste0(folder, "PsychAD_r0_Dec_19_2022.h5ad")
+sce = readH5AD(file, use_hdf5=TRUE, verbose=TRUE)
+assayNames(sce)[1] = "counts"
 
 sce$AD = factor(sce$AD, c(0,1))
 
