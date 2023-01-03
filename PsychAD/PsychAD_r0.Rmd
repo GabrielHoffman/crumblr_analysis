@@ -54,13 +54,13 @@ pb.subclass <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subclass",  
     sample_id = "Channel", 
-    BPPARAM = SnowParam(6, progressbar=TRUE))
+    BPPARAM = SnowParam(2, progressbar=TRUE))
 
 pb.subtype <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subtype",  
     sample_id = "Channel", 
-    BPPARAM = SnowParam(6, progressbar=TRUE))
+    BPPARAM = SnowParam(2, progressbar=TRUE))
 ```
 
 ```{r ph, cache=FALSE}
