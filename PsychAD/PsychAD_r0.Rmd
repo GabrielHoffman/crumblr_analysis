@@ -44,7 +44,7 @@ library(scattermore)
 
 ```{r load.data}
 folder = "/sc/arion/projects/psychAD/NPS-AD/public_release_0/" 
-file = paste0(folder, "PsychAD_r0_Dec_19_2022.h5ad")
+file = paste0(folder, "PsychAD_r0_Dec_28_2022.h5ad")
 sce = readH5AD(file, use_hdf5=TRUE, verbose=TRUE)
 assayNames(sce)[1] = "counts"
 
