@@ -83,7 +83,7 @@ ggplot(df, aes(V1, V2, color=subclass)) + geom_scattermore() + theme_classic() +
 
 # Subclass
 ```{r cca}
-form = ~ SubID + poolID + Sex + scale(Age) + AD + pH + PMI
+form = ~ SubID + poolID + Sex + scale(Age) + Dx + pH + PMI
 C = canCorPairs(form, colData(pb.subclass) )
 ggcorrplot(C, hc.order = TRUE)
 ```
@@ -92,12 +92,12 @@ ggcorrplot(C, hc.order = TRUE)
 ```{r fractions, fig.width=9}
 fracs = cellCounts(pb.subclass) / rowSums(cellCounts(pb.subclass))
 
-i = pb.subclass$AD == 0
+i = pb.subclass$Dx == 'Control'
 fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
 
-i = pb.subclass$AD == 1
+i = pb.subclass$Dx == "AD"
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
@@ -106,7 +106,7 @@ plot_grid(fig1, fig2, rel_widths=c(.75,1))
 ```
 
 ```{r plot.fracs, fig.width=8, fig.height=9}
-df = data.frame(fracs, diagnosis = pb.subclass$AD, check.names=FALSE)
+df = data.frame(fracs, diagnosis = pb.subclass$Dx, check.names=FALSE)
 df = reshape2::melt(df, id.vars="diagnosis")
  
 ggplot(df, aes(diagnosis, value, fill=variable)) + 
@@ -122,7 +122,7 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
 ```{r fraction.table}
 df %>%
   group_by(variable, diagnosis) %>%
-  mutate(diagnosis = recode(diagnosis, '0' = "Control", '1' = "Alzheimer's"))  %>% 
+  # mutate(diagnosis = recode(diagnosis, '0' = "Control", '1' = "Alzheimer's"))  %>% 
   summarize(mean = mean(value)) %>%
   pivot_wider(names_from=c('diagnosis'), values_from=c("mean")) %>%
   kbl %>%
@@ -139,7 +139,7 @@ df %>%
 ```{r crumblr}
 cobj = crumblr(cellCounts(pb.subclass))
 
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD) + pH + PMI
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subclass))
 
@@ -150,7 +150,7 @@ plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) + theme(aspect.ratio=1)
 fig.vp = plotPercentBars( sortCols(vp.c) )
 
 # analysis with dream()
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD + pH + PMI
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
 fit = dream( cobj, form, colData(pb.subclass))
 fit = eBayes(fit)
 ```
@@ -161,11 +161,11 @@ fit = eBayes(fit)
 ```{r sd, fig.width=10, fig.height=5}
 hc = buildClusterTreeFromPB(pb.subclass)
 
-res = treeTest( fit, cobj, hc, coef="AD1")
+res = treeTest( fit, cobj, hc, coef="DxAD")
 
 fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
 
-tab = topTable(fit, coef="AD1", number=Inf)
+tab = topTable(fit, coef="DxAD", number=Inf)
 
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
 tab$se = with(tab, logFC/t)
@@ -189,14 +189,14 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ### Correlation between coefficient estimates
 ```{r ggcorrplot}
 # get covariance matrix
-V = vcov(fit, cobj, coef="AD1")
+V = vcov(fit, cobj, coef="DxAD")
 
 # convert to correlation matrix
 V = cov2cor(V)
 
 # shorten names
-rownames(V) = gsub(":AD1", '', rownames(V))
-colnames(V) = gsub(":AD1", '', colnames(V))
+rownames(V) = gsub(":DxAD", '', rownames(V))
+colnames(V) = gsub(":DxAD", '', colnames(V))
 
 # sort to match tree
 i = match(rev(get_taxa_name(fig1)), rownames(V))
@@ -218,7 +218,7 @@ ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + 
 
 
 ```{r cca.subtype}
-form = ~ SubID + poolID + Sex + scale(Age) + AD + pH + PMI
+form = ~ SubID + poolID + Sex + scale(Age) + Dx + pH + PMI
 C = canCorPairs(form, colData(pb.subtype) )
 ggcorrplot(C, hc.order = TRUE)
 ```
@@ -227,12 +227,12 @@ ggcorrplot(C, hc.order = TRUE)
 ```{r fractions.subtype, fig.width=9}
 fracs = cellCounts(pb.subtype) / rowSums(cellCounts(pb.subtype))
 
-i = pb.subtype$AD == 0
+i = pb.subtype$Dx == "Control"
 fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
 
-i = pb.subtype$AD == 1
+i = pb.subtype$Dx == "AD"
 fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
   ylab("Cell fractions") + 
   theme(legend.position = "none", axis.text.y=element_blank())
@@ -244,7 +244,7 @@ plot_grid(fig1, fig2, rel_widths=c(.75,1))
 
 
 ```{r plot.fracs.subtype, fig.width=8, fig.height=9}
-df = data.frame(fracs, diagnosis = pb.subtype$AD, check.names=FALSE)
+df = data.frame(fracs, diagnosis = pb.subtype$Dx, check.names=FALSE)
 df = reshape2::melt(df, id.vars="diagnosis")
  
 ggplot(df, aes(diagnosis, value, fill=variable)) + 
@@ -261,7 +261,7 @@ ggplot(df, aes(diagnosis, value, fill=variable)) +
 ```{r fraction.table.subtype}
 df %>%
   group_by(variable, diagnosis) %>%
-  mutate(diagnosis = recode(diagnosis, '0' = "Control", '1' = "Alzheimer's"))  %>% 
+  # mutate(diagnosis = recode(diagnosis, '0' = "Control", '1' = "Alzheimer's"))  %>% 
   summarize(mean = mean(value)) %>%
   pivot_wider(names_from=c('diagnosis'), values_from=c("mean")) %>%
   kbl %>%
@@ -278,7 +278,7 @@ df %>%
 ```{r crumblr.subtype}
 cobj = crumblr(cellCounts(pb.subtype))
 
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|AD) + pH + PMI
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subtype))
 
@@ -289,7 +289,7 @@ plotVarPart(sortCols(vp.c), label.angle=60, ncol=4)  + theme(aspect.ratio=1)
 fig.vp = plotPercentBars( sortCols(vp.c) )
 
 # analysis with dream()
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + AD + pH + PMI
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
 fit = dream( cobj, form, colData(pb.subtype))
 fit = eBayes(fit)
 ```
@@ -300,11 +300,11 @@ fit = eBayes(fit)
 ```{r sd.subtype, fig.width=12, fig.height=7}
 hc = buildClusterTreeFromPB(pb.subtype)
 
-res = treeTest( fit, cobj, hc, coef="AD1")
+res = treeTest( fit, cobj, hc, coef="DxAD")
 
 fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
 
-tab = topTable(fit, coef="AD1", number=Inf)
+tab = topTable(fit, coef="DxAD", number=Inf)
 
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
 tab$se = with(tab, logFC/t)
@@ -328,14 +328,14 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ### Correlation between coefficient estimates
 ```{r ggcorrplot.subtype, fig.width=9, fig.height=9}
 # get covariance matrix
-V = vcov(fit, cobj, coef="AD1")
+V = vcov(fit, cobj, coef="DxAD")
 
 # convert to correlation matrix
 V = cov2cor(V)
 
 # shorten names
-rownames(V) = gsub(":AD1", '', rownames(V))
-colnames(V) = gsub(":AD1", '', colnames(V))
+rownames(V) = gsub(":DxAD", '', rownames(V))
+colnames(V) = gsub(":DxAD", '', colnames(V))
 
 # sort to match tree
 i = match(rev(get_taxa_name(fig1)), rownames(V))
