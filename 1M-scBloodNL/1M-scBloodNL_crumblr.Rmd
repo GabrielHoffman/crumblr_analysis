@@ -142,7 +142,7 @@ figList = lapply(names(contrasts), function(ctst){
 ```
 
 ```{r plot_grid, fig.height=20}
-print(fig)
+print(figList)
 
 ```
 
