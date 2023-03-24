@@ -53,6 +53,7 @@ library(aplot)
 library(ggtree)
 library(dreamlet)
 library(crumblr)
+library(cowplot)
 library(DelayedArray)
 })
 setAutoBlockSize(1e9)
@@ -138,6 +139,10 @@ figList = lapply(names(contrasts), function(ctst){
   # combine plots
   fig2 %>% insert_left(fig1) 
 })
+```
+
+```{r plot_grid, fig.height=50}
+plot_grid(plotlist = figList, ncol=1)
 ```
 
 
