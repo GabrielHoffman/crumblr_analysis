@@ -141,10 +141,9 @@ figList = lapply(names(contrasts), function(ctst){
 })
 ```
 
-```{r plot_grid, fig.height=50}
-for(fig in figList){
-  print(fig)
-}
+```{r plot_grid, fig.height=20}
+print(fig)
+
 ```
 
 
