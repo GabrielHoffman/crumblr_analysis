@@ -24,8 +24,8 @@ R --vanilla
 
 system("git pull"); rmarkdown::render("1M-scBloodNL_crumblr.Rmd");
 
-https://hoffmg01.hpc.mssm.edu/crumblr_analysis/
 
+https://hoffmg01.hpc.mssm.edu/crumblr_analysis/1M-scBloodNL/1M-scBloodNL_crumblr.html
 
 
 --->
@@ -58,7 +58,8 @@ library(DelayedArray)
 })
 setAutoBlockSize(1e9)
 
-file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/1M-scBloodNL/1M_v3_20201029.h5ad"
+# file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/1M-scBloodNL/1M_v2_20201029.h5ad"
+file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/1M-scBloodNL/1M_v3_20201106.h5ad"
 sce = readH5AD(file, use_hdf5=TRUE)
 
 sce$sample_id = with(colData(sce), paste(assignment, as.character(timepoint), sep='_'))
