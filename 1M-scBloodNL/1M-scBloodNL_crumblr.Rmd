@@ -58,7 +58,7 @@ library(DelayedArray)
 })
 setAutoBlockSize(1e9)
 
-file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/1M-scBloodNL/1M_v2_20201029.h5ad"
+file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/1M-scBloodNL/1M_v3_20201029.h5ad"
 sce = readH5AD(file, use_hdf5=TRUE)
 
 sce$sample_id = with(colData(sce), paste(assignment, as.character(timepoint), sep='_'))
