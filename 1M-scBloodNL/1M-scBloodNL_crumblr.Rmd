@@ -113,7 +113,7 @@ colnames(coef(fit))
 
 hc = buildClusterTreeFromPB(pb)
 
-figList = lapply(names(contrasts), function(ctst)){
+figList = lapply(names(contrasts), function(ctst){
 
   res = treeTest( fit, cobj, hc, coef=ctst)
 
@@ -137,7 +137,7 @@ figList = lapply(names(contrasts), function(ctst)){
 
   # combine plots
   fig2 %>% insert_left(fig1) 
-}
+})
 ```
 
 
