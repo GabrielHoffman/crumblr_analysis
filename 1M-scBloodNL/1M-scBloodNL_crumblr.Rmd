@@ -113,7 +113,7 @@ colnames(coef(fit))
 
 hc = buildClusterTreeFromPB(pb)
 
-for(ctst in names(contrasts)){
+figList = lapply(names(contrasts), function(ctst)){
 
   res = treeTest( fit, cobj, hc, coef=ctst)
 
