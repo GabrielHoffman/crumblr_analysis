@@ -22,12 +22,31 @@ git pull
 R --vanilla
 
 
-system("git pull"); rmarkdown::render("PsychAD_r0.Rmd");
+system("git pull"); rmarkdown::render("1M-scBloodNL_crumblr.Rmd");
+
+https://hoffmg01.hpc.mssm.edu/crumblr_analysis/
+
 
 
 --->
 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  dev = c("png", "pdf"),
+  package.startup.message = FALSE,
+  cache = FALSE,
+  cache.lazy = FALSE)
+```
+
+
 ```{r load}
+suppressPackageStartupMessages({
 library(zellkonverter)
 library(SingleCellExperiment)
 library(aplot)
@@ -35,6 +54,7 @@ library(ggtree)
 library(dreamlet)
 library(crumblr)
 library(DelayedArray)
+})
 setAutoBlockSize(1e9)
 
 file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/1M-scBloodNL/1M_v2_20201029.h5ad"
@@ -93,29 +113,31 @@ colnames(coef(fit))
 
 hc = buildClusterTreeFromPB(pb)
 
-ctst = "hCA_3_vs_0"
-res = treeTest( fit, cobj, hc, coef=ctst)
+for(ctst in names(contrasts)){
 
-fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none") + ggtitle(ctst)
+  res = treeTest( fit, cobj, hc, coef=ctst)
 
-tab = topTable(fit, coef=ctst, number=Inf)
+  fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none") + ggtitle(ctst)
 
-tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
-tab$se = with(tab, logFC/t)
+  tab = topTable(fit, coef=ctst, number=Inf)
 
-fig2 = ggplot(tab, aes(celltype, logFC)) + 
-geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
-geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
-geom_point(color="dodgerblue") +
-theme_classic() +
-coord_flip() +
-xlab('') + 
-ylab("Effect size") +
-theme(axis.text.y=element_blank(),
-      axis.ticks.y=element_blank())
+  tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
+  tab$se = with(tab, logFC/t)
 
-# combine plots
-fig2 %>% insert_left(fig1) 
+  fig2 = ggplot(tab, aes(celltype, logFC)) + 
+  geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
+  geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
+  geom_point(color="dodgerblue") +
+  theme_classic() +
+  coord_flip() +
+  xlab('') + 
+  ylab("Effect size") +
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
+  # combine plots
+  fig2 %>% insert_left(fig1) 
+}
 ```
 
 
