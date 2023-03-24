@@ -1,0 +1,164 @@
+---
+title: "GTEx single cell data: Immune"
+subtitle: '[Eraslan, et al. biorxiv (2021)](https://www.biorxiv.org/content/10.1101/2021.07.19.452954v1)'
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+documentclass: article
+output: 
+  html_document:
+  toc: true
+  smart: false
+vignette: >
+  %\VignetteIndexEntry{GTEx}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+---
+
+
+<!--- 
+
+cd /hpc/users/hoffmg01/work/eval_methods/dreamlet
+ml python git
+R
+
+system("git pull")
+rmarkdown::render("GTEx_immune.Rmd");
+
+
+# https://hoffmg01.u.hpc.mssm.edu/eval_methods/dreamlet/GTEx.html
+
+
+
+--->
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  dev = c("png", "pdf"),
+  cache = TRUE,
+  cache.lazy = FALSE)
+```
+
+```{r get.data, eval=FALSE}
+# https://gtexportal.org/home/datasets
+
+cd /hpc/users/hoffmg01/work/eval_methods/dreamlet/data
+
+wget --no-check-certificate https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad
+wget --no-check-certificate https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad
+```
+
+```{r load.packages, cache=FALSE}
+library(zellkonverter)
+library(SingleCellExperiment)
+library(dreamlet)
+library(qvalue)
+library(tidyverse)
+library(zenith)
+```
+
+```{r load.data}
+# specify HDF5 file
+file = '/hpc/users/hoffmg01/work/eval_methods/dreamlet/data/GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad'
+
+sce = readH5AD( file, use_hdf5=TRUE)
+
+# remove scrublet: True
+sce = sce[,colData(sce)$scrublet=='False']
+```
+
+
+# Joint UMAP
+```{r umap, dev="png", fig.height=12, fig.width=8}
+# extract UMAP coordinates and annotations
+df = cbind(reducedDim(sce, "X_umap"), colData(sce))
+df = data.frame(df)
+
+ggplot(df, aes(V1, V2, color=granular)) + geom_point(size=.05) + theme_classic() + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="bottom") + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
+```
+
+
+
+```{r aggregateToPseudoBulk}
+sce$id = with(colData(sce), paste(individual, prep, tissue))
+
+# Create pseudo-bulk SingleCellExperiment
+pbObj <- aggregateToPseudoBulk(sce,
+    assay = "counts", 
+    cluster_id = "annotation",
+    sample_id  = "id")
+```
+
+```{r canCorPairs}
+form = ~ tissue + prep + individual 
+
+C = canCorPairs( form, colData(pbObj) )
+
+plotCorrMatrix(C)
+```
+
+```{r processAssays}
+form = ~ (1|tissue) + (1|prep) + (1|individual) 
+res.proc = processAssays(pbObj, form, min.samples = 2)
+```
+
+
+```{r plotVoom, fig.height=18, fig.width=9}
+plotVoom(res.proc, ncol=4)
+```
+
+```{r vp}
+vp = fitVarPart( res.proc, form)
+```
+
+```{r plot.vp, fig.height=18, fig.width=9}
+plotVarPart(sortCols(vp), label.angle=70)
+```
+
+
+
+
+```{r dreamlet.prep, eval=FALSE}
+form = ~ prep + (1|tissue) + (1|Participant.ID) + (1|Age_bin) + (1|Sex) +  RIN.score.from.PAXgene.tissue.Aliquot + Autolysis.Score + Sample.Ischemic.Time..mins.
+
+# define contrast formulas
+lvls = levels(colData(res.proc)$prep)
+lvls = paste0('prep', lvls)
+
+grid = expand.grid(lvls,lvls)
+idx = apply(grid, 1, function(x) length(unique(x)))
+grid = grid[idx==2,]
+
+ids = apply(grid, 1, function(x){
+	paste0(x[1], '_', x[2])
+	})
+
+formulas = apply(grid, 1, function(x){
+	paste0(x[1], ' - ', x[2])
+	})
+
+names(formulas) = ids
+
+res.proc = dreamlet(res.proc, form,
+	# contrasts = formulas,
+    BPPARAM = SnowParam(12, progressbar=TRUE))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
