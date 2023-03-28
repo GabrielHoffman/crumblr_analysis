@@ -49,19 +49,19 @@ sce = readH5AD(file, use_hdf5=TRUE, verbose=TRUE)
 assayNames(sce)[1] = "counts"
 sce$Dx = factor(sce$Dx_AD, c('Control','AD'))
 
-colData(sce)$pool = gsub("^(.*)-\\S+$", "\\1", colData(sce)$poolID)
+sce$pool = gsub("^(.*)-\\S+$", "\\1", sce$poolID)
 
 pb.subclass <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subclass",  
     sample_id = "Channel", 
-    BPPARAM = SnowParam(1, progressbar=TRUE))
+    BPPARAM = SnowParam(6, progressbar=TRUE))
 
 pb.subtype <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subtype",  
     sample_id = "Channel", 
-    BPPARAM = SnowParam(1, progressbar=TRUE))
+    BPPARAM = SnowParam(6, progressbar=TRUE))
 
 pb.subclass$pH[is.na(pb.subclass$pH)] = mean(pb.subclass$pH, na.rm=TRUE)
 pb.subtype$pH[is.na(pb.subtype$pH)] = mean(pb.subtype$pH, na.rm=TRUE)
