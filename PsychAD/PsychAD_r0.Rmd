@@ -224,6 +224,47 @@ knitr::knit_exit(1)
 ```
 
 
+```{r plots}
+
+df = data.frame(IN_SST = cobj$E["IN_SST",],
+                Age = pb.controls$Age,
+                se = 1/sqrt(cobj$weights["IN_SST",]))
+
+# png("~/www/test.png")
+ggplot(df, aes(Age, IN_SST)) +
+  geom_errorbar(aes(ymin = IN_SST - 1.96*se, ymax = IN_SST + 1.96*se), width=0, color="grey50") +
+  geom_point() +
+  theme_classic() +
+  theme(aspect.ratio=1) +
+  geom_smooth(method="lm")
+# dev.off()
+
+
+fracs = cellCounts(pb.controls) / rowSums(cellCounts(pb.controls))
+
+
+df = data.frame(IN_SST = fracs[,"IN_SST"], 
+                Age = pb.controls$Age)
+
+# png("~/www/test.png")
+ggplot(df, aes(Age, IN_SST)) +
+  geom_point() +
+  theme_classic() +
+  theme(aspect.ratio=1) +
+  geom_smooth(method="lm")
+# dev.off()
+
+
+
+
+
+```
+
+
+
+
+
+
 # Subtype
 
 ```{r umap.subtype}
@@ -237,7 +278,7 @@ ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + 
 
 
 ```{r cca.subtype}
-form = ~ SubID + poolID + Sex + scale(Age) + Dx + pH + PMI
+form = ~ SubID + poolID + pool + Sex + scale(Age) + Dx + pH + PMI
 C = canCorPairs(form, colData(pb.subtype) )
 ggcorrplot(C, hc.order = TRUE)
 ```
@@ -361,8 +402,6 @@ i = match(rev(get_taxa_name(fig1)), rownames(V))
 
 ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 ```
-
-
 
 
 # Session Info
