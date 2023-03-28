@@ -82,7 +82,7 @@ ggplot(df, aes(V1, V2, color=subclass)) + geom_scattermore() + theme_classic() +
 
 # Subclass
 ```{r cca}
-form = ~ SubID + poolID + Sex + scale(Age) + Dx + pH + PMI
+form = ~ SubID + poolID + pool + Sex + scale(Age) + Dx + pH + PMI
 C = canCorPairs(form, colData(pb.subclass) )
 ggcorrplot(C, hc.order = TRUE)
 ```
