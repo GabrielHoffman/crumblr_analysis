@@ -149,7 +149,7 @@ fig.vp = plotPercentBars( sortCols(vp.c) )
 form = ~ (1|SubID) + (1|pool) + (1|Sex) + scale(Age) + Dx + pH + PMI
 fit = dream( cobj, form, colData(pb.subclass))
 fit = eBayes(fit)
-topTable(fit, coef="DxAd")
+topTable(fit, coef="DxAD")
 ```
 
 # Age in controls
