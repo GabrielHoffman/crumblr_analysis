@@ -200,22 +200,27 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 
+
 ### Correlation between coefficient estimates
 ```{r ggcorrplot}
 # get covariance matrix
-V = vcov(fit, cobj, coef="DxAD")
+V = vcov(fit, cobj, coef=coef)
 
 # convert to correlation matrix
 V = cov2cor(V)
 
 # shorten names
-rownames(V) = gsub(":DxAD", '', rownames(V))
-colnames(V) = gsub(":DxAD", '', colnames(V))
+rownames(V) = gsub(paste0(":", coef), '', rownames(V))
+colnames(V) = gsub(paste0(":", coef), '', colnames(V))
 
 # sort to match tree
 i = match(rev(get_taxa_name(fig1)), rownames(V))
 
 ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
+```
+
+```{r exit, cache=FALSE}
+knitr::knit_exit(1)
 ```
 
 
