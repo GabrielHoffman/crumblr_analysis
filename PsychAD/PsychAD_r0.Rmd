@@ -49,6 +49,8 @@ sce = readH5AD(file, use_hdf5=TRUE, verbose=TRUE)
 assayNames(sce)[1] = "counts"
 sce$Dx = factor(sce$Dx_AD, c('Control','AD'))
 
+colData(sce)$pool = gsub("^(.*)-\\S+$", "\\1", colData(sce)$poolID)
+
 pb.subclass <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subclass",  
@@ -60,9 +62,7 @@ pb.subtype <- aggregateToPseudoBulk(sce,
     cluster_id = "subtype",  
     sample_id = "Channel", 
     BPPARAM = SnowParam(2, progressbar=TRUE))
-```
 
-```{r ph, cache=FALSE}
 pb.subclass$pH[is.na(pb.subclass$pH)] = mean(pb.subclass$pH, na.rm=TRUE)
 pb.subtype$pH[is.na(pb.subtype$pH)] = mean(pb.subtype$pH, na.rm=TRUE)
 ```
@@ -78,7 +78,6 @@ df = cbind(reducedDim(sce, "X_umap"),
 
 ggplot(df, aes(V1, V2, color=subclass)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
 ```
-
 
 
 # Subclass
@@ -131,15 +130,12 @@ df %>%
 
 
 
-
-
-
 ## crumblr
 ### Variance partitioning analysis
 ```{r crumblr}
 cobj = crumblr(cellCounts(pb.subclass))
 
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
+form = ~ (1|SubID) + (1|pool) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
 
 vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subclass))
 
@@ -150,22 +146,40 @@ plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) + theme(aspect.ratio=1)
 fig.vp = plotPercentBars( sortCols(vp.c) )
 
 # analysis with dream()
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
+form = ~ (1|SubID) + (1|pool) + (1|Sex) + scale(Age) + Dx + pH + PMI
 fit = dream( cobj, form, colData(pb.subclass))
 fit = eBayes(fit)
+topTable(fit, coef="DxAd")
 ```
 
+# Age in controls
+```{r age}
+# cn = colnames(cellCounts(pb.subclass))
 
+# i = which(cn %in% c("Olig", "OPC", "Astro"))
+# i = grep("IN|EN", cn)
+
+pb.controls = pb.subclass[,pb.subclass$Dx == "Control"]
+
+cobj = crumblr(cellCounts(pb.controls))
+form = ~ (1|SubID) + (1|pool) + Sex + Age + pH + PMI
+
+fit = dream( cobj, form, colData(pb.controls))
+fit = eBayes(fit)
+
+coef = 'Age'
+topTable(fit, coef=coef)
+```
 
 ### Multivariate test along hierarchy
 ```{r sd, fig.width=10, fig.height=5}
-hc = buildClusterTreeFromPB(pb.subclass)
+hc = buildClusterTreeFromPB(pb.controls)
 
-res = treeTest( fit, cobj, hc, coef="DxAD")
+res = treeTest( fit, cobj, hc, coef=coef)
 
 fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
 
-tab = topTable(fit, coef="DxAD", number=Inf)
+tab = topTable(fit, coef=coef, number=Inf)
 
 tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
 tab$se = with(tab, logFC/t)
