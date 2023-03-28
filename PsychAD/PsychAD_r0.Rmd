@@ -55,13 +55,13 @@ pb.subclass <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subclass",  
     sample_id = "Channel", 
-    BPPARAM = SnowParam(2, progressbar=TRUE))
+    BPPARAM = SnowParam(1, progressbar=TRUE))
 
 pb.subtype <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subtype",  
     sample_id = "Channel", 
-    BPPARAM = SnowParam(2, progressbar=TRUE))
+    BPPARAM = SnowParam(1, progressbar=TRUE))
 
 pb.subclass$pH[is.na(pb.subclass$pH)] = mean(pb.subclass$pH, na.rm=TRUE)
 pb.subtype$pH[is.na(pb.subtype$pH)] = mean(pb.subtype$pH, na.rm=TRUE)
