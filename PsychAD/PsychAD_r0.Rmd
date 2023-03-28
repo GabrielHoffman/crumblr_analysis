@@ -219,10 +219,7 @@ i = match(rev(get_taxa_name(fig1)), rownames(V))
 ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 ```
 
-```{r exit, cache=FALSE}
-knitr::knit_exit(1)
-```
-
+How to compute residuals.  Ask Roman
 
 ```{r plots}
 
@@ -261,6 +258,10 @@ ggplot(df, aes(Age, IN_SST)) +
 ```
 
 
+
+```{r exit, cache=FALSE}
+knitr::knit_exit(1)
+```
 
 
 
