@@ -226,14 +226,32 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```{r compare.slopes}
 cobj = crumblr(cellCounts(pb))
 
+f = function(fit){
+  residuals(fit) + get_prediction(fit, ~ Age*Dx)
+}
+
+res = fitVarPartModel(cobj, form.dream, colData(pb), fxn = f)
+res = do.call(rbind, res) 
+
+
+
 CT = "IN_SST"
 df = data.frame(Composition = cobj$E[CT,],
+                Composition.residuals = res[CT,],
                 Age = pb$Age,
                 Dx = pb$Dx,
                 se = 1/sqrt(cobj$weights[CT,]))
 
 ggplot(df, aes(Age, Composition, color=Dx)) +
-  geom_errorbar(aes(ymin = Composition - 1.96*se, ymax = Composition + 1.96*se), width=0, color="grey50") +
+  # geom_errorbar(aes(ymin = Composition - 1.96*se, ymax = Composition + 1.96*se), width=0, color="grey50") +
+  geom_point() +
+  theme_classic() +
+  theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+  geom_smooth(method="lm") +
+  scale_color_manual(name = "Disease", values=c("blue", "red")) +
+  ggtitle(CT)
+
+ggplot(df, aes(Age, Composition.residuals, color=Dx)) +
   geom_point() +
   theme_classic() +
   theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
@@ -268,43 +286,6 @@ ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 ```
 
 How to compute residuals.  Ask Roman
-
-```{r plots}
-
-df = data.frame(IN_SST = cobj$E["IN_SST",],
-                Age = pb.controls$Age,
-                se = 1/sqrt(cobj$weights["IN_SST",]))
-
-# png("~/www/test.png")
-ggplot(df, aes(Age, IN_SST)) +
-  geom_errorbar(aes(ymin = IN_SST - 1.96*se, ymax = IN_SST + 1.96*se), width=0, color="grey50") +
-  geom_point() +
-  theme_classic() +
-  theme(aspect.ratio=1) +
-  geom_smooth(method="lm")
-# dev.off()
-
-
-fracs = cellCounts(pb.controls) / rowSums(cellCounts(pb.controls))
-
-
-df = data.frame(IN_SST = fracs[,"IN_SST"], 
-                Age = pb.controls$Age)
-
-# png("~/www/test.png")
-ggplot(df, aes(Age, IN_SST)) +
-  geom_point() +
-  theme_classic() +
-  theme(aspect.ratio=1) +
-  geom_smooth(method="lm")
-# dev.off()
-
-
-
-
-
-```
-
 
 
 ```{r exit, cache=FALSE}
