@@ -190,7 +190,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 
 ## Test Age in controls
-```{r test.disease}
+```{r test.Age}
 coef = "scale(Age)"
 pb = pb.subclass[,pb.subclass$Dx == "Control"]
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
@@ -200,7 +200,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
 ## Test Age in AD
-```{r test.disease}
+```{r test.age.AD}
 coef = "scale(Age)"
 pb = pb.subclass[,pb.subclass$Dx == "AD"]
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
@@ -212,7 +212,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 
 ## Test Age-by-disease interaction
-```{r test.disease}
+```{r test.ag.by.disease}
 coef = "Age:DxAD"
 pb = pb.subclass
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
