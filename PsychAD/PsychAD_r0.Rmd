@@ -32,6 +32,7 @@ library(dreamlet)
 library(crumblr)
 library(aplot)
 library(tidyverse)
+library(RColorBrewer)
 library(kableExtra)
 library(ggplot2)
 library(ggtree)
@@ -133,71 +134,101 @@ df %>%
 ## crumblr
 ### Variance partitioning analysis
 ```{r crumblr}
-cobj = crumblr(cellCounts(pb.subclass))
+run_crumblr_analysis = function(pb, form.vp, form.dream, coef){
 
-form = ~ (1|SubID) + (1|pool) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
+  cobj = crumblr(cellCounts(pb))
 
-vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subclass))
+  vp.c = fitExtractVarPartModel(cobj, form.vp, colData(pb))
 
-plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) + theme(aspect.ratio=1)
+  cols = c(brewer.pal(ncol(vp.c)-1, "Set1"), "grey85")
+  # plotVarPart(sortCols(vp.c), label.angle=60, ncol=4, col=cols) + theme(aspect.ratio=1)
+
+  fig.vp = plotPercentBars( sortCols(vp.c), col=cols )
+
+  # analysis with dream()
+  fit = dream( cobj, form.dream, colData(pb))
+  fit = eBayes(fit)
+
+  ### Multivariate test along hierarchy
+  hc = buildClusterTreeFromPB(pb)
+
+  res = treeTest( fit, cobj, hc, coef=coef)
+
+  fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
+
+  tab = topTable(fit, coef=coef, number=Inf)
+
+  tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
+  tab$se = with(tab, logFC/t)
+
+  fig2 = ggplot(tab, aes(celltype, logFC)) + 
+    geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
+    geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
+    geom_point(color="dodgerblue") +
+    theme_classic() +
+    coord_flip() +
+    xlab('') + 
+    ylab("Effect size") +
+    theme(axis.text.y=element_blank(),
+          axis.ticks.y=element_blank())
+
+  # combine plots
+  fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
+}
 ```
 
-```{r plotPercentBars}
-fig.vp = plotPercentBars( sortCols(vp.c) )
 
-# analysis with dream()
-form = ~ (1|SubID) + (1|pool) + (1|Sex) + scale(Age) + Dx + pH + PMI
-fit = dream( cobj, form, colData(pb.subclass))
-fit = eBayes(fit)
-topTable(fit, coef="DxAD")
+## Test disease
+```{r test.disease}
+coef = "DxAD"
+pb = pb.subclass
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
+
+run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
-# Age in controls
-```{r age}
-# cn = colnames(cellCounts(pb.subclass))
 
-# i = which(cn %in% c("Olig", "OPC", "Astro"))
-# i = grep("IN|EN", cn)
+## Test Age in controls
+```{r test.disease}
+coef = "scale(Age)"
+pb = pb.subclass[,pb.subclass$Dx == "Control"]
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
 
-pb.controls = pb.subclass[,pb.subclass$Dx == "Control"]
-
-cobj = crumblr(cellCounts(pb.controls))
-form = ~ (1|SubID) + (1|pool) + Sex + Age + pH + PMI
-
-fit = dream( cobj, form, colData(pb.controls))
-fit = eBayes(fit)
-
-coef = 'Age'
-topTable(fit, coef=coef)
+run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
-### Multivariate test along hierarchy
-```{r sd, fig.width=10, fig.height=5}
-hc = buildClusterTreeFromPB(pb.controls)
+## Test Age in AD
+```{r test.disease}
+coef = "scale(Age)"
+pb = pb.subclass[,pb.subclass$Dx == "AD"]
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
 
-res = treeTest( fit, cobj, hc, coef=coef)
-
-fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
-
-tab = topTable(fit, coef=coef, number=Inf)
-
-tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
-tab$se = with(tab, logFC/t)
-
-fig2 = ggplot(tab, aes(celltype, logFC)) + 
-  geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
-  geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
-  geom_point(color="dodgerblue") +
-  theme_classic() +
-  coord_flip() +
-  xlab('') + 
-  ylab("Effect size") +
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y=element_blank())
-
-# combine plots
-fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
+run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
+
+
+
+## Test Age-by-disease interaction
+```{r test.disease}
+coef = "Age:DxAD"
+pb = pb.subclass
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
+form.dream = ~ Age:Dx + (1|SubID) + (1|poolID) + (1|Sex) + pH + PMI
+
+run_crumblr_analysis(pb, form.vp, form.dream, coef)
+```
+
+
+
+
+
+
+
+
+
 
 
 
@@ -262,6 +293,36 @@ ggplot(df, aes(Age, IN_SST)) +
 ```{r exit, cache=FALSE}
 knitr::knit_exit(1)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
