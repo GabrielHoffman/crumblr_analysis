@@ -143,7 +143,8 @@ run_crumblr_analysis = function(pb, form.vp, form.dream, coef){
   cols = c(brewer.pal(ncol(vp.c)-1, "Set1"), "grey85")
   # plotVarPart(sortCols(vp.c), label.angle=60, ncol=4, col=cols) + theme(aspect.ratio=1)
 
-  fig.vp = plotPercentBars( sortCols(vp.c), col=cols )
+  cn = c(all.vars(form.vp), "Residuals")
+  fig.vp = plotPercentBars( vp.c, col=cols )
 
   # analysis with dream()
   fit = dream( cobj, form.dream, colData(pb))
@@ -182,8 +183,8 @@ run_crumblr_analysis = function(pb, form.vp, form.dream, coef){
 ```{r test.disease, fig.width=10}
 coef = "DxAD"
 pb = pb.subclass
-form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
-form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + (1|Dx) + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + Dx + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
@@ -191,20 +192,20 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 ## Test Age in controls
 ```{r test.Age, fig.width=10}
-coef = "scale(Age)"
+coef = "Age"
 pb = pb.subclass[,pb.subclass$Dx == "Control"]
-form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
-form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
 ## Test Age in AD
 ```{r test.age.AD, fig.width=10}
-coef = "scale(Age)"
+coef = "Age"
 pb = pb.subclass[,pb.subclass$Dx == "AD"]
-form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
-form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
@@ -224,23 +225,37 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 ### Compare slopes
 ```{r compare.slopes}
-cobj = crumblr(cellCounts(pb))
+pb.sub = pb[,pb$Age > 65]
+
+cobj = crumblr(cellCounts(pb.sub))
+
+fracs = cellCounts(pb.sub) / rowSums(cellCounts(pb.sub))
 
 f = function(fit){
   residuals(fit) + get_prediction(fit, ~ Age*Dx)
 }
 
-res = fitVarPartModel(cobj, form.dream, colData(pb), fxn = f, showWarnings=FALSE)
+res = fitVarPartModel(cobj, form.dream, colData(pb.sub), fxn = f, showWarnings=FALSE)
 res = do.call(rbind, res) 
 
 
 CT = "IN_SST"
-# CT = "Oligo"
 df = data.frame(Composition = cobj$E[CT,],
                 Composition.residuals = res[CT,],
-                Age = pb$Age,
-                Dx = pb$Dx,
+                fractions = fracs[,CT],
+                Age = pb.sub$Age,
+                Dx = pb.sub$Dx,
                 se = 1/sqrt(cobj$weights[CT,]))
+
+
+ggplot(df, aes(Age, fractions, color=Dx)) +
+  geom_point() +
+  theme_classic() +
+  theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+  geom_smooth(method="lm") +
+  scale_color_manual(name = "Disease", values=c("blue", "red")) +
+  ggtitle(CT)
+
 
 ggplot(df, aes(Age, Composition, color=Dx)) +
   # geom_errorbar(aes(ymin = Composition - 1.96*se, ymax = Composition + 1.96*se), width=0, color="grey50") +
