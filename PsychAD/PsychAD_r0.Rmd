@@ -236,9 +236,10 @@ ggplot(df, aes(Age, Composition, color=Dx)) +
   geom_errorbar(aes(ymin = Composition - 1.96*se, ymax = Composition + 1.96*se), width=0, color="grey50") +
   geom_point() +
   theme_classic() +
-  theme(aspect.ratio=1) +
+  theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
   geom_smooth(method="lm") +
-  scale_color_manual(name = "Disease", values=c("blue", "red"))
+  scale_color_manual(name = "Disease", values=c("blue", "red")) +
+  ggtitle(CT)
 ```
 
 
