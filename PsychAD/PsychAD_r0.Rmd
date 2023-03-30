@@ -216,7 +216,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```{r test.ag.by.disease, fig.width=10}
 coef = "Age:DxAD"
 pb = pb.subclass
-form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + (1|Dx) + pH + PMI
 form.dream = ~ Age*Dx + (1|SubID) + (1|poolID) + (1|Sex) + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
@@ -224,6 +224,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 
 ### Compare slopes
+Is the residual plot over fit?  Collapse to Donor level results
 ```{r compare.slopes}
 pb.sub = pb[,pb$Age > 65]
 
