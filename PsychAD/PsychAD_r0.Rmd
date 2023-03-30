@@ -193,8 +193,8 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```{r test.Age}
 coef = "scale(Age)"
 pb = pb.subclass[,pb.subclass$Dx == "Control"]
-form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
-form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
@@ -203,8 +203,8 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```{r test.age.AD}
 coef = "scale(Age)"
 pb = pb.subclass[,pb.subclass$Dx == "AD"]
-form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
-form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
