@@ -144,7 +144,7 @@ run_crumblr_analysis = function(pb, form.vp, form.dream, coef){
   # plotVarPart(sortCols(vp.c), label.angle=60, ncol=4, col=cols) + theme(aspect.ratio=1)
 
   cn = c(all.vars(form.vp), "Residuals")
-  fig.vp = plotPercentBars( vp.c, col=cols )
+  fig.vp = plotPercentBars( vp.c[,cn], col=cols )
 
   # analysis with dream()
   fit = dream( cobj, form.dream, colData(pb))
