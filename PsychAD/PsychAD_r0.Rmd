@@ -179,7 +179,7 @@ run_crumblr_analysis = function(pb, form.vp, form.dream, coef){
 
 
 ## Test disease
-```{r test.disease}
+```{r test.disease, fig.width=10}
 coef = "DxAD"
 pb = pb.subclass
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
@@ -190,7 +190,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 
 ## Test Age in controls
-```{r test.Age}
+```{r test.Age, fig.width=10}
 coef = "scale(Age)"
 pb = pb.subclass[,pb.subclass$Dx == "Control"]
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
@@ -200,7 +200,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
 ## Test Age in AD
-```{r test.age.AD}
+```{r test.age.AD, fig.width=10}
 coef = "scale(Age)"
 pb = pb.subclass[,pb.subclass$Dx == "AD"]
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + pH + PMI
@@ -212,18 +212,34 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 
 ## Test Age-by-disease interaction
-```{r test.ag.by.disease}
+```{r test.ag.by.disease, fig.width=10}
 coef = "Age:DxAD"
 pb = pb.subclass
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
-form.dream = ~ Age:Dx + (1|SubID) + (1|poolID) + (1|Sex) + pH + PMI
+form.dream = ~ Age*Dx + (1|SubID) + (1|poolID) + (1|Sex) + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
 
+### Compare slopes
+```{r compare.slopes}
+cobj = crumblr(cellCounts(pb))
 
+CT = "IN_SST"
+df = data.frame(Composition = cobj$E[CT,],
+                Age = pb$Age,
+                Dx = pb$Dx,
+                se = 1/sqrt(cobj$weights[CT,]))
 
+ggplot(df, aes(Age, Composition, color=Dx)) +
+  geom_errorbar(aes(ymin = Composition - 1.96*se, ymax = Composition + 1.96*se), width=0, color="grey50") +
+  geom_point() +
+  theme_classic() +
+  theme(aspect.ratio=1) +
+  geom_smooth(method="lm") +
+  scale_color_manual(name = "Disease", values=c("blue", "red"))
+```
 
 
 
