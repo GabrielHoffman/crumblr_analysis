@@ -9,6 +9,19 @@ output:
     smart: true
 ---
 
+<!---
+
+
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/PsychAD
+ml python git
+git pull
+R --vanilla
+
+
+system("git pull"); rmarkdown::render("PsychAD_r0.Rmd");
+
+
+--->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -198,6 +211,50 @@ form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
 form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
+```
+
+
+### Compare slopes
+Is the residual plot over fit?  Collapse to Donor level results
+```{r compare.slopes.controls}
+cobj = crumblr(cellCounts(pb))
+
+fracs = cellCounts(pb) / rowSums(cellCounts(pb))
+
+f = function(fit){
+  residuals(fit) + get_prediction(fit, ~ Age)
+}
+
+res = fitVarPartModel(cobj, form.dream, colData(pb), fxn = f, showWarnings=FALSE)
+res = do.call(rbind, res) 
+
+CT = "IN_SST"
+df = data.frame(Composition = cobj$E[CT,],
+                Composition.residuals = res[CT,],
+                fractions = fracs[,CT],
+                Age = pb$Age,
+                se = 1/sqrt(cobj$weights[CT,]))
+
+ggplot(df, aes(Age, fractions)) +
+  geom_point() +
+  theme_classic() +
+  theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+  geom_smooth(method="lm") +
+  ggtitle(CT)
+
+ggplot(df, aes(Age, Composition)) +
+  geom_point() +
+  theme_classic() +
+  theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+  geom_smooth(method="lm") +
+  ggtitle(CT)
+
+ggplot(df, aes(Age, Composition.residuals)) +
+  geom_point() +
+  theme_classic() +
+  theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+  geom_smooth(method="lm") +
+  ggtitle(CT)
 ```
 
 ## Test Age in AD
