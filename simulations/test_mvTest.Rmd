@@ -258,7 +258,7 @@ fig_AUPR = ggplot(df, aes(n_positive, AUPR, color=method, alpha=shrink.cov)) +
 ```
 
 ```{r combine, fig.height=4, fig.width=7, cache=FALSE}
-plot_grid(fig_AUPR, fig_FPR, labels=LETTERS[1:2])
+plot_grid(fig_AUPR, fig_FPR, labels=LETTERS[1:2], nrow=2)
 ```
 
 
