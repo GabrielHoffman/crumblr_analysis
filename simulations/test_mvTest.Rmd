@@ -146,6 +146,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       # Create EList object
       vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
 
+      browser()
       map_df( n.values, function(n){
         i = seq(n)
         # run dream
