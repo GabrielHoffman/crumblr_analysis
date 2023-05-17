@@ -64,7 +64,7 @@ autocorr.mat = function (p, rho){
 }
 
 # Simulate error with given variance and correlations
-sim_error = function(m, rho_error, error_var){
+sim_error = function(m, n, rho_error, error_var){
   Epsilon = map(1:n, function(k){
     # create correlation matrix
     Sig = matrix(rho_error, m,m)
@@ -119,7 +119,7 @@ res = future_map_dfr( seq(n_reps), function(i){
     error_var = matrix(runif(n.max*m, 1, 100), n.max, m)
     # error_var[] = 1
 
-    Epsilon = sim_error(m, rho_error, error_var)
+    Epsilon = sim_error(m, n.max, rho_error, error_var)
 
     values = m
     if(i < n_reps*0.9) values = 0
@@ -148,25 +148,26 @@ res = future_map_dfr( seq(n_reps), function(i){
       vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
 
       map_df( n.values, function(n){
-        browser()
-        i = seq(n)
+        idx = seq(n)
         # run dream
-        suppressMessages(fit <- dream(vobj[,i], form, data=Xdf[i,]))
+        suppressMessages(fit <- dream(vobj[,idx], form, data=Xdf[idx,]))
         fit = eBayes(fit)
         
         res = map_df(methods, function(method){
-          mvTest(fit, vobj[,i], rownames(fit), coef="V2", method, shrink.cov=FALSE)
+          mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method, shrink.cov=FALSE)
         })
         res$i = i
         res$n_positive = n_positive
         res$shrink.cov = FALSE
+        res$n = n
 
         res2 = map_df(methods, function(method){
-          mvTest(fit, vobj[,i], rownames(fit), coef="V2", method, shrink.cov=TRUE)
+          mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method, shrink.cov=TRUE)
         })
         res2$i = i
         res2$n_positive = n_positive
         res2$shrink.cov = TRUE
+        res2$n = n
 
         rbind(res, res2)
       })
