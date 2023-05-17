@@ -85,7 +85,6 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 
 # Multivariate hypothesis testing
 ```{r mvTest1}
-knitr::knit_exit()
 plan(multisession, workers = 36)
 set.seed(12)
  
