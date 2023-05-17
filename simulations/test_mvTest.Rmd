@@ -154,14 +154,14 @@ res = future_map_dfr( seq(n_reps), function(i){
       })
       res$i = i
       res$n_positive = n_positive
-      res$shrink.cov=FALSE
+      res$shrink.cov = FALSE
 
       res2 = map_df(methods, function(method){
         mvTest(fit, vobj, rownames(fit), coef="V2", method, shrink.cov=TRUE)
       })
       res2$i = i
       res2$n_positive = n_positive
-      res2$shrink.cov=FALSE
+      res2$shrink.cov = TRUE
 
       rbind(res, res2)
     })
