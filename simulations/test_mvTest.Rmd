@@ -88,19 +88,20 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 plan(multisession, workers = 36)
 set.seed(12)
  
-n = 200 # samples
+n.max = 200 # samples
 p = 2 # features
 m.max = 12 # responses
 rho = 0 # correlation between covariates
 rho_error = .8 # error correlation between responses
-n_reps = 1e5
+n_reps = 1e3
+n.values = c(10, 30, 50, 200)
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
 
-X = rmvnorm(n,rep(0,p), Sigma)
+X = rmvnorm(n.max,rep(0,p), Sigma)
 Xdf = as.data.frame(X)
-rownames(Xdf) = paste0("sample_", 1:n)
+rownames(Xdf) = paste0("sample_", 1:n.max)
 
 form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
 
@@ -114,7 +115,7 @@ res = future_map_dfr( seq(n_reps), function(i){
   map_df( seq(2, m.max), function(m){
 
     # Error variance
-    error_var = matrix(runif(n*m, 1, 100), n, m)
+    error_var = matrix(runif(n*m, 1, 100), n.max, m)
     # error_var[] = 1
 
     Epsilon = sim_error(m, rho_error, error_var)
@@ -137,7 +138,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       # linear predictor with no noise
       Eta = X %*% beta
       colnames(Eta) = paste0("gene_", 1:m)
-      rownames(Eta) = paste0("sample_", 1:n)
+      rownames(Eta) = paste0("sample_", 1:n.max)
 
       # Observe data with error
       Y = Eta + Epsilon
@@ -145,25 +146,28 @@ res = future_map_dfr( seq(n_reps), function(i){
       # Create EList object
       vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
 
-      # run dream
-      suppressMessages(fit <- dream(vobj, form, data=Xdf))
-      fit = eBayes(fit)
-      
-      res = map_df(methods, function(method){
-        mvTest(fit, vobj, rownames(fit), coef="V2", method, shrink.cov=FALSE)
-      })
-      res$i = i
-      res$n_positive = n_positive
-      res$shrink.cov = FALSE
+      maf_df( n.values, function(n){
+        i = seq(n)
+        # run dream
+        suppressMessages(fit <- dream(vobj[,i], form, data=Xdf[i,]))
+        fit = eBayes(fit)
+        
+        res = map_df(methods, function(method){
+          mvTest(fit, vobj, rownames(fit), coef="V2", method, shrink.cov=FALSE)
+        })
+        res$i = i
+        res$n_positive = n_positive
+        res$shrink.cov = FALSE
 
-      res2 = map_df(methods, function(method){
-        mvTest(fit, vobj, rownames(fit), coef="V2", method, shrink.cov=TRUE)
-      })
-      res2$i = i
-      res2$n_positive = n_positive
-      res2$shrink.cov = TRUE
+        res2 = map_df(methods, function(method){
+          mvTest(fit, vobj, rownames(fit), coef="V2", method, shrink.cov=TRUE)
+        })
+        res2$i = i
+        res2$n_positive = n_positive
+        res2$shrink.cov = TRUE
 
-      rbind(res, res2)
+        rbind(res, res2)
+      })
     })
   })
 },.options = furrr_options(seed=TRUE))
@@ -173,24 +177,25 @@ res = future_map_dfr( seq(n_reps), function(i){
 ```{r FPR, fig.height=5, fig.width=10, cache=FALSE}
 df = res %>%
   filter(n_positive==0) %>%
-  group_by(method, n_features) %>%
+  group_by(method, shrink.cov, n_features) %>%
   summarize( count = sum(pvalue < 0.05), total=length(pvalue)) %>%
   mutate(FPR = count / total) %>%
   mutate( se = sqrt(FPR*(1-FPR)/ total))
 
-ggplot(df, aes(method, FPR, fill=method)) +
+ggplot(df, aes(method, FPR, fill=method, alpha = shrink.cov)) +
   geom_bar(stat="identity") +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
   geom_hline(yintercept=0.05, linetype="dashed") +
   scale_fill_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
+  scale_alpha_manual(values = c(.5, 1)) +
   facet_wrap(~ n_features) 
 ```
 
 
 ```{r plot.FPR, fig.width=6, fig.height=5, cache=FALSE}
-fig_FPR = ggplot(df, aes(n_features, FPR, color=method)) +
+fig_FPR = ggplot(df, aes(n_features, FPR, color=method, alpha = shrink.cov)) +
   geom_line(size=1) + 
   geom_point() +
   # geom_errorbar(aes(ymin=FPR-1.96*se, ymax=FPR+1.96*se), width=0) +
@@ -199,7 +204,8 @@ fig_FPR = ggplot(df, aes(n_features, FPR, color=method)) +
   theme(aspect.ratio=1) +
   scale_color_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
-  scale_x_continuous("Number of responses", breaks=seq(2, 12, by=2))
+  scale_x_continuous("Number of responses", breaks=seq(2, 12, by=2)) +
+  scale_alpha_manual(values = c(.5, 1))
 ```
 
 
