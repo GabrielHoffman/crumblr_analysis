@@ -207,7 +207,8 @@ fig_FPR = ggplot(df, aes(n_features, FPR, color=method, alpha = shrink.cov)) +
   scale_color_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
   scale_x_continuous("Number of responses", breaks=seq(2, 12, by=2)) +
-  scale_alpha_manual(values = c(.3, 1))
+  scale_alpha_manual(values = c(.3, 1)) +
+  facet_wrap(~n, nrow=1)
 ```
 
 
