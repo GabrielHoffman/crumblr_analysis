@@ -85,6 +85,7 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 
 # Multivariate hypothesis testing
 ```{r mvTest1}
+knitr::knit_exit()
 plan(multisession, workers = 1)
 set.seed(12)
  
@@ -146,8 +147,8 @@ res = future_map_dfr( seq(n_reps), function(i){
       # Create EList object
       vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
 
-      browser()
       map_df( n.values, function(n){
+        browser()
         i = seq(n)
         # run dream
         suppressMessages(fit <- dream(vobj[,i], form, data=Xdf[i,]))
