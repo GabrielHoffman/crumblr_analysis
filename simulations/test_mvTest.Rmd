@@ -179,7 +179,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 ```{r FPR, fig.height=5, fig.width=10, cache=FALSE}
 df = res %>%
   filter(n_positive==0) %>%
-  group_by(method, shrink.cov, n_features) %>%
+  group_by(method, shrink.cov, n_features, n) %>%
   summarize( count = sum(pvalue < 0.05), total=length(pvalue)) %>%
   mutate(FPR = count / total) %>%
   mutate( se = sqrt(FPR*(1-FPR)/ total))
