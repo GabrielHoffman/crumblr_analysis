@@ -252,7 +252,7 @@ fig_AUPR = ggplot(df, aes(n_positive, AUPR, color=method)) +
   scale_x_continuous("Number of responses", breaks=seq(2, 12, by=2))
 ```
 
-```{r combine, fig.height=4, fig.width=7}
+```{r combine, fig.height=4, fig.width=7, cache=FALSE}
 plot_grid(fig_AUPR, fig_FPR, labels=LETTERS[1:2])
 ```
 
