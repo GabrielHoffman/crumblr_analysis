@@ -85,7 +85,7 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 
 # Multivariate hypothesis testing
 ```{r mvTest1}
-plan(multisession, workers = 36)
+plan(multisession, workers = 1)
 set.seed(12)
  
 n.max = 200 # samples
@@ -153,14 +153,14 @@ res = future_map_dfr( seq(n_reps), function(i){
         fit = eBayes(fit)
         
         res = map_df(methods, function(method){
-          mvTest(fit, vobj, rownames(fit), coef="V2", method, shrink.cov=FALSE)
+          mvTest(fit, vobj[,i], rownames(fit), coef="V2", method, shrink.cov=FALSE)
         })
         res$i = i
         res$n_positive = n_positive
         res$shrink.cov = FALSE
 
         res2 = map_df(methods, function(method){
-          mvTest(fit, vobj, rownames(fit), coef="V2", method, shrink.cov=TRUE)
+          mvTest(fit, vobj[,i], rownames(fit), coef="V2", method, shrink.cov=TRUE)
         })
         res2$i = i
         res2$n_positive = n_positive
