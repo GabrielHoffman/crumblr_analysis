@@ -228,7 +228,7 @@ ggplot(df, aes(method, FPR, fill=method, alpha = shrink.cov)) +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
   geom_hline(yintercept=0.05, linetype="dashed") +
-  scale_fill_brewer(palette = "Set1") +
+  # scale_fill_brewer(palette = "Set1") +
   scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
   scale_alpha_manual(values = c(.5, 1)) +
   facet_wrap(~ n_features) 
