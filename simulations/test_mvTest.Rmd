@@ -192,8 +192,8 @@ res = future_map_dfr( seq(n_reps), function(i){
         idx2 = grep(":V2$", rownames(V))
         V = V[idx2,idx2]
 
-        a = wald.test(V, beta, Terms=seq(length(beta)))
-        df$pvalue[2] = a$result$chi2[3]
+        a = wald.test(V, beta, Terms=seq(length(beta)), df=mean(fit$df.residual))
+        df$pvalue[2] = a$result$Ftest['P']
         
 
         # residuals(fitlm)[1:3,]
