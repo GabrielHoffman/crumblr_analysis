@@ -268,7 +268,7 @@ df = map_df(unique(res$n_positive)[-1], function(n_pos){
     summarize( AUPR = calc_aupr(pvalue, n_positive==0)) %>% 
     mutate(n_positive = n_pos)
 }) 
-
+ 
 # ggplot(df, aes(method, AUPR, fill=method, alpha=shrink.cov)) +
 #   geom_bar(stat="identity") +
 #   facet_wrap(~n_positive, nrow=1) +
