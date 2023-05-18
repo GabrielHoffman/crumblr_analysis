@@ -221,6 +221,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 ```{r FPR, fig.height=5, fig.width=10, cache=FALSE}
 df = res %>%
   filter(n_positive==0) %>%
+  mutate(pvalue = as.numeric(pvalue)) %>%
   group_by(method, shrink.cov, n_features, n) %>%
   summarize( count = sum(pvalue < 0.05), total=length(pvalue)) %>%
   mutate(FPR = count / total) %>%
@@ -266,8 +267,11 @@ calc_aupr = function(pvalues, category){
 
 df = map_df(unique(res$n_positive)[-1], function(n_pos){
   res %>%
-    filter(n_positive %in% c(0,n_pos))  %>%
-    group_by(method, shrink.cov, n) %>%
+    filter(n_positive %in% c(0,n_pos)) %>%
+    mutate(pvalue = as.numeric(pvalue)) %>%
+    filter(!is.na(pvalue)) %>%
+    mutate(method2 = paste(method, shrink.cov)) %>%
+    group_by(method2, n) %>%
     summarize( AUPR = calc_aupr(pvalue, n_positive==0)) %>% 
     mutate(n_positive = n_pos)
 }) 
