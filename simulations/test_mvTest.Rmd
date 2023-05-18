@@ -88,13 +88,13 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 plan(multisession, workers = 36)
 set.seed(12)
  
-n.max = 200 # samples
+n.max = 400 # samples
 p = 2 # features
-m.max = 12 # responses
+m.max = 30 # responses
 rho = 0 # correlation between covariates
 rho_error = .8 # error correlation between responses
 n_reps = 1e4
-n.values = c(10, 30, 50, 200)
+n.values = c(20, 50, 150, 400)
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
@@ -112,7 +112,7 @@ res = future_map_dfr( seq(n_reps), function(i){
   message('\r', i, '   ', appendLF=FALSE)
   RhpcBLASctl::omp_set_num_threads(1)
 
-  map_df( seq(2, m.max), function(m){
+  map_df( seq(2, m.max, by=3), function(m){
 
     # Error variance
     error_var = matrix(runif(n.max*m, 1, 100), n.max, m)
