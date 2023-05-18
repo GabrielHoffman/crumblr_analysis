@@ -108,7 +108,8 @@ rownames(Xdf) = paste0("sample_", 1:n.max)
 
 form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
 
-methods = c("FE", "sidak", "fisher") 
+methods = c("sidak", "fisher") 
+shrink.methods = c("FALSE", "Schafer", "OAS", "RBLW", "EB")
 
 res = future_map_dfr( seq(n_reps), function(i){
 
@@ -148,43 +149,64 @@ res = future_map_dfr( seq(n_reps), function(i){
 
       # Create EList object
       vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
+      vobj$weights[] = 1
 
       map_df( n.values, function(n){
         idx = seq(n)
         # run dream
-        suppressMessages(fit <- dream(vobj$E[,idx], form, data=Xdf[idx,]))
+        suppressMessages(fit <- dream(vobj[,idx], form, data=Xdf[idx,]))
         fit = eBayes(fit)
         
         res = map_df(methods, function(method){
-          mvTest(fit, vobj$E[,idx], rownames(fit), coef="V2", method, shrink.cov=FALSE)
+          mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method)
         })
         res$i = i
         res$n_positive = n_positive
-        res$shrink.cov = FALSE
+        res$shrink.cov = 'FALSE'
         res$n = n
 
-        res2 = map_df(methods, function(method){
-          mvTest(fit, vobj$E[,idx], rownames(fit), coef="V2", method, shrink.cov=TRUE)
+        res2 = map_df(shrink.methods, function(shrink){
+          a = mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method="FE", shrink.cov=shrink)
+          a$shrink.cov = shrink
+          a
         })
         res2$i = i
         res2$n_positive = n_positive
-        res2$shrink.cov = TRUE
         res2$n = n
 
+        # S = vcov(fit, vobj[,idx], coef="V2")
+        # P = vcovSqrt(fit, vobj[,idx], coef="V2", approx=TRUE)
+        # range(S - crossprod(P))
+
+        # corpcor::estimate.lambda(P, verbose=FALSE)
+        # CovTools::CovEst.2010RBLW(P)$rho
+        # decorrelate::eclairs(P, n.samples = n)$lambda
+        
         # standard tests
-        df = data.frame(method = c("anova", "wald"), pvalue = c(0,0), n_features = res$n_features[1], i = i, n_positive = n_positive, shrink.cov = FALSE, n=n)
+        df = data.frame(method = c("anova", "wald"), pvalue = c(0,0), n_features = res$n_features[1], i = i, n_positive = n_positive, shrink.cov = 'FALSE', n=n)
         library(aod)
-        fitlm = lm( t(vobj$E) ~ V1 + V2, Xdf)
+        fitlm = lm( t(vobj$E[,idx]) ~ V1 + V2, Xdf[idx,])
         df$pvalue[1] = anova(fitlm)$`Pr(>F)`[3]
 
         beta = coef(fitlm)[3,]
         V = vcov(fitlm)
-        idx = grep(":V2$", rownames(V))
-        V = V[idx,idx]
-        
+        idx2 = grep(":V2$", rownames(V))
+        V = V[idx2,idx2]
+
         a = wald.test(V, beta, Terms=seq(length(beta)))
         df$pvalue[2] = a$result$chi2[3]
+        
 
+        # residuals(fitlm)[1:3,]
+        # # trace("vcov", browser, exit=browser, signature = c("MArrayLM"))
+        # # untrace("vcov", signature = c("MArrayLM"))
+        # S = vcov(fit, vobj[,idx], coef="V2")
+
+        # coef(fitlm)
+        # t(coef(fit))
+
+        # coef(fitlm)
+        
         smartbind(rbind(res, res2), df)
       })
     })
