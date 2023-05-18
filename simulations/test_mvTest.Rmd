@@ -124,7 +124,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 
   Epsilon = sim_error(max(m.values), n.max, rho_error, error_var)
 
-  beta.all = matrnorm(p,max(m.values))/3
+  beta.all = matrnorm(p,max(m.values))/8
 
   map_df( m.values, function(m){
 
