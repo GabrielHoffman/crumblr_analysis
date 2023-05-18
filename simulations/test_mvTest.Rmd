@@ -241,7 +241,7 @@ df = res %>%
 
 
 ```{r plot.FPR, fig.width=6, fig.height=5, cache=FALSE}
-fig_FPR = ggplot(df, aes(n_features, FPR, color=paste(method, shrink.cov))) +
+fig_FPR = ggplot(df, aes(n_features, FPR, color=method2)) +
   geom_line(size=1) + 
   geom_point() +
   geom_hline(yintercept=0.05, linetype="dashed") +
