@@ -223,7 +223,7 @@ df = res %>%
   mutate(FPR = count / total) %>%
   mutate( se = sqrt(FPR*(1-FPR)/ total))
 
-ggplot(df, aes(method, FPR, fill=method, alpha = shrink.cov)) +
+ggplot(df, aes(method, FPR, fill=paste(method, shrink.cov))) +
   geom_bar(stat="identity") +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
@@ -236,7 +236,7 @@ ggplot(df, aes(method, FPR, fill=method, alpha = shrink.cov)) +
 
 
 ```{r plot.FPR, fig.width=6, fig.height=5, cache=FALSE}
-fig_FPR = ggplot(df, aes(n_features, FPR, color=method, alpha = shrink.cov)) +
+fig_FPR = ggplot(df, aes(n_features, FPR, color=paste(method, shrink.cov))) +
   geom_line(size=1) + 
   geom_point() +
   geom_hline(yintercept=0.05, linetype="dashed") +
@@ -282,7 +282,7 @@ df = map_df(unique(res$n_positive)[-1], function(n_pos){
 ```
 
 ```{r plot.lines, fig.width=6, fig.height=5, cache=FALSE}
-fig_AUPR = ggplot(df, aes(n_positive, AUPR, color=method, alpha=shrink.cov)) +
+fig_AUPR = ggplot(df, aes(n_positive, AUPR, color=paste(method, shrink.cov))) +
   geom_line(size=1) + 
   geom_point() +
   geom_hline(yintercept=0.1, linetype="dashed") +
