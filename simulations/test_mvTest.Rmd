@@ -283,7 +283,7 @@ fig_AUPR = ggplot(df2, aes(jitter(n_positive), AUPR, color=method2)) +
   facet_wrap(~n, nrow=1)
 ```
 
-```{r combine, fig.height=5, fig.width=16, cache=FALSE}
+```{r combine, fig.height=8, fig.width=16, cache=FALSE}
 fig_AUPR
 fig_FPR
 ```
