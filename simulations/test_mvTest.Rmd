@@ -90,7 +90,7 @@ set.seed(12)
  
 n.max = 400 # samples
 p = 2 # features
-m.max = 30 # responses
+m.max = 20 # responses
 rho = 0 # correlation between covariates
 rho_error = .8 # error correlation between responses
 n_reps = 1e4
