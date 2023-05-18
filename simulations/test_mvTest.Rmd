@@ -14,7 +14,7 @@ output:
 ---
 
 <!---
-cd /Users/gabrielhoffman/workspace/repos
+cd /Users/gabrielhoffman/workspace/repos/crumblr_analysis/simulations
 R
 
 rmarkdown::render('test_mvTest.Rmd')
@@ -57,6 +57,7 @@ library(variancePartition)
 library(purrr)
 library(furrr)
 library(tidyverse)
+library(gtools)
 
 autocorr.mat = function (p, rho){
     mat <- diag(p)
@@ -90,11 +91,13 @@ set.seed(12)
  
 n.max = 400 # samples
 p = 2 # features
-m.max = 20 # responses
+m.max = 10 # responses
 rho = 0 # correlation between covariates
 rho_error = .8 # error correlation between responses
-n_reps = 1e4
+n_reps = 1e3
 n.values = c(20, 50, 150, 400)
+n.values = c(200)
+
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
@@ -149,11 +152,11 @@ res = future_map_dfr( seq(n_reps), function(i){
       map_df( n.values, function(n){
         idx = seq(n)
         # run dream
-        suppressMessages(fit <- dream(vobj[,idx], form, data=Xdf[idx,]))
+        suppressMessages(fit <- dream(vobj$E[,idx], form, data=Xdf[idx,]))
         fit = eBayes(fit)
         
         res = map_df(methods, function(method){
-          mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method, shrink.cov=FALSE)
+          mvTest(fit, vobj$E[,idx], rownames(fit), coef="V2", method, shrink.cov=FALSE)
         })
         res$i = i
         res$n_positive = n_positive
@@ -161,14 +164,28 @@ res = future_map_dfr( seq(n_reps), function(i){
         res$n = n
 
         res2 = map_df(methods, function(method){
-          mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method, shrink.cov=TRUE)
+          mvTest(fit, vobj$E[,idx], rownames(fit), coef="V2", method, shrink.cov=TRUE)
         })
         res2$i = i
         res2$n_positive = n_positive
         res2$shrink.cov = TRUE
         res2$n = n
 
-        rbind(res, res2)
+        # standard tests
+        df = data.frame(method = c("anova", "wald"), pvalue = c(0,0), n_features = res$n_features[1], i = i, n_positive = n_positive, shrink.cov = FALSE, n=n)
+        library(aod)
+        fitlm = lm( t(vobj$E) ~ V1 + V2, Xdf)
+        df$pvalue[1] = anova(fitlm)$`Pr(>F)`[3]
+
+        beta = coef(fitlm)[3,]
+        V = vcov(fitlm)
+        idx = grep(":V2$", rownames(V))
+        V = V[idx,idx]
+        
+        a = wald.test(V, beta, Terms=seq(length(beta)))
+        df$pvalue[2] = a$result$chi2[3]
+
+        smartbind(rbind(res, res2), df)
       })
     })
   })
@@ -244,7 +261,7 @@ df = map_df(unique(res$n_positive)[-1], function(n_pos){
 
 ```{r plot.lines, fig.width=6, fig.height=5, cache=FALSE}
 fig_AUPR = ggplot(df, aes(n_positive, AUPR, color=method, alpha=shrink.cov)) +
-  geom_line() + 
+  geom_line(size=1) + 
   geom_point() +
   geom_hline(yintercept=0.1, linetype="dashed") +
   theme_classic() +
@@ -262,7 +279,10 @@ fig_FPR
 ```
 
 
-
+OAS, RBLW
+divide by n or n-1
+is covariance correct?
+When is FE better?
 
 <!---
 
