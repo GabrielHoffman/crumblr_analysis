@@ -118,23 +118,23 @@ res = future_map_dfr( seq(n_reps), function(i){
   message('\r', i, '   ', appendLF=FALSE)
   RhpcBLASctl::omp_set_num_threads(1)
 
+  # Error variance
+  error_var = matrix(runif(n.max*max(m.values), 1, 25), n.max, max(m.values))
+  # error_var[] = 1
+
+  Epsilon = sim_error(max(m.values), n.max, rho_error, error_var)
+
+  beta.all = matrnorm(p,max(m.values))/10
+
   map_df( m.values, function(m){
 
-    # Error variance
-    error_var = matrix(runif(n.max*m, 1, 25), n.max, m)
-    # error_var[] = 1
-
-    Epsilon = sim_error(m, n.max, rho_error, error_var)
-
-    values = m
-    if(i < n_reps*0.9) values = 0
-
-    map_df( values, function(n_positive){
+      n_positive = m
+      if(i < n_reps*0.8) n_positive = 0
 
       if(n_positive == 0){
-        beta = matrix(0, p,m)
+        beta = matrix(0, p,max(m.values))
       }else{    
-        beta = matrnorm(p,m)/10
+        beta = beta.all
         beta[p,] = .8
         # set to zero
         # beta[p,] = 0
@@ -142,15 +142,15 @@ res = future_map_dfr( seq(n_reps), function(i){
       }
 
       # linear predictor with no noise
-      Eta = X %*% beta
+      Eta = X %*% beta[,1:m]
       colnames(Eta) = paste0("gene_", 1:m)
       rownames(Eta) = paste0("sample_", 1:n.max)
 
       # Observe data with error
-      Y = Eta + Epsilon
+      Y = Eta + Epsilon[,1:m]
 
       # Create EList object
-      vobj = new("EList", list(E = t(Y), weights = t(1/error_var)))
+      vobj = new("EList", list(E = t(Y), weights = t(1/error_var[,1:m])))
       vobj$weights[] = 1
 
       map_df( n.values, function(n){
