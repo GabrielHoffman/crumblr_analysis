@@ -214,7 +214,7 @@ fig_FPR = ggplot(df, aes(n_features, FPR, color=method, alpha = shrink.cov)) +
 
 
 
-```{r AUPR, fig.height=5, fig.width=10, cache=FALSE}
+```{r AUPR, fig.height=5, fig.width=10}
 calc_aupr = function(pvalues, category){
 
   pr = pr.curve(-log10(pvalues)[!category], -log10(pvalues)[category], rand.compute=TRUE, curve=TRUE)
@@ -222,7 +222,7 @@ calc_aupr = function(pvalues, category){
   pr$auc.integral
 }
 
-df = map_df(2:m.max, function(n_pos){
+df = map_df(unique(res$n_positive)[-1], function(n_pos){
   res %>%
     filter(n_positive %in% c(0,n_pos))  %>%
     group_by(method, shrink.cov, n) %>%
