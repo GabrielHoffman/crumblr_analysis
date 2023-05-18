@@ -90,7 +90,7 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 plan(multisession, workers = 36)
 set.seed(12)
  
-n.max = 150 # samples
+n.max = 200 # samples
 p = 2 # features
 m.values = c(2, 5, 10, 15, 20, 30, 50) # responses
 rho = 0 # correlation between covariates
