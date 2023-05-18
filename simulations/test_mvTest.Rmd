@@ -235,7 +235,7 @@ df = res %>%
   mutate(FPR = count / total) %>%
   mutate( se = sqrt(FPR*(1-FPR)/ total))
 
-fig_FPR = ggplot(df, aes(n_features, FPR, color=method2)) +
+fig_FPR = ggplot(df, aes(jitter(n_features), FPR, color=method2)) +
   geom_line(size=1) + 
   geom_point() +
   geom_hline(yintercept=0.05, linetype="dashed") +
@@ -270,7 +270,7 @@ df2 = map_df(unique(res$n_positive)[-1], function(n_pos){
     mutate(n_positive = n_pos)
 }) 
 
-fig_AUPR = ggplot(df2, aes(n_positive, AUPR, color=method2)) +
+fig_AUPR = ggplot(df2, aes(jitter(n_positive), AUPR, color=method2)) +
   geom_line(size=1) + 
   geom_point() +
   geom_hline(yintercept=0.1, linetype="dashed") +
