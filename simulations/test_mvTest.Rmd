@@ -94,7 +94,7 @@ p = 2 # features
 m.max = 10 # responses
 rho = 0 # correlation between covariates
 rho_error = .8 # error correlation between responses
-n_reps = 4e3
+n_reps = 1e3
 n.values = c(150)
 
 
@@ -118,7 +118,7 @@ res = future_map_dfr( seq(n_reps), function(i){
   map_df( seq(2, m.max, by=3), function(m){
 
     # Error variance
-    error_var = matrix(runif(n.max*m, 1, 10), n.max, m)
+    error_var = matrix(runif(n.max*m, 1, 30), n.max, m)
     # error_var[] = 1
 
     Epsilon = sim_error(m, n.max, rho_error, error_var)
