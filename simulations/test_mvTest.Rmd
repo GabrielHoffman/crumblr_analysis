@@ -135,7 +135,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       beta = matrix(0, p,max(m.values))
     }else{    
       beta = beta.all
-      beta[p,] = .8
+      beta[p,] = .5
       # set to zero
       # beta[p,] = 0
       # beta[p,sample.int(m, n_positive)] = 1
@@ -272,7 +272,7 @@ df2 = map_df(unique(res$n_positive)[-1], function(n_pos){
 fig_AUPR = ggplot(df2, aes(n_positive, AUPR, color=method2)) +
   geom_line(size=1) + 
   geom_point() +
-  geom_hline(yintercept=0.1, linetype="dashed") +
+  geom_hline(yintercept=0.2, linetype="dashed") +
   theme_classic() +
   theme(aspect.ratio=1) +
   scale_color_brewer(palette = "Set1") +
