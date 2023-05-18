@@ -244,7 +244,7 @@ df = map_df(2:m.max, function(n_pos){
 
 ```{r plot.lines, fig.width=6, fig.height=5, cache=FALSE}
 fig_AUPR = ggplot(df, aes(n_positive, AUPR, color=method, alpha=shrink.cov)) +
-  geom_line(size=1) + 
+  geom_line() + 
   geom_point() +
   geom_hline(yintercept=0.1, linetype="dashed") +
   theme_classic() +
