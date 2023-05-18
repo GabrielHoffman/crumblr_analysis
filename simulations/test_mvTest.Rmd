@@ -89,13 +89,13 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 plan(multisession, workers = 36)
 set.seed(12)
  
-n.max = 400 # samples
+n.max = 150 # samples
 p = 2 # features
-m.max = 25 # responses
+m.max = 10 # responses
 rho = 0 # correlation between covariates
 rho_error = .8 # error correlation between responses
-n_reps = 1e4
-n.values = c(20, 50, 150)
+n_reps = 1e3
+n.values = c(150)
 
 
 Sigma = matrix(rho, p,p)
@@ -131,7 +131,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       if(n_positive == 0){
         beta = matrix(0, p,m)
       }else{    
-        beta = matrnorm(p,m)/3
+        beta = matrnorm(p,m)/10
         beta[p,] = .8
         # set to zero
         # beta[p,] = 0
@@ -182,11 +182,12 @@ res = future_map_dfr( seq(n_reps), function(i){
         # decorrelate::eclairs(P, n.samples = n)$lambda
         
         # standard tests
-        df = data.frame(method = c("anova", "wald"), pvalue = c(NA,NA), n_features = res$n_features[1], i = i, n_positive = n_positive, shrink.cov = 'FALSE', n=n)
+        df = data.frame(method = c("anova", "wald"), n_features = res$n_features[1], i = i, n_positive = n_positive, shrink.cov = 'FALSE', n=n)
        
         rdf = mean(fit$df.residual)
         if( rdf -n > 3){
-           library(aod)
+          library(aod)
+          df$pvalue = c(NA, NA)
           fitlm = lm( t(vobj$E[,idx]) ~ V1 + V2, Xdf[idx,])
           df$pvalue[1] = anova(fitlm)$`Pr(>F)`[3]
 
@@ -221,7 +222,6 @@ res = future_map_dfr( seq(n_reps), function(i){
 ```{r FPR, fig.height=5, fig.width=10, cache=FALSE}
 df = res %>%
   filter(n_positive==0) %>%
-  mutate(pvalue = as.numeric(pvalue)) %>%
   group_by(method, shrink.cov, n_features, n) %>%
   summarize( count = sum(pvalue < 0.05), total=length(pvalue)) %>%
   mutate(FPR = count / total) %>%
@@ -268,7 +268,6 @@ calc_aupr = function(pvalues, category){
 df = map_df(unique(res$n_positive)[-1], function(n_pos){
   res %>%
     filter(n_positive %in% c(0,n_pos)) %>%
-    mutate(pvalue = as.numeric(pvalue)) %>%
     filter(!is.na(pvalue)) %>%
     mutate(method2 = paste(method, shrink.cov)) %>%
     group_by(method2, n) %>%
