@@ -221,21 +221,22 @@ res = future_map_dfr( seq(n_reps), function(i){
 
 ```{r FPR, fig.height=5, fig.width=10, cache=FALSE}
 df = res %>%
-  filter(n_positive==0) %>%
-  group_by(method, shrink.cov, n_features, n) %>%
+  filter(n_positive==0) %>%  
+  mutate(method2 = paste(method, shrink.cov)) %>%
+  group_by(method2, n_features, n) %>%
   summarize( count = sum(pvalue < 0.05), total=length(pvalue)) %>%
   mutate(FPR = count / total) %>%
   mutate( se = sqrt(FPR*(1-FPR)/ total))
 
-ggplot(df, aes(method, FPR, fill=paste(method, shrink.cov))) +
-  geom_bar(stat="identity") +
-  theme_classic() +
-  theme(aspect.ratio=1, legend.position="none") +
-  geom_hline(yintercept=0.05, linetype="dashed") +
-  # scale_fill_brewer(palette = "Set1") +
-  scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
-  scale_alpha_manual(values = c(.5, 1)) +
-  facet_wrap(~ n_features) 
+# ggplot(df, aes(method, FPR, fill=paste(method, shrink.cov))) +
+  # geom_bar(stat="identity") +
+  # theme_classic() +
+  # theme(aspect.ratio=1, legend.position="none") +
+  # geom_hline(yintercept=0.05, linetype="dashed") +
+  # # scale_fill_brewer(palette = "Set1") +
+  # scale_y_continuous("False positive rate", limits=c(0, NA), expand=c(0,0)) +
+  # scale_alpha_manual(values = c(.5, 1)) +
+  # facet_wrap(~ n_features) 
 ```
 
 
@@ -265,7 +266,7 @@ calc_aupr = function(pvalues, category){
   pr$auc.integral
 }
 
-df = map_df(unique(res$n_positive)[-1], function(n_pos){
+df2 = map_df(unique(res$n_positive)[-1], function(n_pos){
   res %>%
     filter(n_positive %in% c(0,n_pos)) %>%
     filter(!is.na(pvalue)) %>%
@@ -288,7 +289,7 @@ df = map_df(unique(res$n_positive)[-1], function(n_pos){
 ```
 
 ```{r plot.lines, fig.width=6, fig.height=5, cache=FALSE}
-fig_AUPR = ggplot(df, aes(n_positive, AUPR, color=method2)) +
+fig_AUPR = ggplot(df2, aes(n_positive, AUPR, color=method2)) +
   geom_line(size=1) + 
   geom_point() +
   geom_hline(yintercept=0.1, linetype="dashed") +
