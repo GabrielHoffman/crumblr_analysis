@@ -182,18 +182,19 @@ res = future_map_dfr( seq(n_reps), function(i){
         # decorrelate::eclairs(P, n.samples = n)$lambda
         
         # standard tests
-        df = data.frame(method = c("anova", "wald"), pvalue = c(0,NA), n_features = res$n_features[1], i = i, n_positive = n_positive, shrink.cov = 'FALSE', n=n)
-        library(aod)
-        fitlm = lm( t(vobj$E[,idx]) ~ V1 + V2, Xdf[idx,])
-        df$pvalue[1] = anova(fitlm)$`Pr(>F)`[3]
-
-        beta = coef(fitlm)[3,]
-        V = vcov(fitlm)
-        idx2 = grep(":V2$", rownames(V))
-        V = V[idx2,idx2]
-
+        df = data.frame(method = c("anova", "wald"), pvalue = c(NA,NA), n_features = res$n_features[1], i = i, n_positive = n_positive, shrink.cov = 'FALSE', n=n)
+       
         rdf = mean(fit$df.residual)
         if( rdf -n > 3){
+           library(aod)
+          fitlm = lm( t(vobj$E[,idx]) ~ V1 + V2, Xdf[idx,])
+          df$pvalue[1] = anova(fitlm)$`Pr(>F)`[3]
+
+          beta = coef(fitlm)[3,]
+          V = vcov(fitlm)
+          idx2 = grep(":V2$", rownames(V))
+          V = V[idx2,idx2]
+
           a = wald.test(V, beta, Terms=seq(length(beta)), df=rdf)
           df$pvalue[2] = a$result$Ftest['P']
         }
