@@ -98,8 +98,8 @@ rho_error = .3 # error correlation between responses
 n_reps = 5e4
 n.values = c(20, 50, 75, 150)
 
-m.values = c(2, 5, 8, 12)
-n.values = c( 50, 200)
+m.values = c(2, 5, 8, 12, 15, 20)
+n.values = c( 50, 100, 200, 500)
 
 Sigma = matrix(rho, p,p)
 diag(Sigma) = 1
