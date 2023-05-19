@@ -119,7 +119,7 @@ res = future_map_dfr( seq(n_reps), function(i){
   RhpcBLASctl::omp_set_num_threads(1)
 
   # Error variance
-  error_var = matrix(runif(n.max*max(m.values), 1, 50), n.max, max(m.values))
+  error_var = matrix(runif(n.max*max(m.values), 20, 20), n.max, max(m.values))
   # error_var[] = 1
 
   Epsilon = sim_error(max(m.values), n.max, rho_error, error_var)
