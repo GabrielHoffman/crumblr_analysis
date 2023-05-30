@@ -100,6 +100,10 @@ n.values = c(20, 50, 75, 150)
 m.values = c(2, 5, 8, 12, 15, 20)
 n.values = c( 50, 100, 200, 500)
 
+
+m.values = c(8)
+n.values = c( 100)
+
 # samples
 n.max = max(n.values)
 
@@ -121,7 +125,7 @@ res = future_map_dfr( seq(n_reps), function(i){
   RhpcBLASctl::omp_set_num_threads(1)
 
   # Error variance
-  error_var = matrix(runif(n.max*max(m.values), 20, 20), n.max, max(m.values))
+  error_var = matrix(runif(n.max*max(m.values), 4, 6), n.max, max(m.values))
   # error_var[] = 1
 
   Epsilon = sim_error(max(m.values), n.max, rho_error, error_var)
