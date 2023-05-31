@@ -138,7 +138,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       beta = matrix(0, p,max(m.values))
     }else{    
       beta = beta.all
-      beta[p,] = .3
+      beta[p,] = .1
       # set to zero
       # beta[p,] = 0
       # beta[p,sample.int(m, n_positive)] = 1
