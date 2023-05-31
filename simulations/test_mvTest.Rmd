@@ -90,7 +90,7 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 plan(multisession, workers = 36)
 set.seed(12)
  
-p = 2 # features
+p = 2 # covariates
 m.values = c(2, 5, 10, 15, 20, 30, 50) # responses
 rho = .2 # correlation between covariates
 rho_error = .3 # error correlation between responses
@@ -101,16 +101,14 @@ m.values = c(2, 5, 8, 12, 15, 20)
 n.values = c( 50, 100, 200, 500)
 
 
-m.values = c(2, 5, 10)
-n.values = c( 100)
+m.values = c(2, 5, 10) # responses
+n.values = c( 100)  # samples
 
 # samples
 n.max = max(n.values)
+m.max = max(m.values)
 
-Sigma = matrix(rho, p,p)
-diag(Sigma) = 1
-
-X = rmvnorm(n.max,rep(0,p), Sigma)
+X = matrix(rnorm(n.max*p), ncol=p)
 Xdf = as.data.frame(X)
 rownames(Xdf) = paste0("sample_", 1:n.max)
 
