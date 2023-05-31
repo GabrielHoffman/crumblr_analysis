@@ -94,8 +94,8 @@ set.seed(12)
  
 p = 2 # covariates
 m.values = c(2, 5, 10, 15, 20, 30, 50) # responses
-rho_error = 0 # error correlation between responses
-n_reps = 1e4
+rho_error = .3 # error correlation between responses
+n_reps = 1e3
 n.values = c(20, 50, 75, 150)
 
 m.values = c(2, 5, 8, 12, 15, 20)
