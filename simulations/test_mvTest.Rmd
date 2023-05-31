@@ -204,7 +204,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       #       error = function(e) NA)
       # df$pvalue = as.numeric(df$pvalue)
             
-      smartbind(rbind(res, res2), df)
+      smartbind(rbind(res, res2)) # , df
     })
   })
 },.options = furrr_options(seed=TRUE))
