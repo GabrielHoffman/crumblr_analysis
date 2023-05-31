@@ -122,8 +122,8 @@ res = future_map_dfr( seq(n_reps), function(i){
   RhpcBLASctl::omp_set_num_threads(1)
 
   # Error variance
-  error_var = matrix(runif(n.max*max(m.values), 4, 6), n.max, max(m.values))
-  error_var[] = 1
+  error_var = matrix(runif(n.max*max(m.values), .5, 2), n.max, max(m.values))
+  # error_var[] = 1
 
   Epsilon = sim_error(max(m.values), n.max, rho_error, error_var)
 
@@ -154,7 +154,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 
     # Create EList object
     vobj = new("EList", list(E = t(Y), weights = t(1/error_var[,1:m])))
-    vobj$weights[] = 1
+    # vobj$weights[] = 1
 
     map_df( n.values, function(n){
       idx = seq(n)
