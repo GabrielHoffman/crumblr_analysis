@@ -116,7 +116,7 @@ rownames(Xdf) = paste0("sample_", 1:n.max)
 form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
 
 methods = c("sidak", "fisher") 
-shrink.methods = c("FALSE", "Schafer", "OAS", "RBLW", "EB")
+shrink.methods = c("FALSE", "Schafer")#, "OAS", "RBLW", "EB")
 
 res = future_map_dfr( seq(n_reps), function(i){
 
@@ -287,7 +287,7 @@ fig_AUPR = ggplot(df2, aes(n_positive, AUPR, color=method2)) +
   facet_wrap(~n, nrow=1)
 ```
 
-```{r combine, fig.height=8, fig.width=20, cache=FALSE}
+```{r combine, fig.height=8, fig.width=12, cache=FALSE}
 fig_AUPR
 fig_FPR
 ```
