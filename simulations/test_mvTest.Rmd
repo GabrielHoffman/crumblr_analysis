@@ -251,14 +251,17 @@ df2 = map_df(unique(res$n_positive)[-1], function(n_pos){
     filter(!is.na(pvalue)) %>%
     mutate(method2 = paste(method, shrink.cov)) %>%
     group_by(method2, n) %>%
-    summarize( AUPR = calc_aupr(pvalue, n_positive==0)) %>% 
+    summarize( AUPR = calc_aupr(pvalue, n_positive==0), 
+      AUPR.random = sum(n_positive!=0) / length(n_positive)) %>% 
     mutate(n_positive = n_pos)
 }) 
+
+AUPR.random = df2$AUPR.random[1]
 
 fig_AUPR = ggplot(df2, aes(n_positive, AUPR, color=method2)) +
   geom_line(size=1) + 
   geom_point() +
-  geom_hline(yintercept=0.2, linetype="dashed") +
+  geom_hline(yintercept=AUPR.random, linetype="dashed") +
   theme_classic() +
   theme(aspect.ratio=1) +
   scale_color_brewer(palette = "Set1") +
