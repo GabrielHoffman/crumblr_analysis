@@ -96,8 +96,8 @@ p = 2 # covariates
 rho_error = .8 # error correlation between responses
 n_reps = 1e4
 
-m.values = c(2, 8, 15) # responses , 12, 15, 20  5,
-n.values = c( 35, 200, 600, 1000) # samples , 400 100,
+m.values = c(2, 8, 15, 20) # responses , 12, 15, 20  5,
+n.values = c( 30, 100, 200, 500) # samples , 400 100,
 
 # samples
 n.max = max(n.values)
