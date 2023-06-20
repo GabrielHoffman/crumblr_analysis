@@ -107,7 +107,7 @@ rownames(Xdf) = paste0("sample_", 1:n.max)
 
 form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
 
-methods = c("sidak", "fisher", "FE", "FE.empirical") 
+methods = c("sidak", "fisher") 
 shrink.methods = c("FALSE", "Schafer")
 
 res = future_map_dfr( seq(n_reps), function(i){
