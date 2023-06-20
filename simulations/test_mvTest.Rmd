@@ -91,11 +91,11 @@ plan(multisession, workers = 36)
 set.seed(12)
  
 p = 2 # covariates
-rho_error = 0 # error correlation between responses
-n_reps = 1e5
+rho_error = .4 # error correlation between responses
+n_reps = 1e3
 
 m.values = c(2, 8, 15, 20) # responses , 12, 15, 20  5,
-n.values = c( 50, 100, 200, 500) # samples , 400 100,
+n.values = c( 50, 100, 200) # samples , 400 100,
 
 # samples
 n.max = max(n.values)
