@@ -95,7 +95,7 @@ rho_error = .4 # error correlation between responses
 n_reps = 1e4
 
 m.values = c(2, 8, 15) # responses , 12, 15, 20  5,
-n.values = c(50, 100, 200) # samples , 400 100,
+n.values = c(50, 100) # samples , 400 100,
 
 # samples
 n.max = max(n.values)
@@ -107,7 +107,7 @@ rownames(Xdf) = paste0("sample_", 1:n.max)
 
 form = as.formula(paste('~',paste0(colnames(Xdf), collapse=' + ')))
 
-methods = c("sidak", "fisher") 
+methods = c("sidak", "fisher", "FE", "FE.empirical") 
 shrink.methods = c("FALSE", "Schafer")
 
 res = future_map_dfr( seq(n_reps), function(i){
@@ -154,21 +154,20 @@ res = future_map_dfr( seq(n_reps), function(i){
       fit = eBayes(fit)
       
       res = map_df(methods, function(method){
-        mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method)
+        mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method=method, shrink.cov="FALSE")
       })
       res$i = i
       res$n_positive = n_positive
       res$shrink.cov = 'FALSE'
       res$n = n
 
-      res2 = map_df(shrink.methods, function(shrink){
-        a = mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method="FE", shrink.cov=shrink)
-        a$shrink.cov = shrink
-        a
+      res = map_df(methods[3:4], function(method){
+        mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method=method, shrink.cov=TRUE)
       })
-      res2$i = i
-      res2$n_positive = n_positive
-      res2$n = n
+      res$i = i
+      res$n_positive = n_positive
+      res$shrink.cov = "Schafer"
+      res$n = n
             
       smartbind(rbind(res, res2)) # , df
     })
