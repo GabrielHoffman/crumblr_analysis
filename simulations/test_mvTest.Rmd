@@ -92,7 +92,7 @@ set.seed(12)
  
 p = 2 # covariates
 rho_error = .4 # error correlation between responses
-n_reps = 1e4
+n_reps = 1e3
 
 m.values = c(2, 8, 15) # responses , 12, 15, 20  5,
 n.values = c(50, 100) # samples , 400 100,
@@ -161,13 +161,13 @@ res = future_map_dfr( seq(n_reps), function(i){
       res$shrink.cov = 'FALSE'
       res$n = n
 
-      res = map_df(methods[3:4], function(method){
+      res2 = map_df(methods[3:4], function(method){
         mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method=method, shrink.cov=TRUE)
       })
-      res$i = i
-      res$n_positive = n_positive
-      res$shrink.cov = "Schafer"
-      res$n = n
+      res2$i = i
+      res2$n_positive = n_positive
+      res2$shrink.cov = "Schafer"
+      res2$n = n
             
       smartbind(rbind(res, res2)) # , df
     })
