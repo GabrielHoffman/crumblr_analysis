@@ -92,9 +92,9 @@ set.seed(12)
  
 p = 2 # covariates
 rho_error = .4 # error correlation between responses
-n_reps = 1e3
+n_reps = 1e4
 
-m.values = c(2, 5)#, 10, 15, 20, 25, 30, 40) # responses , 12, 15, 20  5,
+m.values = c(2, 5, 10, 15, 20, 25, 30, 40) # responses , 12, 15, 20  5,
 n.values = c(50, 100, 200) # samples , 400 100,
 
 # samples
@@ -117,7 +117,7 @@ res = future_map_dfr( seq(n_reps), function(i){
 
   # Error variance
   error_var = matrix(runif(n.max*max(m.values), .5, 2), n.max, max(m.values))
-  error_var[] = 1
+  # error_var[] = 1
 
   Epsilon = sim_error(max(m.values), n.max, rho_error, error_var)
 
@@ -154,7 +154,7 @@ res = future_map_dfr( seq(n_reps), function(i){
       fit = eBayes(fit)
       
       res = map_df(methods, function(method){
-        mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method=method, shrink.cov="FALSE")
+        mvTest(fit, vobj[,idx], rownames(fit), coef="V2", method=method, shrink.cov="FALSE", n.mc.samples=1e3)
       })
       res$i = i
       res$n_positive = n_positive
