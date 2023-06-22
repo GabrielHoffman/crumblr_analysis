@@ -271,13 +271,13 @@ form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
-## SessionInfo
+## Session Info
 <details>
-```{r s}
-sessioninfo()
+```{r sessioninfo, cache=FALSE}
+sessionInfo()
 ```
 </details>
- 
+
 ```{r exitd, cache=FALSE}
 knitr::knit_exit()
 ```
