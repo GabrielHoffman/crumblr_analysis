@@ -72,17 +72,9 @@ sce$pool = gsub("^(.*)-\\S+$", "\\1", sce$poolID)
 pb.subclass <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "subclass",  
-    sample_id = "Channel", 
-    BPPARAM = SnowParam(6, progressbar=TRUE))
-
-pb.subtype <- aggregateToPseudoBulk(sce,
-    assay = "counts",     
-    cluster_id = "subtype",  
-    sample_id = "Channel", 
-    BPPARAM = SnowParam(6, progressbar=TRUE))
+    sample_id = "Channel")
 
 pb.subclass$pH[is.na(pb.subclass$pH)] = mean(pb.subclass$pH, na.rm=TRUE)
-pb.subtype$pH[is.na(pb.subtype$pH)] = mean(pb.subtype$pH, na.rm=TRUE)
 ```
 
 Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table(sce$round_num))` rounds, `r length(table(sce$poolID))` 10X batches, `r length(table(sce$SubID))` donors, and `r format(ncol(sce), big.mark=',')` cells passing QC.
@@ -378,9 +370,6 @@ ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
 ```
 
 
-```{r exit, cache=FALSE}
-knitr::knit_exit(1)
-```
 
 
 
@@ -402,156 +391,6 @@ knitr::knit_exit(1)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Subtype
-
-```{r umap.subtype}
-# extract UMAP coordinates and annotations
-df = cbind(reducedDim(sce, "X_umap"), 
-    colData(sce)[,c("subclass", "subtype")]) %>% 
-    as.data.frame
-
-ggplot(df, aes(V1, V2, color=subtype)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
-```
-
-
-```{r cca.subtype}
-form = ~ SubID + poolID + pool + Sex + scale(Age) + Dx + pH + PMI
-C = canCorPairs(form, colData(pb.subtype) )
-ggcorrplot(C, hc.order = TRUE)
-```
-
-## Plots of cell fractions
-```{r fractions.subtype, fig.width=9}
-fracs = cellCounts(pb.subtype) / rowSums(cellCounts(pb.subtype))
-
-i = pb.subtype$Dx == "Control"
-fig1 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
-  ylab("Cell fractions") + 
-  theme(legend.position = "none", axis.text.y=element_blank())
-
-i = pb.subtype$Dx == "AD"
-fig2 = plotPercentBars(fracs[i,], col=ggColorHue(ncol(fracs))) + 
-  ylab("Cell fractions") + 
-  theme(legend.position = "none", axis.text.y=element_blank())
-
-plot_grid(fig1, fig2, rel_widths=c(.75,1))
-```
-
-
-
-
-```{r plot.fracs.subtype, fig.width=8, fig.height=9}
-df = data.frame(fracs, diagnosis = pb.subtype$Dx, check.names=FALSE)
-df = reshape2::melt(df, id.vars="diagnosis")
- 
-ggplot(df, aes(diagnosis, value, fill=variable)) + 
-  geom_violin() +
-  geom_boxplot(fill="grey50", width=.1) + 
-  facet_wrap(~ variable) +
-  theme_classic() +
-  theme(aspect.ratio=1, legend.position="none") +
-  ylab(bquote(Fraction~(log[10]))) +
-  scale_y_log10()
-```
-
-
-```{r fraction.table.subtype}
-df %>%
-  group_by(variable, diagnosis) %>%
-  # mutate(diagnosis = recode(diagnosis, '0' = "Control", '1' = "Alzheimer's"))  %>% 
-  summarize(mean = mean(value)) %>%
-  pivot_wider(names_from=c('diagnosis'), values_from=c("mean")) %>%
-  kbl %>%
-  kable_styling(full_width = F)
-```
-
-
-
-
-
-
-## crumblr
-### Variance partitioning analysis
-```{r crumblr.subtype}
-cobj = crumblr(cellCounts(pb.subtype))
-
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + (1|Dx) + pH + PMI
-
-vp.c = fitExtractVarPartModel(cobj, form, colData(pb.subtype))
-
-plotVarPart(sortCols(vp.c), label.angle=60, ncol=4)  + theme(aspect.ratio=1)
-```
-
-```{r plotPercentBars.subtype}
-fig.vp = plotPercentBars( sortCols(vp.c) )
-
-# analysis with dream()
-form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + pH + PMI
-fit = dream( cobj, form, colData(pb.subtype))
-fit = eBayes(fit)
-```
-
-
-
-### Multivariate test along hierarchy
-```{r sd.subtype, fig.width=12, fig.height=7}
-hc = buildClusterTreeFromPB(pb.subtype)
-
-res = treeTest( fit, cobj, hc, coef="DxAD")
-
-fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
-
-tab = topTable(fit, coef="DxAD", number=Inf)
-
-tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
-tab$se = with(tab, logFC/t)
-
-fig2 = ggplot(tab, aes(celltype, logFC)) + 
-  geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
-  geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
-  geom_point(color="dodgerblue") +
-  theme_classic() +
-  coord_flip() +
-  xlab('') + 
-  ylab("Effect size") +
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y=element_blank())
-
-# combine plots
-fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
-```
-
-
-### Correlation between coefficient estimates
-```{r ggcorrplot.subtype, fig.width=9, fig.height=9}
-# get covariance matrix
-V = vcov(fit, cobj, coef="DxAD")
-
-# convert to correlation matrix
-V = cov2cor(V)
-
-# shorten names
-rownames(V) = gsub(":DxAD", '', rownames(V))
-colnames(V) = gsub(":DxAD", '', colnames(V))
-
-# sort to match tree
-i = match(rev(get_taxa_name(fig1)), rownames(V))
-
-ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
-```
 
 
 # Session Info
