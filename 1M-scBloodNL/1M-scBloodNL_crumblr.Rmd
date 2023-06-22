@@ -64,7 +64,7 @@ sce = readH5AD(file, use_hdf5=TRUE)
 
 sce$sample_id = with(colData(sce), paste(assignment, as.character(timepoint), sep='_'))
 
-pb = aggregateToPseudoBulk(sce[1:100,], 
+pb = aggregateToPseudoBulk(sce, 
         assay = "counts",    
         cluster_id = 'cell_type', 
         sample_id = 'sample_id',
