@@ -97,13 +97,15 @@ n_reps = 1e4
 # m.values = c(2, 5, 10, 15, 20, 25, 30, 40) # responses , 12, 15, 20  5,
 # n.values = c(50, 100, 200) # samples , 400 100,
 
-
 m.values = c(2, 5, 10, 15) 
 n.values = c(100) 
 
 # samples
 n.max = max(n.values)
 m.max = max(m.values)
+
+Sigma = matrix(rho_error, m.max, m.max)
+diag(Sigma) = 1
 
 X = matrix(rnorm(n.max*p), ncol=p)
 Xdf = as.data.frame(X)
@@ -123,7 +125,8 @@ res = future_map_dfr( seq(n_reps), function(i){
   error_var = matrix(runif(n.max*max(m.values), .5, 2), n.max, max(m.values))
   error_var[] = 1
 
-  Epsilon = sim_error(max(m.values), n.max, rho_error, error_var)
+  # Epsilon = sim_error(max(m.values), n.max, rho_error, error_var)
+  Epsilon = rmvnorm(n.max, rep(0, m.max), Sigma)
 
   beta.all = matrnorm(p,max(m.values))/3
 
