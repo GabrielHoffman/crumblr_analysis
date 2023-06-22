@@ -142,7 +142,8 @@ plotVarPart(sortCols(vp), col=cols)
 plotPercentBars(sortCols(vp), col=cols)
 ```
 
-## removing repeated measures
+## Removing repeated measures
+Keep only a single sample per donor
 ```{r vp.nodup}
 form = ~ (1|TB_status) + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale(age)^2) + scale(prop_NAT)
 
@@ -152,6 +153,8 @@ vp = fitExtractVarPartModel(cobj[,keep], form, colData(pb)[keep,])
 vp$age = vp[,'scale(age)'] + vp[,'I(scale(age)^2)']
 vp[,'scale(age)']  = c()
 vp[,'I(scale(age)^2)'] = c()
+
+cols = c(brewer.pal(ncol(vp)-1, "Set1"), "grey85")
 
 plotVarPart(sortCols(vp), col=cols)
 ```
