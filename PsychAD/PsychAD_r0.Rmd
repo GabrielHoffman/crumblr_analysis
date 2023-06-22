@@ -89,12 +89,7 @@ Public freeze 0 includes `r length(table(sce$Channel))` samples, `r length(table
 
 
 ```{r umap.subclass}
-# extract UMAP coordinates and annotations
-df = cbind(reducedDim(sce, "X_umap"), 
-    colData(sce)[,c("subclass", "subtype")]) %>% 
-    as.data.frame
-
-ggplot(df, aes(V1, V2, color=subclass)) + geom_scattermore() + theme_classic() + theme(aspect.ratio=1) + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
+plotProjection( sce, "X_umap", "subclass")
 ```
 
 
@@ -261,15 +256,6 @@ ggplot(df, aes(Age, Composition.residuals)) +
   ggtitle(CT)
 ```
 
-## Test Age in AD
-```{r test.age.AD, fig.width=10}
-coef = "Age"
-pb = pb.subclass[,pb.subclass$Dx == "AD"]
-form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
-form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
-
-run_crumblr_analysis(pb, form.vp, form.dream, coef)
-```
 
 ## Session Info
 <details>
@@ -284,6 +270,18 @@ knitr::knit_exit()
 
 
 
+
+
+
+## Test Age in AD
+```{r test.age.AD, fig.width=10}
+coef = "Age"
+pb = pb.subclass[,pb.subclass$Dx == "AD"]
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
+
+run_crumblr_analysis(pb, form.vp, form.dream, coef)
+```
 
 
 
