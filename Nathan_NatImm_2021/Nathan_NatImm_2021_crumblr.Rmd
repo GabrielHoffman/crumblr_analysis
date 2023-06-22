@@ -191,7 +191,7 @@ topTable(fit, coef='TB_statusCASE', number=Inf) %>%
 ## Multivariate test along hierarchy
 ```{r treeTest, fig.height=6, fig.width=12}
 # Perform multivariate testing 
-res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE", method="FE")
+res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
 
 # plot tree with results
 fig.tree = plotTreeTest(res1) + theme(legend.position="none")
