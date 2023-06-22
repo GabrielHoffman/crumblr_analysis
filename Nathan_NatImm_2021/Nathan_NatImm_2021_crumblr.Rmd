@@ -139,7 +139,7 @@ plotVarPart(sortCols(vp), col=cols)
 ```
 
 ```{r plotPercentBars1}
-plotPercentBars(sortCols(vp), col=cols)
+plotPercentBars(sortCols(vp), col=cols) 
 ```
 
 ## Removing repeated measures
@@ -161,7 +161,7 @@ plotVarPart(sortCols(vp), col=cols)
 
 
 ```{r plotPercentBars2}
-fig.vp = plotPercentBars(sortCols(vp), col=cols)
+fig.vp = plotPercentBars(sortCols(vp), col=cols) 
 fig.vp
 ```
 
