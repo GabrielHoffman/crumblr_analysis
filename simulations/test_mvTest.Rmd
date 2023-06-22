@@ -89,7 +89,7 @@ Simulation with 200 samples, 2-12 responses, 1e6 replicates, effect sizes of 0.8
 ```{r mvTest1}
 plan(multisession, workers = 36)
 set.seed(12)
- 
+  
 p = 2 # covariates
 rho_error = .4 # error correlation between responses
 n_reps = 1e4
