@@ -234,26 +234,28 @@ df = data.frame(Composition = cobj$E[CT,],
                 Age = pb$Age,
                 se = 1/sqrt(cobj$weights[CT,]))
 
-ggplot(df, aes(Age, fractions)) +
+fig1 = ggplot(df, aes(Age, fractions)) +
   geom_point() +
   theme_classic() +
   theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
   geom_smooth(method="lm") +
   ggtitle(CT)
 
-ggplot(df, aes(Age, Composition)) +
+fig2 = ggplot(df, aes(Age, Composition)) +
   geom_point() +
   theme_classic() +
   theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
   geom_smooth(method="lm") +
   ggtitle(CT)
 
-ggplot(df, aes(Age, Composition.residuals)) +
+fig3 = ggplot(df, aes(Age, Composition.residuals)) +
   geom_point() +
   theme_classic() +
   theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
   geom_smooth(method="lm") +
   ggtitle(CT)
+
+plot_grid(fig1, fig2, fig3, nrow=1)
 ```
 
 
