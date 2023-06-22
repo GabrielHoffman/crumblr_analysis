@@ -1,4 +1,7 @@
 
+bsub -Is -q premium -R span[hosts=1] -R rusage[mem=12000] -W 96:00 -P acc_CommonMind -n 12 bash
+
+
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/PsychAD
 ml python git
 git pull
@@ -14,3 +17,52 @@ system("git pull"); rmarkdown::render("PsychAD_r0.Rmd");
 
 
 SPRY4-AS1
+
+
+library(dreamlet)
+library(SingleCellExperiment)
+library(tidyverse)
+
+file = "/sc/arion/projects/psychAD/NPS-AD/freeze2_rc/pseudobulk/MSSM_2023-02-28_13_54_PB_Channel_subclass.RDS"
+pb = readRDS(file)
+
+pb = pb[,pb$prep != "S"]
+
+# Load data for batching and sequencing
+df_batching = read_csv("/sc/arion/projects/psychAD/NPS-AD/freeze2_rc/metadata/NYGC_projID_date_poolID_flowcell_lane.csv")
+
+# get order of matching
+i = match(pb$poolID, df_batching$poolID)
+
+any(is.na(i))
+
+# Assign new metadata
+cols = c('projID', 'date', 'pool', 'flowcell', 'lane')
+colData(pb) = cbind(colData(pb), df_batching[i,cols])
+
+
+
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + PMI
+
+res.proc = processAssays( pb, form, BPPARAM=SnowParam(4), assay="Astro")
+
+
+vp = fitVarPart(res.proc, form, BPPARAM=SnowParam(4), assay="Astro")
+
+
+
+library(mvIC)
+
+form = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) #+ Dx + pH + PMI
+
+variables = colnames(colData(pb.subclass))
+variables = variables[! variables %in% all.vars(form)]
+variables = c("Dx")
+
+# fit forward stepwise regression starting with model: ~1. 
+bestModel = mvForwardStepwise( cobj, baseFormula = form,
+								data=colData(pb.subclass), 
+								variables=variables, 
+								shrink.method = "var_unequal")
+
+

@@ -14,12 +14,16 @@ output:
 
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/PsychAD
 ml python git
+ml gcc/11.2.0
 git pull
 R --vanilla
 
 
 system("git pull"); rmarkdown::render("PsychAD_r0.Rmd");
 
+
+
+https://hoffmg01.hpc.mssm.edu/crumblr_analysis/PsychAD/PsychAD_r0.html
 
 --->
 
@@ -266,6 +270,21 @@ form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
+
+## SessionInfo
+<details>
+```{r s}
+sessioninfo()
+```
+</details>
+ 
+```{r exitd, cache=FALSE}
+knitr::knit_exit()
+```
+
+
+
+
 
 
 
