@@ -124,7 +124,7 @@ hcl = buildClusterTreeFromPB( pb )
 
 ## Variance partitioning analysis
 Scale `age` to avoid numerical issues.
-```{r vp}
+```{r vp, eval=FALSE, echo=FALSE}
 form = ~ (1|TB_status) + (1|donor) + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale(age)^2) + scale(prop_NAT)
 
 vp = fitExtractVarPartModel(cobj, form, colData(pb))
@@ -138,21 +138,26 @@ cols = c(brewer.pal(ncol(vp)-1, "Set1"), "grey85")
 plotVarPart(sortCols(vp), col=cols)
 ```
 
-```{r plotPercentBars1}
+```{r plotPercentBars1, eval=FALSE, echo=FALSE}
 plotPercentBars(sortCols(vp), col=cols) 
 ```
 
-## Removing repeated measures
+### Removing repeated measures
 Keep only a single sample per donor
 ```{r vp.nodup}
-form = ~ (1|TB_status) + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale(age)^2) + scale(prop_NAT)
+form = ~ as.numeric(TB_status) + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale(age)^2) + scale(prop_NAT)
 
 keep = !duplicated(colData(pb)$donor)
 vp = fitExtractVarPartModel(cobj[,keep], form, colData(pb)[keep,])
 
+# Rename columns and sum 2 age components
 vp$age = vp[,'scale(age)'] + vp[,'I(scale(age)^2)']
 vp[,'scale(age)']  = c()
 vp[,'I(scale(age)^2)'] = c()
+vp[,'TB_status'] = vp[,'as.numeric(TB_status)']
+vp[,'as.numeric(TB_status)'] = c()
+vp[,'Ancestry'] = vp[,'scale(prop_NAT)']
+vp[,'scale(prop_NAT)'] = c()
 
 cols = c(brewer.pal(ncol(vp)-1, "Set1"), "grey85")
 
@@ -170,8 +175,8 @@ fig.vp
 ```{r diff.test}
 # Run precision-weighted linear mixed model using dream()
 # and compute empirical Bayes moderated t-statistics
-form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale(age)^2) + scale(prop_NAT)
-fit = dream(cobj, form, colData(pb))
+form = ~ TB_status + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale(age)^2) + scale(prop_NAT)
+fit = dream(cobj[,keep], form, colData(pb)[keep,])
 fit = eBayes(fit) 
 
 # show results
@@ -187,7 +192,7 @@ topTable(fit, coef='TB_statusCASE', number=Inf) %>%
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
 
 # plot tree with results
-fig.tree = plotTreeTest(res1) + xlim(0, 15) + theme(legend.position="none")
+fig.tree = plotTreeTest(res1) + theme(legend.position="none")
 
 # plot of logFC
 tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
