@@ -273,7 +273,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 ## Session Info
 <details>
-```{r sessioninfo, cache=FALSE}
+```{r sessioninfo1, cache=FALSE}
 sessionInfo()
 ```
 </details>
