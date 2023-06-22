@@ -29,7 +29,7 @@ https://hoffmg01.hpc.mssm.edu/crumblr_analysis/PsychAD/PsychAD_r0.html
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = FALSE,
+  echo = TRUE,
   warning=FALSE,
   message=FALSE,
   error = FALSE,
