@@ -127,7 +127,7 @@ form = ~ (1|TB_status) + (1|donor) + (1|batch) + (1|season) + (1|sex) + scale(ag
 
 vp = fitExtractVarPartModel(cobj, form, colData(pb))
 
-vp$age = vp$age + vp[,'I(age^2)']
+vp$age = vp$age + vp[,'I(scale(age)^2)']
 vp[,'I(age^2)'] = c()
 
 cols = c(brewer.pal(ncol(vp)-1, "Set1"), "grey85")
@@ -146,8 +146,8 @@ form = ~ (1|TB_status) + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale
 keep = !duplicated(colData(pb)$donor)
 vp = fitExtractVarPartModel(cobj[,keep], form, colData(pb)[keep,])
 
-vp$age = vp$age + vp[,'I(age^2)']
-vp[,'I(age^2)'] = c()
+vp$age = vp$age + vp[,'I(sacle(age)^2)']
+vp[,'I(sacle(age)^2)'] = c()
 
 plotVarPart(sortCols(vp), col=cols)
 ```
