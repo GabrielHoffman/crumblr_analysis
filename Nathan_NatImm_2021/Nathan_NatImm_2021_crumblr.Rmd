@@ -90,7 +90,8 @@ colData(sce) %>%
 
 ## Create pseudobulk
 ```{r pb}
-pb <- aggregateToPseudoBulk(sce,
+# Use subset of genes since we only need cell counts
+pb <- aggregateToPseudoBulk(sce[1:100,],
     assay = "counts",     
     cluster_id = "cluster_name",  
     sample_id = "donor_batch")
