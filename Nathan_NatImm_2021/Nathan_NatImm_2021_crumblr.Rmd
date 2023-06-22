@@ -37,8 +37,8 @@ library(tidyverse)
 library(dreamlet)
 library(kableExtra)
 library(ggcorrplot)
-
 library(DelayedArray)
+
 setAutoBlockSize(1e9)
 ```
 
@@ -130,11 +130,13 @@ vp = fitExtractVarPartModel(cobj, form, colData(pb))
 vp$age = vp$age + vp[,'I(age^2)']
 vp[,'I(age^2)'] = c()
 
-plotVarPart(sortCols(vp))
+cols = c(brewer.pal(ncol(vp)-1, "Set1"), "grey85")
+
+plotVarPart(sortCols(vp), col=cols)
 ```
 
 ```{r plotPercentBars1}
-plotPercentBars(sortCols(vp))
+plotPercentBars(sortCols(vp), col=cols)
 ```
 
 ## removing repeated measures
@@ -147,12 +149,12 @@ vp = fitExtractVarPartModel(cobj[,keep], form, colData(pb)[keep,])
 vp$age = vp$age + vp[,'I(age^2)']
 vp[,'I(age^2)'] = c()
 
-plotVarPart(sortCols(vp))
+plotVarPart(sortCols(vp), col=cols)
 ```
 
 
 ```{r plotPercentBars2}
-fig.vp = plotPercentBars(sortCols(vp))
+fig.vp = plotPercentBars(sortCols(vp), col=cols)
 fig.vp
 ```
 
@@ -200,7 +202,7 @@ fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
 
 
 ## Correlation between coefficient estimates
-```{r ggcorrplot}
+```{r ggcorrplot, fig.height=8, fig.width=8}
 # get covariance matrix
 V = vcov(fit, cobj, coef="TB_statusCASE")
 
