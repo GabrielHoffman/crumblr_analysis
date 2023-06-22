@@ -141,7 +141,7 @@ plotPercentBars(sortCols(vp), col=cols)
 
 ## removing repeated measures
 ```{r vp.nodup}
-form = ~ (1|TB_status) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
+form = ~ (1|TB_status) + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale(age)^2) + scale(prop_NAT)
 
 keep = !duplicated(colData(pb)$donor)
 vp = fitExtractVarPartModel(cobj[,keep], form, colData(pb)[keep,])
@@ -163,7 +163,7 @@ fig.vp
 ```{r diff.test}
 # Run precision-weighted linear mixed model using dream()
 # and compute empirical Bayes moderated t-statistics
-form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + age + I(age^2) + prop_NAT
+form = ~ TB_status + (1|donor) + (1|batch) + (1|season) + (1|sex) + scale(age) + I(scale(age)^2) + scale(prop_NAT)
 fit = dream(cobj, form, colData(pb))
 fit = eBayes(fit) 
 
