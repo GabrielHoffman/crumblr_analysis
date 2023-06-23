@@ -29,7 +29,7 @@ R --vanilla
 system("git pull"); rmarkdown::render("Kfoury_CancerCell_2021.Rmd");
 
 
-https://hoffmg01.hpc.mssm.edu/crumblr_analysis/1M-scBloodNL/1M-scBloodNL_crumblr.html
+https://hoffmg01.hpc.mssm.edu/crumblr_analysis/Kfoury_CancerCell_2021/Kfoury_CancerCell_2021.html
 
 
 --->
@@ -187,7 +187,9 @@ plotVarPart(sortCols(vp.c), label.angle=60, ncol=4) + theme(aspect.ratio=1)
 fig.vp = plotPercentBars( sortCols(vp.c) )
 
 # analysis with dream()
-form = ~ 0 + Status + (1|subject.id) + (1|subject.status)
+form = ~ 0 + Status + (1|subject.id) #+ (1|subject.status)
+
+keep = pb$subject.status == "prostate cancer patient"
 
 # Specify contrasts to compare regression coefficients
 # For example, 
@@ -197,9 +199,9 @@ contrasts = c(Tumor_Involved  = 'StatusTumor - StatusInvolved',
               Tumor_Distal    = 'StatusTumor - StatusDistal',
               Involved_Distal = 'StatusInvolved - StatusDistal')
 
-L = makeContrastsDream(form, colData(pb), contrasts=contrasts)
+L = makeContrastsDream(form, colData(pb)[keep,], contrasts=contrasts)
 
-fit = dream( cobj, form, colData(pb), L=L)
+fit = dream( cobj[,keep], form, colData(pb)[keep,], L=L)
 fit = eBayes(fit)
 ```
 
