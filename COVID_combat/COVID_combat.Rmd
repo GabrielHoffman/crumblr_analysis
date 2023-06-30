@@ -29,9 +29,22 @@ system("git pull"); rmarkdown::render("COVID_combat.Rmd");
 
 # cd 
 
-rmarkdown::render("COVID_combat.Rmd")
-
 --->
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  dev = c("png", "pdf"),
+  package.startup.message = FALSE,
+  cache = TRUE,
+  cache.lazy = FALSE)
+```
+
 
 ```{r load}
 library(SingleCellExperiment)
@@ -59,19 +72,17 @@ df = read.table(file, header=TRUE)
 df = df[df$scRNASeq_sample_ID %in% sce$scRNASeq_sample_ID,]
 idx = match(sce$scRNASeq_sample_ID, df$scRNASeq_sample_ID)
 colData(sce) = cbind(colData(sce), df[idx,])
-```
 
-```{r pb}
 pb <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "minor_subset",  
     sample_id = "scRNASeq_sample_ID",
     verbose = FALSE)
 
-# subset to only include one sample per donor
-
-
 cobj = crumblr(cellCounts(pb))
+
+```{r analysis}
+# subset to only include one sample per donor
 
 form = ~ Age + (1|sex) + (1|Source)# + (1|donor_id)
 res.vp = fitExtractVarPartModel(cobj, form, colData(pb) )
