@@ -1,0 +1,114 @@
+---
+title: "COVID COMBAT study"
+subtitle: 'crumblr analysis'
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+output: 
+  html_document:
+    toc: true
+    smart: true
+    self_contained: false
+---
+
+<!---
+
+
+# cd /sc/arion/projects/CommonMind/hoffman/scRNAseq_data/covid19_combat
+
+rmarkdown::render("COVID_combat.Rmd")
+
+--->
+
+```{r load}
+library(SingleCellExperiment)
+library(zellkonverter)
+library(dreamlet)
+library(crumblr)
+library(aplot)
+library(ggtree)
+library(edgeR)
+
+# read single cell RNA-seq
+sce = readH5AD("local.h5ad", use_hdf5=TRUE)
+counts(sce) = assay(sce, "X")
+
+plotProjection(sce, "X_umap", "major_subset")
+```
+
+```{r merge.data}
+# read metadata
+df = read.table("CBD-KEY-CLINVAR/COMBAT_CLINVAR_for_processed.txt", header=TRUE)
+
+# filter and merge metadata
+df = df[df$scRNASeq_sample_ID %in% sce$scRNASeq_sample_ID,]
+idx = match(sce$scRNASeq_sample_ID, df$scRNASeq_sample_ID)
+colData(sce) = cbind(colData(sce), df[idx,])
+```
+
+```{r pb}
+pb <- aggregateToPseudoBulk(sce,
+    assay = "counts",     
+    cluster_id = "minor_subset",  
+    sample_id = "scRNASeq_sample_ID",
+    verbose = FALSE)
+
+# subset to only include one sample per donor
+
+
+cobj = crumblr(cellCounts(pb))
+
+form = ~ Age + (1|sex) + (1|Source)# + (1|donor_id)
+res.vp = fitExtractVarPartModel(cobj, form, colData(pb) )
+fig.vp = plotPercentBars(sortCols(res.vp))
+
+form = ~ Age + sex + Source + (1|donor_id)
+fit = dream(cobj, form, colData(pb))
+fit = eBayes(fit)
+
+hc = buildClusterTreeFromPB(pb, "ward.D2")
+
+# head(coef(fit))
+
+coef = "SourceCOVID_MILD"
+
+res = treeTest( fit, cobj, hc, coef=coef, method="FE")
+
+fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(coef)
+
+tab = topTable(fit, coef=coef, number=Inf)
+tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
+tab$se = with(tab, logFC/t)
+
+fig2 = ggplot(tab, aes(celltype, logFC)) + 
+	geom_hline(yintercept=0, linetype="dashed", color="grey", linewidth=1) +
+	geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
+	geom_point(color="dodgerblue") +
+	theme_classic() +
+	coord_flip() +
+	xlab('') + 
+	ylab("Effect size") +
+	theme(axis.text.y=element_blank(),
+	      axis.ticks.y=element_blank())
+
+# combine plots
+fig.combine = fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
+```
+
+```{r plot, fig.height=8, fig.width=12}
+fig.combine
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
