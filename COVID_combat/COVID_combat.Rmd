@@ -13,7 +13,21 @@ output:
 <!---
 
 
-# cd /sc/arion/projects/CommonMind/hoffman/scRNAseq_data/covid19_combat
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/COVID_combat/
+ml python git
+ml gcc/11.2.0
+git pull
+R --vanilla
+
+
+system("git pull"); rmarkdown::render("COVID_combat.Rmd");
+
+
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/COVID_combat
+
+
+
+# cd 
 
 rmarkdown::render("COVID_combat.Rmd")
 
@@ -29,7 +43,8 @@ library(ggtree)
 library(edgeR)
 
 # read single cell RNA-seq
-sce = readH5AD("local.h5ad", use_hdf5=TRUE)
+file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/covid19_combat/local.h5ad"
+sce = readH5AD(file, use_hdf5=TRUE)
 counts(sce) = assay(sce, "X")
 
 plotProjection(sce, "X_umap", "major_subset")
@@ -37,7 +52,8 @@ plotProjection(sce, "X_umap", "major_subset")
 
 ```{r merge.data}
 # read metadata
-df = read.table("CBD-KEY-CLINVAR/COMBAT_CLINVAR_for_processed.txt", header=TRUE)
+file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/covid19_combat/CBD-KEY-CLINVAR/COMBAT_CLINVAR_for_processed.txt"
+df = read.table(file, header=TRUE)
 
 # filter and merge metadata
 df = df[df$scRNASeq_sample_ID %in% sce$scRNASeq_sample_ID,]
