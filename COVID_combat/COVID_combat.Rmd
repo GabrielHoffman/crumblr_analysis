@@ -140,7 +140,7 @@ names(figList) = coef_array
 figList
 ```
 
-```{r topTable, fig.height=12, fig.width=8, cache=FALSE}
+```{r topTable1, fig.height=12, fig.width=8, cache=FALSE}
 # get results from each coefficient
 tab = lapply(coef_array, function(coef){
 	
