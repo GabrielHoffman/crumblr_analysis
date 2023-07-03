@@ -46,7 +46,7 @@ knitr::opts_chunk$set(
 ```
 
 
-```{r load}
+```{r load, cache=FALSE}
 library(SingleCellExperiment)
 library(zellkonverter)
 library(dreamlet)
@@ -54,12 +54,17 @@ library(crumblr)
 library(aplot) 
 library(ggtree) 
 library(cowplot)
+```
 
+```{r read.data}
 # read single cell RNA-seq
 file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/covid19_combat/local.h5ad"
 sce = readH5AD(file, use_hdf5=TRUE)
 counts(sce) = assay(sce, "X")
+```
 
+# UMAP provided with data
+```{r plots.UMAP}
 fig1 = plotProjection(sce, "X_umap", "major_subset")
 fig2 = plotProjection(sce, "X_umap", "minor_subset")
 plot_grid(fig1, fig2)
