@@ -174,8 +174,6 @@ ggplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", 
 	scale_fill_gradient2(low="blue", mid="white", high="red", limits=c(-lim, lim)) 
 ```
 
-sdgsdgsdgf!!!
-
 
    
 
