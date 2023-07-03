@@ -53,6 +53,7 @@ library(dreamlet)
 library(crumblr)
 library(aplot) 
 library(ggtree) 
+library(tidyverse) 
 library(cowplot)
 ```
 
@@ -129,7 +130,7 @@ run_test = function(coef){
 }
 
 # compare to baseline of controls
-coef_array = c("SourceCOVID_MILD", "SourceCOVID_SEV", "SourceCOVID_CRIT", "SourceCOVID_HCW_MILD", "SourceSepsis", "SourceFlu")
+coef_array = c("SourceCOVID_HCW_MILD", "SourceCOVID_MILD", "SourceCOVID_SEV", "SourceCOVID_CRIT", "SourceSepsis", "SourceFlu")
 
 figList = lapply(coef_array, run_test)
 names(figList) = coef_array
@@ -139,14 +140,39 @@ names(figList) = coef_array
 figList
 ```
 
+```{r topTable}
+# get results from each coefficient
+tab = lapply(coef_array, function(coef){
+	
+	tab = topTable(fit, coef=coef, number=Inf)
+	tab$coef = coef
+	tab$celltype = rownames(tab)
+	tab$se = with(tab, logFC/t)
 
+	tab
+})
+tab = do.call(rbind, tab)
+rownames(tab) = c()
+tab$adj.P.Val = p.adjust(tab$P.Value, "fdr")
 
+# get order of cell types
+res = treeTest( fit, cobj, hc, coef=coef_array[1], method="FE")
+fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(coef)
+lvls = rev(get_taxa_name(fig1))
+tab$celltype = factor(tab$celltype, lvls)
 
-
-
-
-
-
+# Heatmap of all results
+tab$coef = factor(tab$coef, coef_array)
+lim = max(abs(tab$logFC))
+ratio = with(tab, length(unique(celltype)) / length(unique(coef))
+	)
+gplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", ''))) +
+	geom_tile() +
+	geom_text(vjust=1, hjust=0.5) +
+	theme_classic() + 
+	theme(aspect.ratio=ratio, axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+	scale_fill_gradient2(low="blue", mid="white", high="red", limits=c(-lim, lim)) 
+```
 
 
 
