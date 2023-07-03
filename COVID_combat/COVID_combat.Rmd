@@ -51,7 +51,7 @@ library(SingleCellExperiment)
 library(zellkonverter)
 library(dreamlet)
 library(crumblr)
-library(aplot)
+library(aplot) 
 library(ggtree)
 library(cowplot)
 
