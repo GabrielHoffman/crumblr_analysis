@@ -123,13 +123,14 @@ run_test = function(coef){
 	fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 }
 
-coef_array = c("SourceCOVID_MILD", "SourceCOVID_SEV")
+# compare to baseline of controls
+coef_array = c("SourceCOVID_MILD", "SourceCOVID_CRIT", "SourceCOVID_SEV", "SourceSepsis", "SourceFlu")
 
 figList = lapply(coef_array, run_test)
 ```
 
 ```{r plot, fig.height=7, fig.width=12}
-figList
+plot_grid(plotlist = figList, ncol=1)
 ```
 
 
