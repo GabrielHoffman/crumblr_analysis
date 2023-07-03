@@ -52,7 +52,7 @@ library(zellkonverter)
 library(dreamlet)
 library(crumblr)
 library(aplot) 
-library(ggtree)
+library(ggtree) 
 library(cowplot)
 
 # read single cell RNA-seq
@@ -127,10 +127,11 @@ run_test = function(coef){
 coef_array = c("SourceCOVID_MILD", "SourceCOVID_CRIT", "SourceCOVID_SEV", "SourceSepsis", "SourceFlu")
 
 figList = lapply(coef_array, run_test)
+names(figList) = coef_array
 ```
 
 ```{r plot, fig.height=7, fig.width=12}
-plot_grid(plotlist = figList, ncol=1)
+figList
 ```
 
 
