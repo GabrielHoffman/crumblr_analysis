@@ -64,7 +64,7 @@ counts(sce) = assay(sce, "X")
 ```
 
 # UMAP provided with data
-```{r plots.UMAP}
+```{r plots.UMAP, fig.widht=8, fig.height=6}
 fig1 = plotProjection(sce, "X_umap", "major_subset")
 fig2 = plotProjection(sce, "X_umap", "minor_subset")
 plot_grid(fig1, fig2)
@@ -129,7 +129,7 @@ run_test = function(coef){
 }
 
 # compare to baseline of controls
-coef_array = c("SourceCOVID_MILD", "SourceCOVID_CRIT", "SourceCOVID_SEV", "SourceSepsis", "SourceFlu")
+coef_array = c("SourceCOVID_MILD", "SourceCOVID_SEV", "SourceCOVID_CRIT", "COVID_HCW_MILD", "SourceSepsis", "SourceFlu")
 
 figList = lapply(coef_array, run_test)
 names(figList) = coef_array
