@@ -135,7 +135,7 @@ figList = lapply(coef_array, run_test)
 names(figList) = coef_array
 ```
 
-```{r plot, fig.height=7, fig.width=12}
+```{r plot, fig.height=7, fig.width=12, cache=FALSE}
 figList
 ```
 
