@@ -166,7 +166,7 @@ tab$coef = factor(tab$coef, coef_array)
 lim = max(abs(tab$logFC))
 ratio = with(tab, length(unique(celltype)) / length(unique(coef))
 	)
-gplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", ''))) +
+ggplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", ''))) +
 	geom_tile() +
 	geom_text(vjust=1, hjust=0.5) +
 	theme_classic() + 
