@@ -140,7 +140,7 @@ names(figList) = coef_array
 figList
 ```
 
-```{r topTable}
+```{r topTable, fig.height=12, fig.width=8}
 # get results from each coefficient
 tab = lapply(coef_array, function(coef){
 	
@@ -162,7 +162,7 @@ lvls = rev(get_taxa_name(fig1))
 tab$celltype = factor(tab$celltype, lvls)
 
 # Heatmap of all results
-tab$coef = factor(tab$coef, coef_array)
+tab$coef = factor(gsub("^Source", "", tab$coef), gsub("^Source", "", coef_array))
 lim = max(abs(tab$logFC))
 ratio = with(tab, length(unique(celltype)) / length(unique(coef))
 	)
