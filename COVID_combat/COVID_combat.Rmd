@@ -63,6 +63,7 @@ library(cowplot)
 file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/covid19_combat/local.h5ad"
 sce = readH5AD(file, use_hdf5=TRUE)
 counts(sce) = assay(sce, "X")
+sce = sce[,sce$GEX_region != "E: Doublets"]
 ```
 
 # UMAP provided with data
