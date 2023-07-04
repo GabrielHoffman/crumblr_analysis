@@ -140,7 +140,7 @@ names(figList) = coef_array
 ```
 
 ```{r plot, fig.height=7, fig.width=12, cache=FALSE}
-figList
+figList  
 ```
 
 ```{r topTable1, fig.height=12, fig.width=8, cache=FALSE}
