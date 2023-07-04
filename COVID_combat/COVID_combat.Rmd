@@ -122,7 +122,7 @@ run_test = function(coef){
 		geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
 		geom_point(color="dodgerblue") +
 		theme_classic() +
-		coord_flip() +
+		coord_flip() + 
 		xlab('') + 
 		ylab("Effect size") +
 		theme(axis.text.y=element_blank(),
