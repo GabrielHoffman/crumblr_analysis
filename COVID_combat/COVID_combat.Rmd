@@ -120,7 +120,7 @@ res.vp = fitExtractVarPartModel(cobj, form, colData(pb) )
 cols = c(brewer.pal(ncol(res.vp)-1, "Set1"), "grey85")
 fig.vp = plotPercentBars(sortCols(res.vp), col=cols)
 
-form = ~ Age + sex + Source + (1|donor_id)
+form = ~ Age + sex + Source
 fit = dream(cobj, form, colData(pb))
 fit = eBayes(fit)
 
