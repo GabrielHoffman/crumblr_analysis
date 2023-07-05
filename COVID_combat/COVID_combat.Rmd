@@ -85,12 +85,28 @@ df = df[df$scRNASeq_sample_ID %in% sce$scRNASeq_sample_ID,]
 idx = match(sce$scRNASeq_sample_ID, df$scRNASeq_sample_ID)
 colData(sce) = cbind(colData(sce), df[idx,])
 
-pb <- aggregateToPseudoBulk(sce,
+# For each donor, select the most severe sample
+res = colData(sce) %>%
+	as_tibble %>%
+	group_by(donor_id) %>%
+	select(scRNASeq_sample_ID, Source) %>%
+	distinct %>%
+	summarize(scRNASeq_sample_ID, Source, i = which.max(Source),
+		use_sample_id = scRNASeq_sample_ID[which.max(Source)])
+
+# res[res$donor_id == "S00109",]
+
+# subset to one sample per donor
+sceSub = sce[,sce$scRNASeq_sample_ID %in% droplevels(res$use_sample_id)]
+
+# create pseudobulk
+pb <- aggregateToPseudoBulk(sceSub,
     assay = "counts",     
     cluster_id = "minor_subset",  
     sample_id = "scRNASeq_sample_ID",
     verbose = FALSE)
 
+# crumblr transform
 cobj = crumblr(cellCounts(pb))
 ```
 
@@ -98,7 +114,7 @@ cobj = crumblr(cellCounts(pb))
 
 ```{r analysis}
 # model repeated measures per donor
-form = ~ Age + (1|sex) + (1|Source) + (1|donor_id)
+form = ~ Age + (1|sex) + (1|Source)
 res.vp = fitExtractVarPartModel(cobj, form, colData(pb) )
 
 cols = c(brewer.pal(ncol(res.vp)-1, "Set1"), "grey85")
