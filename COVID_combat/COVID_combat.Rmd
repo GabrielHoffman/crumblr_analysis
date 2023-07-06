@@ -66,6 +66,9 @@ counts(sce) = assay(sce, "X")
 
 # remove doublets
 sce = sce[,sce$GEX_region != "E: Doublets"]
+
+# remove nan cells
+sce = sce[,sce$minor_subset != "nan"]
 ```
 
 # UMAP provided with data
