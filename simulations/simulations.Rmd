@@ -67,7 +67,7 @@ library(RColorBrewer)
 library(tidyverse)
 
 library(reticulate)
-python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python"
+python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.12.0/0/bin/python"
 use_python(python_path)
 scoda = import("sccoda")
 scoda.utils = import("sccoda.util.cell_composition_data")
