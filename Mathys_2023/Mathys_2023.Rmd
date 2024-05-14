@@ -1,0 +1,153 @@
+---
+title: "Single-cell atlas reveals correlates of high cognitive function, dementia, and resilience to Alzheimer's disease pathology"
+subtitle: '[Mathys, et al. Cell (2023)](https://doi.org/10.1016/j.cell.2023.08.039)'
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+documentclass: article
+output: 
+  html_document:
+    toc: true
+    smart: false
+vignette: >
+  %\VignetteIndexEntry{Single-cell atlas reveals correlates of high cognitive function, dementia, and resilience to Alzheimers disease pathology}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
+---
+
+
+
+
+
+<!--- 
+
+cd /sc/arion/projects/CommonMind/hoffman/dreamlet_analysis/Mathys_2023
+R
+
+system("git pull"); rmarkdown::render("Mathys_2023.Rmd");
+
+
+# https://hoffmg01.u.hpc.mssm.edu/dreamlet_analysis/Mathys_2023.html
+
+--->
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  dev = c("png", "pdf"),
+  cache = TRUE,
+  cache.lazy = FALSE)
+```
+
+# Load packages
+```{r load.packages, cache=FALSE}
+library(SingleCellExperiment)
+library(zellkonverter)
+library(DelayedArray)
+library(dreamlet)
+library(knitr)
+library(kableExtra)
+library(cowplot)
+library(ggplot2)
+library(crumblr)
+```
+
+# Load data
+```{r load.data}
+# read H5AD file
+file = "/sc/arion/projects/CommonMind/leed62/ref/published/2023_Mathys_Cell_snRNA/cell_browser/ad-aging-brain/240321_2023_Mathys_Cell_snRNA_cb_final_only_counts.h5ad"
+sce = readH5AD(file, use_hdf5=TRUE, verbose=TRUE)
+counts(sce) = assay(sce, "X")
+
+sce$Cell_Type = factor(sce$Cell_Type, sort(levels(sce$Cell_Type)))
+
+# create pseudobulk 
+pb <- aggregateToPseudoBulk(sce,
+    assay = "counts",     
+    cluster_id = "Major_Cell_Type",  
+    sample_id = "individualID")
+
+types = c("nonAD", "AD" )
+pb$ADdiag2types = factor(pb$ADdiag2types, types)
+
+types = c("nonAD", "earlyAD", "lateAD" )
+pb$ADdiag3types = factor(pb$ADdiag3types, types)
+
+pb$CERAD = 5 - pb$ceradsc
+```
+
+# UMAP embedding
+```{r embedding}
+plotProjection(sce, "X_umap", annotation='Major_Cell_Type') 
+plotProjection(sce, "X_umap", annotation='Cell_Type')  
+```
+
+
+## Properties of dataset
+```{r properties}
+df = data.frame(table(pb$ADdiag2types))
+colnames(df) = c("Disease status", "Count")
+
+df %>%
+  kbl(row.names=FALSE) %>% 
+  kable_classic(full_width = FALSE) 
+
+
+df = data.frame(table(pb$ADdiag3types))
+colnames(df) = c("Disease status", "Count")
+
+df %>%
+  kbl(row.names=FALSE) %>% 
+  kable_classic(full_width = FALSE) 
+
+df = list()
+df$`# Samples` = ncol(pb)
+df$`# Subjects` = nlevels(sce$Individual)
+df$`# Cells` = ncol(sce)
+df = unlist(df)
+df = data.frame(Propert=names(df), count = df)
+
+df %>%  
+  kbl(row.names=FALSE) %>% 
+  kable_classic(full_width = FALSE) 
+```
+
+# Cell_Type
+```{r CT}
+# Mathys_ crumblr
+cobj = crumblr(cellCounts(pb))
+
+tab = with(colData(sce), xtabs(~ individualID + Cell_Type))
+tab = as.data.frame.matrix(tab)
+cobj = crumblr(tab)
+
+form.base = ~ age + sex + Study + pmi 
+fit = dream(cobj, form, colData(pb))
+fit = eBayes(fit)
+
+tab = topTable(fit, coef="age", number=Inf)
+tab
+```
+
+
+
+
+
+
+
+
+
+
+# Session Info
+<details>
+```{r sessioninfo, cache=FALSE}
+sessionInfo()
+```
+</details>
+
