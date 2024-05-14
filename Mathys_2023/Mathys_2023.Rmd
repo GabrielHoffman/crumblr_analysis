@@ -150,6 +150,8 @@ fit = eBayes(fit)
 tab = topTable(fit, coef="age", number=Inf)
 tab
 
+tab[grepl("SST", rownames(tab)),]
+
 df = data.frame(CLR = cobj$E["IN_SST",], 
         se = sqrt(1/cobj$weights["IN_SST",]), 
         fractions = df_count[idx,"IN_SST"] / rowSums(df_count[idx,]), colData(pb)[idx,])
