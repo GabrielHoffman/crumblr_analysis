@@ -51,6 +51,7 @@ library(SingleCellExperiment)
 library(zellkonverter)
 library(DelayedArray)
 library(dreamlet)
+library(variancePartition)
 library(knitr)
 library(kableExtra)
 library(cowplot)
@@ -120,21 +121,57 @@ df %>%
 
 # Cell_Type
 ```{r CT}
-# Mathys_ crumblr
-cobj = crumblr(cellCounts(pb))
+# Controls only
+idx = which(pb$ADdiag2types == "nonAD")
+cobj = crumblr(cellCounts(pb)[idx,])
 
-tab = with(colData(sce), xtabs(~ individualID + Cell_Type))
-tab = as.data.frame.matrix(tab)
-cobj = crumblr(tab)
-
-form.base = ~ age + sex + Study + pmi 
-fit = dream(cobj, form, colData(pb))
+form = ~ age + sex + Study + pmi 
+fit = dream(cobj, form, colData(pb)[idx,])
 fit = eBayes(fit)
 
 tab = topTable(fit, coef="age", number=Inf)
 tab
 ```
 
+# Combine SST
+```{r SST}
+df_count = as.data.frame(cellCounts(pb))
+
+i =  grep("SST", colnames(df_count))
+df_count[['IN_SST']] = rowSums(df_count[,i])
+df_count = df_count[,-i]
+
+cobj = crumblr(df_count[idx,])
+
+form = ~ age + sex + Study + pmi 
+fit = dream(cobj, form, colData(pb)[idx,])
+fit = eBayes(fit)
+
+tab = topTable(fit, coef="age", number=Inf)
+tab
+
+df = data.frame(CLR = cobj$E["IN_SST",], 
+        se = sqrt(1/cobj$weights["IN_SST",]), 
+        fractions = df_count[idx,"IN_SST"] / rowSums(df_count[idx,]), colData(pb)[idx,])
+
+fig1 = ggplot(df, aes(age, fractions)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  theme_classic() +
+  theme(aspect.ratio=1)
+
+fig2 = ggplot(df, aes(age, CLR)) +
+  geom_errorbar(aes(ymin=CLR - 1.96*se, ymax=CLR + 1.96*se), width=0, color="grey80") +
+  geom_point() +
+  geom_smooth(method="lm") +
+  coord_fixed(ylim=c(-2, 2.5)) +
+  theme_classic() +
+  theme(aspect.ratio=1)
+
+fig = cowplot::plot_grid(fig1, fig2)
+
+ggsave(fig, file="~/www/test.png")
+```
 
 
 
