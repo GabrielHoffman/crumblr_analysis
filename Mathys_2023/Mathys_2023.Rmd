@@ -67,13 +67,19 @@ counts(sce) = assay(sce, "X")
 
 sce$Cell_Type = factor(sce$Cell_Type, sort(levels(sce$Cell_Type)))
 
+# create pseudobulk 
+pb <- aggregateToPseudoBulk(sce,
+    assay = "counts",     
+    cluster_id = "Cell_Type",  
+    sample_id = "individualID")
+
 types = c("nonAD", "AD" )
-sce$ADdiag2types = factor(sce$ADdiag2types, types)
+pb$ADdiag2types = factor(pb$ADdiag2types, types)
 
 types = c("nonAD", "earlyAD", "lateAD" )
-sce$ADdiag3types = factor(sce$ADdiag3types, types)
+pb$ADdiag3types = factor(pb$ADdiag3types, types)
 
-sce$CERAD = 5 - sce$ceradsc
+pb$CERAD = 5 - pb$ceradsc
 ```
 
 # UMAP embedding
