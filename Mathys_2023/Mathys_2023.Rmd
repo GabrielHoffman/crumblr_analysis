@@ -170,9 +170,7 @@ fig2 = ggplot(df, aes(age, CLR)) +
   theme_classic() +
   theme(aspect.ratio=1)
 
-fig = cowplot::plot_grid(fig1, fig2)
-
-ggsave(fig, file="~/www/test.png")
+cowplot::plot_grid(fig1, fig2)
 ```
 
 
