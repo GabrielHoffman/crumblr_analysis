@@ -79,6 +79,8 @@ df = lapply(seq(2,12, by=3), function(m){
 
 	df = mclapply( seq(n_sims), function(i){		
 
+		RhpcBLASctl::omp_set_num_threads(1)
+
 		Sigma = genPositiveDefMat(m, ratioLambda= 100)$Sigma
 		# v = diag(Sigma)
 		# Sigma[] = .05
@@ -168,6 +170,8 @@ m = 8
 df = lapply(seq(50, 500, by=100), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
+
+		RhpcBLASctl::omp_set_num_threads(1)
 
 		Sigma = genPositiveDefMat(m, ratioLambda= 100)$Sigma
 
