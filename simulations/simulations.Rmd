@@ -92,7 +92,7 @@ rmultinomdir = function(n, size, alpha){
 
 cap_ratio = function(W, max.ratio=10){
 	t(apply(W, 1, function(x){
-		x = x / quantile(x, .5)
+		x = x / quantile(x, 0)
 		pmin(x,max.ratio)
 		}))
 }
