@@ -359,9 +359,7 @@ fig2 = df_res %>%
 	scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
-knitr::knit_exit()
 ```
-
 
 
 
@@ -423,10 +421,8 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 
 
-
 # Increasing number of cells
 ```{r increase.cells}
-mean_counts_max = 5000
 n_batches = floor(n_samples/2)
 var.batch = 0
        
@@ -477,6 +473,9 @@ fig2 = df_res %>%
 	 scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
+
+
+knitr::knit_exit()
 ```
 
 
