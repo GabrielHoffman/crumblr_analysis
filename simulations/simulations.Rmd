@@ -375,10 +375,6 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
-```{r exit, cache=FALSE}
-knitr::knit_exit()
-```
-
 
 # Mixed model
 ```{r run.mixed}
@@ -434,6 +430,10 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
+
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
 
 
 
