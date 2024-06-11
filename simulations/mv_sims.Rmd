@@ -1,0 +1,302 @@
+---
+title: "Compare multivariate tests"
+subtitle: ''
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+documentclass: article
+output: 
+  html_document:
+  toc: true
+  smart: false
+---
+
+
+
+<!---
+cd /Users/gabrielhoffman/workspace/repos/crumblr_analysis/simulations
+R
+
+rmarkdown::render('mv_sims.Rmd')
+
+
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations
+R
+
+system("ml git; git pull"); rmarkdown::render("mv_sims.Rmd");
+
+
+
+# disable X11
+
+ssh -x sklar1
+
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/mv_sims.html
+
+
+
+--->
+
+```{r setup, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(	
+						tidy=FALSE, 
+						cache=TRUE,
+						echo=FALSE,
+          	dev=c("png", "pdf"),
+          	package.startup.message = FALSE,
+          	message=FALSE, 
+          	error=FALSE, 
+          	warning=FALSE)
+
+knitr::opts_chunk$set()
+```	
+
+```{r load}
+library(clusterGeneration)
+library(mvtnorm)
+library(remaCor)
+library(corpcor)
+library(parallel)
+library(variancePartition)
+library(tidyverse)
+library(PRROC)
+library(cowplot)
+library(RColorBrewer)
+```
+
+# Increase number of responses
+```{r run}
+# Sidak: uses only smallest p-value
+# fisher: uses all p-values and assumes independence
+
+# sample size
+n = 200
+
+n_sims = 5000
+
+df = lapply(seq(2,12, by=3), function(m){
+
+	df = mclapply( seq(n_sims), function(i){		
+
+		Sigma = genPositiveDefMat(m, ratioLambda= 100)$Sigma
+		# v = diag(Sigma)
+		# Sigma[] = .05
+		# diag(Sigma) = 1
+
+		beta = matrix(runif(m, .05, .5), 1, m)
+		beta[] = .25
+		if( i > n_sims*.2){
+			beta[] = 0
+		}
+		X = matrix(rnorm(n), ncol=1)
+		Y = X %*% beta + rmvnorm(n, sigma = Sigma)
+		colnames(Y) = paste0("gene_", seq(m))
+		rownames(Y) = paste0("sample_", seq(n))
+
+		obj = new("EList", list(E = t(Y), weights=matrix(1, ncol(Y), nrow(Y))))
+
+		fit = dream(obj, ~ X, data.frame(X))
+		fit = eBayes(fit)
+
+		methods = c( "FE", "sidak", "fisher") #"FE.empirical",
+		res = lapply(methods, function(x){
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=50, shrink.cov=FALSE)
+			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
+		})
+		res = do.call(rbind, res)
+
+		data.frame(i = i, isDE = i <= n_sims*.2, m, res)
+	}, mc.cores=10)
+	do.call(rbind, df) 
+})
+df = do.call(rbind, df)
+```
+
+samples: `r n`
+
+```{r plots, cache=FALSE, fig.width=9, fig.height=7}
+f = function(pvalue, isDE){
+	pr <- pr.curve(scores.class0 = -log10(pvalue[isDE]), 
+					scores.class1 = -log10(pvalue[!isDE]),
+					rand = TRUE)
+	pr$auc.integral
+}
+
+fig1 = df %>%
+	as_tibble %>%
+	group_by(method, m) %>%
+	summarize( AUPR = f(pvalue, isDE)) %>%
+	ggplot(aes(m, AUPR, color=method)) +
+		geom_point() +
+		geom_line() +
+		theme_classic() +
+		theme(aspect.ratio=1, legend.position="none") +
+		scale_y_continuous(limits=c(0,1.02), expand=c(0,0)) +
+		geom_hline(yintercept=0.2, color="grey50", linetype="dashed") +
+		xlab("Number of responses") +
+		scale_color_brewer(palette = "Dark2") +
+		scale_x_continuous(breaks = seq(2,12, by=2))
+
+fig2 = df %>%
+	as_tibble %>%
+	filter(!isDE) %>%
+	group_by(method, m) %>%
+	summarize( FP = sum(pvalue < 0.05), len = length(pvalue) ) %>%
+	ggplot(aes(m, FP / len, color=method)) +
+		geom_point() +
+		geom_line() +
+		theme_classic() +
+		theme(aspect.ratio=1) +
+		geom_hline(yintercept=0.05, color="grey50", linetype="dashed") +
+		scale_color_brewer(palette = "Dark2") +
+		xlab("Number of responses") +
+		scale_y_continuous(limits=c(0,NA), expand=c(0,0)) + 
+		ylab("False positive rate") +
+		scale_x_continuous(breaks = seq(2,12, by=2))
+
+plot_grid(fig1, fig2, aling="v", axis="tblr", labels=LETTERS[1:2])
+```
+
+
+
+# Increase sample size
+```{r run_samplesize}
+# number of responses
+m = 8
+
+df = lapply(seq(50, 500, by=100), function(n){
+
+	df = mclapply( seq(n_sims), function(i){		
+
+		Sigma = genPositiveDefMat(m, ratioLambda= 100)$Sigma
+
+		beta = matrix(runif(m, .05, .5), 1, m)
+		beta[] = .25
+		if( i > n_sims*.2){
+			beta[] = 0
+		}
+		X = matrix(rnorm(n), ncol=1)
+		Y = X %*% beta + rmvnorm(n, sigma = Sigma)
+		colnames(Y) = paste0("gene_", seq(m))
+		rownames(Y) = paste0("sample_", seq(n))
+
+		obj = new("EList", list(E = t(Y), weights=matrix(1, ncol(Y), nrow(Y))))
+
+		fit = dream(obj, ~ X, data.frame(X))
+		fit = eBayes(fit)
+
+		methods = c( "FE", "sidak", "fisher") #"FE.empirical",
+		res = lapply(methods, function(x){
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=50, shrink.cov=FALSE)
+			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
+		})
+		res = do.call(rbind, res)
+
+		data.frame(i = i, isDE = i <= n_sims*.2, n, res)
+	}, mc.cores=10)
+	do.call(rbind, df) 
+})
+df = do.call(rbind, df)
+```
+
+
+responses: `r m`
+
+```{r plots_samplesize, cache=FALSE, fig.width=9, fig.height=7}
+f = function(pvalue, isDE){
+	pr <- pr.curve(scores.class0 = -log10(pvalue[isDE]), 
+					scores.class1 = -log10(pvalue[!isDE]),
+					rand = TRUE)
+	pr$auc.integral
+}
+
+fig1 = df %>%
+	as_tibble %>%
+	group_by(method, n) %>%
+	summarize( AUPR = f(pvalue, isDE)) %>%
+	ggplot(aes(n, AUPR, color=method)) +
+		geom_point() +
+		geom_line() +
+		theme_classic() +
+		theme(aspect.ratio=1, legend.position="none") +
+		scale_y_continuous(limits=c(0,1.02), expand=c(0,0)) +
+		geom_hline(yintercept=0.2, color="grey50", linetype="dashed") +
+		xlab("Number of samples") +
+		scale_color_brewer(palette = "Dark2") 
+fig2 = df %>%
+	as_tibble %>%
+	filter(!isDE) %>%
+	group_by(method, n) %>%
+	summarize( FP = sum(pvalue < 0.05), len = length(pvalue) ) %>%
+	ggplot(aes(n, FP / len, color=method)) +
+		geom_point() +
+		geom_line() +
+		theme_classic() +
+		theme(aspect.ratio=1) +
+		geom_hline(yintercept=0.05, color="grey50", linetype="dashed") +
+		scale_color_brewer(palette = "Dark2") +
+		xlab("Number of samples") +
+		scale_y_continuous(limits=c(0,NA), expand=c(0,0)) + 
+		ylab("False positive rate")
+
+plot_grid(fig1, fig2, aling="vh", axis="tblr", labels=LETTERS[1:2])
+```
+
+
+
+
+
+
+<!---
+# sample size
+n = 200
+
+# number of response variables
+m = 10
+
+Sigma = genPositiveDefMat(m)$Sigma
+
+# NULL model
+df = mclapply( seq(3000), function(i){
+	beta = matrix(.6, 1, m)
+	beta[] = 0
+	X = matrix(rnorm(n), ncol=1)
+	Y = X %*% beta + rmvnorm(n, sigma = Sigma)
+	fit = lm(Y ~ X)
+	R = residuals(fit)
+	C = cor(R)
+
+	# lambda = estimate.lambda(R, verbose = FALSE)
+	lambda = 0.01
+
+    C <- (1 - lambda) * C + lambda * diag(diag(C), ncol(C))
+
+	# Extract effect sizes and standard errors from model fit
+	df = lapply(coef(summary(fit)), function(a) 
+	     data.frame(beta = a["X", 1], se = a["X", 2]))
+	df = do.call(rbind, df)
+
+	res1 = LS(df$beta, df$se, C)
+	res2 = LS.empirical(df$beta, df$se, C, nu=n-2, n.mc.samples=100)
+
+	data.frame(LS = res1$p, LS.empirical = res2$p)
+}, mc.cores=8)
+df = do.call(rbind, df)
+
+par(mfrow=c(1,2))
+hist(df$LS)
+hist(df$LS.empirical)
+
+
+		Sigma = genPositiveDefMat(m)$Sigma
+		v = diag(Sigma)
+		Sigma[] = .05
+		diag(Sigma) = 1
+
+		beta = matrix(runif(m, .005, .05), 1, m)
+		Y = X %*% beta + rmvnorm(n, sigma = Sigma)*.5
+
+
+--->
+
+
+
