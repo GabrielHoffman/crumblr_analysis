@@ -164,12 +164,13 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		# fit2cl = suppressMessages(dream(cobj2cl, formula, X, BPPARAM=SerialParam()))
 		# fit2cl = eBayes(fit2cl)
 		# tab.crumblr2cl = topTable(fit2cl, coef="trait", sort.by="none")
+			# "crumblr2cl" = tab.crumblr2cl$P.Value,
 
-		df_p = data.frame(assay = rownames(tab.crumblr),
+		df_p = data.frame(assay = rownames(tab_clr),
 			"CLR" = tab_clr$P.Value,
-			"crumblr" = tab.crumblr$P.Value,
-			# "crumblr2cl" = tab.crumblr2cl$P.Value, 
 			check.names=FALSE)
+		i = match(df_p$assay, rownames(tab.crumblr))
+		df_p$crumblr = tab.crumblr$P.Value[i]
 
 		if( use.sccoda){
 			res = sccoda_wrapper(counts, X, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
