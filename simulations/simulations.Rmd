@@ -97,6 +97,15 @@ cap_ratio = function(W, max.ratio=10){
 		}))
 }
 
+# hist(x / min(x))
+
+# res = fivenum(x)
+
+# res[2] / res[4]
+
+
+
+
 run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
 	# each batch is observed at last twice
@@ -153,7 +162,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 		# crumblr
 		cobj = crumblr(counts)
-		cobj$weights = cap_ratio(cobj$weights, 10)
+		cobj$weights = cap_ratio(cobj$weights, 100)
 		fit = suppressMessages(dream(cobj, formula, X, BPPARAM=SerialParam()))
 		fit = eBayes(fit)
 		tab.crumblr = topTable(fit, coef="trait", sort.by="none")
