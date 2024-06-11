@@ -368,7 +368,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```{r run.mixed}
 n_batches = floor(n_samples/2)
 var.batch = .1
-
+ 
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE)  
 ```
 
