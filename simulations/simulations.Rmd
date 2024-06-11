@@ -97,12 +97,6 @@ cap_ratio = function(W, max.ratio=10){
 		}))
 }
 
-
-
-
-
-
-
 run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
 	# each batch is observed at last twice
