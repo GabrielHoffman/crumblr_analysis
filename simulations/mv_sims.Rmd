@@ -81,7 +81,7 @@ n_sims = 500
 
 methods = c("FE", "tstat", "hotelling", "sidak", "fisher")
 
-df = lapply(seq(2,12, by=3), function(m){
+df = lapply(seq(2,12, by=2), function(m){
 
 	df = mclapply( seq(n_sims), function(i){		
 
@@ -172,7 +172,7 @@ plot_grid(fig1, fig2, aling="v", axis="tblr", labels=LETTERS[1:2])
 # number of responses
 m = 20
  
-df = lapply(seq(50, 500, by=150), function(n){
+df = lapply(seq(50, 500, by=50), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
 
