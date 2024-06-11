@@ -66,14 +66,14 @@ library(gtools)
 library(RColorBrewer)
 library(tidyverse)
 
-library(reticulate)
-python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.12.0/0/bin/python"
-use_python(python_path)
-scoda = import("sccoda")
-scoda.utils = import("sccoda.util.cell_composition_data")
-scoda.analysis = import("sccoda.util.comp_ana")
+# library(reticulate)
+# python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.12.0/0/bin/python"
+# use_python(python_path)
+# scoda = import("sccoda")
+# scoda.utils = import("sccoda.util.cell_composition_data")
+# scoda.analysis = import("sccoda.util.comp_ana")
 
-source("scCoda_wrapper.R")
+# source("scCoda_wrapper.R")
 source("cellTypeCompositionTest.R")
 ```
 
@@ -89,6 +89,13 @@ rmultinomdir = function(n, size, alpha){
 
 	t(res)
 } 
+
+cap_ratio = function(W, max.ratio=10){
+	t(apply(W, 1, function(x){
+		x = x / min(x)
+		pmin(x,max.ratio)
+		}))
+}
 
 run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
@@ -146,13 +153,23 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 		# crumblr
 		cobj = crumblr(counts)
+		cobj$weights = cap_ratio(cobj$weights, 5)
 		fit = suppressMessages(dream(cobj, formula, X, BPPARAM=SerialParam()))
 		fit = eBayes(fit)
 		tab.crumblr = topTable(fit, coef="trait", sort.by="none")
 
+		# # crumblr clr_2class
+		# cobj2cl = crumblr(counts, method="clr_2class")
+		# cobj2cl$weights = cap_ratio(cobj2cl$weights, 5)
+		# fit2cl = suppressMessages(dream(cobj2cl, formula, X, BPPARAM=SerialParam()))
+		# fit2cl = eBayes(fit2cl)
+		# tab.crumblr2cl = topTable(fit2cl, coef="trait", sort.by="none")
+
 		df_p = data.frame(assay = rownames(tab.crumblr),
 			"CLR" = tab_clr$P.Value,
-			"crumblr" = tab.crumblr$P.Value, check.names=FALSE)
+			"crumblr" = tab.crumblr$P.Value,
+			# "crumblr2cl" = tab.crumblr2cl$P.Value, 
+			check.names=FALSE)
 
 		if( use.sccoda){
 			res = sccoda_wrapper(counts, X, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
@@ -284,15 +301,17 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 } 
 
 n_samples = 100
-n_clusters = 12
+n_clusters = 5
 mean_counts = 2000
-n_sims = 1000
-beta.true = 0.25
+n_sims = 3000 
+beta.true = 0.08
 n_batches = floor(n_samples/2)
-var.batch = 0.01
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-       
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=3, use.sccoda=TRUE, mc.cores=1)  
+var.batch = 0
+tau = 2 
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")  
+methods = c( "lm") 
+          
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=10, short=TRUE)  
 ```
 
 
@@ -303,7 +322,7 @@ Parameters:
  - mean_counts: `r mean_counts`
  - beta.true: `r beta.true`
  - var.batch: `r var.batch`
- - tau: 3
+ - tau: `r tau`
 
 
 ```{r plot.sims, cache=FALSE, fig.height=4, fig.width=12}
@@ -340,18 +359,24 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
+
+
+
+
 # Mixed model
 ```{r run.mixed}
-n_samples = 100
-n_clusters = 12
-mean_counts = 2000
-n_sims = 5000
-beta.true = 0.25
+# n_samples = 100
+# n_clusters = 12
+# mean_counts = 2000
+# n_sims = 500
+# beta.true = 0.25
 n_batches = floor(n_samples/2)
-var.batch = .20
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-       
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=3, use.sccoda=FALSE, mc.cores=36, short=FALSE)  
+var.batch = .2
+# tau = 5
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+methods = c( "lm") 
+        
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=10, short=TRUE)  
 ```
 
 Parameters:
@@ -361,7 +386,7 @@ Parameters:
  - mean_counts: `r mean_counts`
  - beta.true: `r beta.true`
  - var.batch: `r var.batch`
- - tau: 3
+ - tau: `r tau`
 
 ```{r plot.sims.mixed, cache=FALSE, fig.height=4, fig.width=16}
 CT = "CT_1"
@@ -371,14 +396,31 @@ fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("AUPR") + geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + scale_fill_manual(values=cols)
+		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + 
+		geom_bar(stat="identity", position = "dodge") + 
+		theme_classic() + 
+		coord_flip() + 
+		scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + 
+		scale_alpha_discrete( range = c(1, 1)) + 
+		ggtitle("AUPR") + 
+		geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + 
+		scale_fill_manual(values=cols)
 
 # FPR
 fig2 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		ggplot(aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + ylab("False positive rate") + scale_fill_manual(values=cols)
+		ggplot(aes(method, FPR, fill=method, alpha=Status)) + 
+		geom_bar(stat="identity", position = "dodge") + 
+		theme_classic() + 
+		coord_flip() + 
+		scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + 
+		theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right") + 
+		scale_alpha_discrete( range = c(1, 1)) + 
+		ggtitle("False positive rate") + 
+		geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + ylab("False positive rate") + 
+		scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
@@ -386,21 +428,24 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 
 
+
+
+
+
 # Increasing number of cells
 ```{r increase.cells}
-n_samples = 100
-n_clusters = 12
+# n_samples = 100
+# n_clusters = 12
 mean_counts_max = 5000
-n_sims = 10000
-beta.true = 0.3
+# n_sims = 1000
+# beta.true = 0.3
 n_batches = floor(n_samples/2)
 var.batch = 0#0.2 
-tau = 3
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-    
-# c(100, 500,seq(1000, mean_counts_max, by=1000)   
+# tau = 3
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
+       
 df_res = lapply( c(100, 500,1000, 2000, 4000), function(mean_counts){
-	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=36) 
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=11) 
 })
 df_res = do.call(rbind, df_res)
 ```
@@ -450,18 +495,19 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 
 
+
 # Increasing overdispersion
 ```{r increase.tau}
-n_samples = 100
-n_clusters = 12
-mean_counts = 2000
-n_sims = 10000
-beta.true = 0.3
-n_batches = floor(n_samples/2)
-var.batch = 0#0.01
+# n_samples = 100
+# n_clusters = 12
+# mean_counts = 2000
+# n_sims = 10000
+# beta.true = 0.3
+# n_batches = floor(n_samples/2)
+# var.batch = 0#0.01
  
 df_res = lapply(c(1, 5, 10, 20), function(tau){
-	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=36) 
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=10) 
 })
 df_res = do.call(rbind, df_res)
 ```
@@ -511,17 +557,16 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 
 
-
 # Number of components
 ```{r increase.clusters}
-n_samples = 100
-n_sims = 10000
-beta.true = 0.1
-n_batches = floor(n_samples/2)
-var.batch = 0#0.01
+# n_samples = 100
+# n_sims = 10000
+# beta.true = 0.1
+# n_batches = floor(n_samples/2)
+# var.batch = 0#0.01
  
 df_res = lapply(c(5, 10, 20, 50), function(n_clusters){
-	run_three_formulas( n_samples, n_clusters, mean_counts=1000*n_clusters, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda=FALSE, mc.cores=36) 
+	run_three_formulas( n_samples, n_clusters, mean_counts=1000*n_clusters, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda=FALSE, mc.cores=10) 
 })
 df_res = do.call(rbind, df_res)
 ```
@@ -574,15 +619,15 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Sample size
 ```{r increase.samples}
-n_sims = 10000
-mean_counts = 3000
-n_clusters = 12
-beta.true = 0.25
-n_batches = floor(n_samples/2)
-var.batch = 0#0.01
+# n_sims = 10000
+# mean_counts = 3000
+# n_clusters = 12
+# beta.true = 0.25
+# n_batches = floor(n_samples/2)
+# var.batch = 0#0.01
  
 df_res = lapply(c(20, 50, 100, 200), function(n_samples){
-	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda=FALSE, mc.cores=36) 
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda=FALSE, mc.cores=10) 
 })
 df_res = do.call(rbind, df_res)
 ```
@@ -636,17 +681,16 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Increasing batch effect
 ```{r sim2}
-n_samples = 100
-n_clusters = 12
-n_sims = 10000     
-beta.true = 0.3
-n_batches = floor(n_samples/2)
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
-# methods = c( "lm", "lmlog") 
+# n_samples = 100
+# n_clusters = 12
+# n_sims = 10000     
+# beta.true = 0.3
+# n_batches = floor(n_samples/2)
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") 
   
 df_res2 = lapply(c(5000), function(mean_counts){  
 	df = lapply(c( 0, .5, 1, 3), function(var.batch){  
-		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2, use.sccoda=FALSE, mc.cores=36, short=FALSE)  
+		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=2, use.sccoda=FALSE, mc.cores=10, short=FALSE)  
 	})
 	do.call(rbind, df)
 })
@@ -718,7 +762,6 @@ fig2 = df_res2 %>%
 
 plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
-
 
 
 
