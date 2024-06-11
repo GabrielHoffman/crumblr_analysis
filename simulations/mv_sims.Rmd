@@ -63,6 +63,10 @@ library(cowplot)
 library(RColorBrewer)
 
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
+
+cols = rainbow(n)
+names(cols) = c( "FE.empirical", "FE", "sidak", "fisher")
+
 ```
 
 # Increase number of responses
@@ -137,7 +141,7 @@ fig1 = df %>%
 		scale_y_continuous(limits=c(0,1.02), expand=c(0,0)) +
 		geom_hline(yintercept=0.2, color="grey50", linetype="dashed") +
 		xlab("Number of responses") +
-		scale_color_brewer(palette = "Dark2") +
+		scale_color_manual(values=cols) +
 		scale_x_continuous(breaks = seq(2,12, by=2))
 
 fig2 = df %>%
@@ -151,7 +155,7 @@ fig2 = df %>%
 		theme_classic() +
 		theme(aspect.ratio=1) +
 		geom_hline(yintercept=0.05, color="grey50", linetype="dashed") +
-		scale_color_brewer(palette = "Dark2") +
+		scale_color_manual(values=cols) +
 		xlab("Number of responses") +
 		scale_y_continuous(limits=c(0,NA), expand=c(0,0)) + 
 		ylab("False positive rate") +
@@ -227,7 +231,7 @@ fig1 = df %>%
 		scale_y_continuous(limits=c(0,1.02), expand=c(0,0)) +
 		geom_hline(yintercept=0.2, color="grey50", linetype="dashed") +
 		xlab("Number of samples") +
-		scale_color_brewer(palette = "Dark2") 
+		scale_color_manual(values=cols) 
 fig2 = df %>%
 	as_tibble %>%
 	filter(!isDE) %>%
@@ -239,7 +243,7 @@ fig2 = df %>%
 		theme_classic() +
 		theme(aspect.ratio=1) +
 		geom_hline(yintercept=0.05, color="grey50", linetype="dashed") +
-		scale_color_brewer(palette = "Dark2") +
+		scale_color_manual(values=cols) +
 		xlab("Number of samples") +
 		scale_y_continuous(limits=c(0,NA), expand=c(0,0)) + 
 		ylab("False positive rate")
