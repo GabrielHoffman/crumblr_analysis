@@ -538,7 +538,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Number of components
 ```{r increase.clusters} 
-df_res = lapply(c(5, 10, 20, 50), function(n_clusters){
+df_res = lapply(c(7, 10, 15, 20), function(n_clusters){
 	run_three_formulas( n_samples, n_clusters, mean_counts=mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda=FALSE, mc.cores=mc.cores) 
 }) 
 df_res = do.call(rbind, df_res)
