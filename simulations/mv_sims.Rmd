@@ -64,7 +64,7 @@ library(RColorBrewer)
 
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 
-cols = rainbow(n)
+cols = rainbow(4)
 names(cols) = c( "FE.empirical", "FE", "sidak", "fisher")
 
 ```
