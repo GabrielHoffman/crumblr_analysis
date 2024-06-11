@@ -101,7 +101,7 @@ df = lapply(seq(2,12, by=3), function(m){
 		fit = dream(obj, ~ X, data.frame(X))
 		fit = eBayes(fit)
 
-		methods = c( "FE", "sidak", "fisher") #"FE.empirical",
+		methods = c( "FE.empirical", "FE", "sidak", "fisher")
 		res = lapply(methods, function(x){
 			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=50, shrink.cov=FALSE)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
@@ -190,7 +190,7 @@ df = lapply(seq(50, 500, by=100), function(n){
 		fit = dream(obj, ~ X, data.frame(X))
 		fit = eBayes(fit)
 
-		methods = c( "FE", "sidak", "fisher") #"FE.empirical",
+		methods = c( "FE.empirical", "FE", "sidak", "fisher")
 		res = lapply(methods, function(x){
 			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=50, shrink.cov=FALSE)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
