@@ -432,7 +432,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 # Increasing number of cells
 ```{r increase.cells}
 n_batches = floor(n_samples/2)
-var.batch = 0
+var.batch = 0 
        
 df_res = lapply( c(100, 500,1000, 2000, 4000), function(mean_counts){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores) 
@@ -490,7 +490,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```{r increase.tau}
 df_res = lapply(c(1, 5, 10, 20), function(tau){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores) 
-})
+}) 
 df_res = do.call(rbind, df_res)
 ```
 
