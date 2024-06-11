@@ -546,6 +546,7 @@ Parameters:
  - mean_counts: `r mean_counts`
  - beta.true: `r beta.true`
  - var.batch: `r var.batch`
+ - tau: `r tau`
 
 ```{r plot.increase.clusters, cache=FALSE, fig.width=10, fig.height=4}
 CT = "CT_1"
