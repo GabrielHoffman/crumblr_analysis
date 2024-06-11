@@ -327,7 +327,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.sims, cache=FALSE, fig.height=4, fig.width=8}
+```{r plot.sims, cache=FALSE, fig.height=4, fig.width=11}
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
@@ -381,7 +381,7 @@ Parameters:
  - var.batch: `r var.batch`
  - tau: `r tau`
 
-```{r plot.sims.mixed, cache=FALSE, fig.height=4, fig.width=8}
+```{r plot.sims.mixed, cache=FALSE, fig.height=4, fig.width=11}
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -440,7 +440,7 @@ Parameters:
  - var.batch: `r var.batch`
  - tau: `r tau`
 
-```{r plot.increasing, cache=FALSE, fig.width=8, fig.height=4}
+```{r plot.increasing, cache=FALSE, fig.width=11, fig.height=4}
 CT = "CT_1"
 
 # AUPR
@@ -495,7 +495,7 @@ Parameters:
  - beta.true: `r beta.true`
  - var.batch: `r var.batch`
 
-```{r plot.increasing.tau, cache=FALSE, fig.width=8, fig.height=4}
+```{r plot.increasing.tau, cache=FALSE, fig.width=11, fig.height=4}
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -548,7 +548,7 @@ Parameters:
  - var.batch: `r var.batch`
  - tau: `r tau`
 
-```{r plot.increase.clusters, cache=FALSE, fig.width=8, fig.height=4}
+```{r plot.increase.clusters, cache=FALSE, fig.width=11, fig.height=4}
 CT = "CT_1"
 
 # AUPR
@@ -603,7 +603,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.increase.samples, cache=FALSE, fig.width=8, fig.height=4}
+```{r plot.increase.samples, cache=FALSE, fig.width=11, fig.height=4}
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -659,7 +659,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r sim2.plots, fig.height=4, fig.width=8, cache=FALSE, eval=FALSE}
+```{r sim2.plots, fig.height=4, fig.width=11, cache=FALSE, eval=FALSE}
 aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 df_res2 %>%
 		as_tibble %>%
@@ -677,7 +677,7 @@ df_res2 %>%
 
 
 
-```{r plot.batch.effect, cache=FALSE, fig.width=8, fig.height=8}
+```{r plot.batch.effect, cache=FALSE, fig.width=11, fig.height=8}
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
