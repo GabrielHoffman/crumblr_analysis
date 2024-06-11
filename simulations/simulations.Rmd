@@ -373,10 +373,11 @@ fig2 = df_res %>%
 	scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
-knitr::knit_exit()
 ```
 
-
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
 
 
 # Mixed model
