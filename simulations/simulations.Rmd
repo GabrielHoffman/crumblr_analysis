@@ -317,7 +317,7 @@ tau = 10
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")    
 # methods = c( "nb", "lm", "lmlog", "poisson") 
           
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE)  
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=1, short=TRUE)  
 ```
 
 
