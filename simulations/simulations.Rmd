@@ -308,7 +308,7 @@ n_sims = 1000
 beta.true = 0.25
 n_batches = floor(n_samples/2)
 var.batch = 0
-tau = 5 
+tau = 10 
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")  
 methods = c( "nb", "lm", "lmlog", "poisson") 
           
