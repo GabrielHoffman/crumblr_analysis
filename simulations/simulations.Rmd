@@ -265,7 +265,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 
 # Simulations
-```{r run_simulations, cache=FALSE}
+```{r run_simulations, cache=TRUE}
 run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda, mc.cores, short=TRUE){
 
 	RNGkind("L'Ecuyer-CMRG")
