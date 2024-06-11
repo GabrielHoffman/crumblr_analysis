@@ -65,7 +65,7 @@ library(RColorBrewer)
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 
 cols = rainbow(6)
-names(cols) = c("FE.empirical", "FE", "tstat", "hotelling", "sidak", "fisher")
+names(cols) = c(, "FE", "tstat", "hotelling", "sidak", "fisher")
 
 ```
 
@@ -77,9 +77,9 @@ names(cols) = c("FE.empirical", "FE", "tstat", "hotelling", "sidak", "fisher")
 # sample size
 n = 200
 
-n_sims = 500
+n_sims = 10000
 
-methods = c("FE", "tstat", "hotelling", "sidak", "fisher")
+methods = c("FE.empirical", "FE", "tstat", "hotelling", "sidak", "fisher")
 
 df = lapply(seq(2,12, by=2), function(m){
 
