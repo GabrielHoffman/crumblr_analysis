@@ -425,10 +425,6 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
 
-```{r exit, cache=FALSE}
-knitr::knit_exit()
-```
-
 
 
 # Increasing number of cells
@@ -485,6 +481,10 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
 
+
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
 
 
 
