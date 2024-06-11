@@ -50,7 +50,7 @@ knitr::opts_chunk$set(
 knitr::opts_chunk$set()
 ```	
 
-```{r load}
+```{r load, cache=FALSE}
 library(clusterGeneration)
 library(mvtnorm)
 library(remaCor)
@@ -77,7 +77,7 @@ names(cols) = c( "FE.empirical", "FE", "sidak", "fisher")
 # sample size
 n = 200
 
-n_sims = 5000
+n_sims = 500
 
 df = lapply(seq(2,12, by=3), function(m){
 
@@ -170,8 +170,8 @@ plot_grid(fig1, fig2, aling="v", axis="tblr", labels=LETTERS[1:2])
 ```{r run_samplesize}
 # number of responses
 m = 8
-
-df = lapply(seq(50, 500, by=100), function(n){
+ 
+df = lapply(seq(50, 500, by=150), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
 
@@ -196,7 +196,7 @@ df = lapply(seq(50, 500, by=100), function(n){
 
 		methods = c( "FE.empirical", "FE", "sidak", "fisher")
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=50, shrink.cov=FALSE)
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=5000, shrink.cov=FALSE)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
