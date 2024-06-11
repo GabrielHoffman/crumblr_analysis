@@ -690,7 +690,7 @@ aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
 
 fig1 = df_res2 %>%
 	filter(assay==CT) %>%
-	filter(Status != "none") %>%
+	# filter(Status != "none") %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
  	ggplot(aes(factor(var.batch), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
@@ -705,7 +705,7 @@ fig1 = df_res2 %>%
 # FPR
 fig2 = df_res2 %>%
 	filter(assay==CT) %>%
-	filter(Status != "none") %>%
+	# filter(Status != "none") %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(var.batch), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
