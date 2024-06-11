@@ -64,8 +64,8 @@ library(RColorBrewer)
 
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 
-cols = rainbow(4)
-names(cols) = c( "FE.empirical", "FE", "sidak", "fisher")
+cols = rainbow(6)
+names(cols) = c("FE.empirical", "FE", "tstat", "hotelling", "sidak", "fisher")
 
 ```
 
@@ -78,6 +78,8 @@ names(cols) = c( "FE.empirical", "FE", "sidak", "fisher")
 n = 200
 
 n_sims = 500
+
+methods = c("FE", "tstat", "hotelling", "sidak", "fisher")
 
 df = lapply(seq(2,12, by=3), function(m){
 
@@ -105,9 +107,8 @@ df = lapply(seq(2,12, by=3), function(m){
 		fit = dream(obj, ~ X, data.frame(X))
 		fit = eBayes(fit)
 
-		methods = c( "FE.empirical", "FE", "sidak", "fisher")
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=50, shrink.cov=FALSE)
+			res = mvTest(fit, obj, coef="X", method=x)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
@@ -115,7 +116,7 @@ df = lapply(seq(2,12, by=3), function(m){
 		data.frame(i = i, isDE = i <= n_sims*.2, m, res)
 	}, mc.cores=mc.cores)
 	do.call(rbind, df) 
-})
+}) 
 df = do.call(rbind, df)
 ```
 
@@ -169,7 +170,7 @@ plot_grid(fig1, fig2, aling="v", axis="tblr", labels=LETTERS[1:2])
 # Increase sample size
 ```{r run_samplesize}
 # number of responses
-m = 8
+m = 20
  
 df = lapply(seq(50, 500, by=150), function(n){
 
@@ -196,7 +197,7 @@ df = lapply(seq(50, 500, by=150), function(n){
 
 		methods = c( "FE.empirical", "FE", "sidak", "fisher")
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=5000, shrink.cov=FALSE)
+			res = mvTest(fit, obj, coef="X", method=x)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
