@@ -61,6 +61,8 @@ library(tidyverse)
 library(PRROC)
 library(cowplot)
 library(RColorBrewer)
+
+mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 ```
 
 # Increase number of responses
@@ -105,7 +107,7 @@ df = lapply(seq(2,12, by=3), function(m){
 		res = do.call(rbind, res)
 
 		data.frame(i = i, isDE = i <= n_sims*.2, m, res)
-	}, mc.cores=10)
+	}, mc.cores=mc.cores)
 	do.call(rbind, df) 
 })
 df = do.call(rbind, df)
@@ -192,7 +194,7 @@ df = lapply(seq(50, 500, by=100), function(n){
 		res = do.call(rbind, res)
 
 		data.frame(i = i, isDE = i <= n_sims*.2, n, res)
-	}, mc.cores=10)
+	}, mc.cores=mc.cores)
 	do.call(rbind, df) 
 })
 df = do.call(rbind, df)
