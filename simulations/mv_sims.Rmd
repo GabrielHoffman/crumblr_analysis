@@ -77,11 +77,11 @@ names(cols) = c("FE.empirical", "FE", "sidak", "fisher")
 # sample size
 n = 200
 
-n_sims = 10000
+n_sims = 1000
 
 methods = c("FE.empirical", "FE", "sidak", "fisher")
 
-df = lapply(seq(2,12, by=2), function(m){
+df = lapply(seq(2,22, by=4), function(m){
 
 	df = mclapply( seq(n_sims), function(i){		
 
@@ -233,7 +233,7 @@ fig1 = df %>%
 		xlab("Number of samples") +
 		scale_x_continuous(limits=c(0,NA), expand=c(0,0)) +
 		scale_color_manual(values=cols) 
-		
+
 fig2 = df %>%
 	as_tibble %>%
 	filter(!isDE) %>%
