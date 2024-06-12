@@ -97,13 +97,13 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 	rownames(info) = paste0("sample_", 1:nrow(info))
 
-	df_res = mclapply( 1:n_sims, function(i){
+	df_res = mclapply( 1:n_sims, function(idx){
 
 		RhpcBLASctl::omp_set_num_threads(1)
 
-		if( i %% 10 == 0) message("\r", i, " / ", n_sims, '    ', appendLF=FALSE)
+		if( idx %% 10 == 0) message("\r", idx, " / ", n_sims, '    ', appendLF=FALSE)
 
-		value = ifelse( i <= n_sims*0.9, 0, beta.true )
+		value = ifelse( idx <= n_sims*0.9, 0, beta.true )
 		beta = data.frame(mu = rep(0, n_clusters), b = c(0, value, rep(0, n_clusters-2)))
 		a = n_clusters 
 		b = nlevels(info$Batch)-1
@@ -195,14 +195,10 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		})
 		df_methods = do.call(rbind, df_methods)
 
-		if( ! is.numeric(df_methods$pValue)){
-			browser()
-		}
-
 		df = with(df_methods, data.frame(Method, assay, p.value = pValue, check.names=FALSE))
 		df = rbind(df, reshape2::melt(df_p, value.name="p.value", variable.name="Method", id.vars="assay"))
 
-		df$i = i
+		df$i = idx
 		df$value = value
 
 		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
@@ -210,11 +206,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df
 	}, mc.cores=mc.cores)
 	df_res = do.call(rbind, df_res)
-	
-	if( ! "p.value" %in% names(df_res)) browser()
-	if( ! is.numeric(df_res$p.value)){
-			browser()
-	}
 
 	# small offset to fix error if p-value is exactly zero
 	df_res$p.value <- df_res$p.value + 1e-300
@@ -647,7 +638,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Increasing batch effect
 ```{r sim2}  
-n_batches = 20
+n_batches = 20 
 # n_sims = 1000 
 # methods = c('lm', "poisson")
  
