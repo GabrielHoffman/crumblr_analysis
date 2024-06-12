@@ -285,7 +285,7 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 	df_res = rbind(res_none, res_fixed)
 
 	df_res$Status = factor(df_res$Status, c("none", "fixed", "random"))
-	return(df_res)
+	# return(df_res)
 	   
 	set.seed(1)
 	formula = ~ trait + (1|Batch)
