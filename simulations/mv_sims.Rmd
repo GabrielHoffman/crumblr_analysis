@@ -77,7 +77,7 @@ names(cols) = c("FE.empirical", "FE", "sidak", "fisher")
 # sample size
 n = 200
 
-n_sims = 50000
+n_sims = 100000
 
 methods = c("FE.empirical", "FE", "sidak", "fisher")
 
@@ -254,62 +254,6 @@ fig2 = df %>%
 plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 ```
 
-
-
-
-
-
-<!---
-# sample size
-n = 200
-
-# number of response variables
-m = 10
-
-Sigma = genPositiveDefMat(m)$Sigma
-
-# NULL model
-df = mclapply( seq(3000), function(i){
-	beta = matrix(.6, 1, m)
-	beta[] = 0
-	X = matrix(rnorm(n), ncol=1)
-	Y = X %*% beta + rmvnorm(n, sigma = Sigma)
-	fit = lm(Y ~ X)
-	R = residuals(fit)
-	C = cor(R)
-
-	# lambda = estimate.lambda(R, verbose = FALSE)
-	lambda = 0.01
-
-    C <- (1 - lambda) * C + lambda * diag(diag(C), ncol(C))
-
-	# Extract effect sizes and standard errors from model fit
-	df = lapply(coef(summary(fit)), function(a) 
-	     data.frame(beta = a["X", 1], se = a["X", 2]))
-	df = do.call(rbind, df)
-
-	res1 = LS(df$beta, df$se, C)
-	res2 = LS.empirical(df$beta, df$se, C, nu=n-2, n.mc.samples=100)
-
-	data.frame(LS = res1$p, LS.empirical = res2$p)
-}, mc.cores=8)
-df = do.call(rbind, df)
-
-par(mfrow=c(1,2))
-hist(df$LS)
-hist(df$LS.empirical)
-
-
-		Sigma = genPositiveDefMat(m)$Sigma
-		v = diag(Sigma)
-		Sigma[] = .05
-		diag(Sigma) = 1
-
-		beta = matrix(runif(m, .005, .05), 1, m)
-		Y = X %*% beta + rmvnorm(n, sigma = Sigma)*.5
-
-
---->
 
 
 
