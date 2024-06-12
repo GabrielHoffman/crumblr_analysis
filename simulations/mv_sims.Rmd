@@ -211,7 +211,7 @@ df = do.call(rbind, df)
 
 responses: `r m`
 
-```{r plots_samplesize, cache=FALSE, fig.width=9, fig.height=7}
+```{r plots_samplesize, cache=FALSE, fig.width=9, fig.height=5}
 f = function(pvalue, isDE){
 	pr <- pr.curve(scores.class0 = -log10(pvalue[isDE]), 
 					scores.class1 = -log10(pvalue[!isDE]),
