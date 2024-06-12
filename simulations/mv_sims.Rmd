@@ -248,7 +248,7 @@ fig2 = df %>%
 		scale_y_continuous(limits=c(0,NA), expand=c(0,0)) + 
 		ylab("False positive rate")
 
-plot_grid(fig1, fig2, aling="vh", axis="tblr", labels=LETTERS[1:2])
+plot_grid(fig1, fig2, aling="h", labels=LETTERS[1:2])
 ```
 
 
