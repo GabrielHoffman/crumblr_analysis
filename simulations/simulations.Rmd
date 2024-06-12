@@ -212,7 +212,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	}, mc.cores=mc.cores)
 	df_res = do.call(rbind, df_res)
 	
-	if( ! "p.value" %in% names(df_res) browser()
+	if( ! "p.value" %in% names(df_res)) browser()
 	if( ! is.numeric(df_res$p.value)){
 			browser()
 	}
