@@ -93,9 +93,9 @@ rmultinomdir = function(n, size, alpha){
 run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
 	# each batch is observed at last twice
-	X = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
+	info = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
 
-	rownames(X) = paste0("sample_", 1:nrow(X))
+	rownames(info) = paste0("sample_", 1:nrow(info))
 
 	df_res = mclapply( 1:n_sims, function(i){
 
@@ -106,12 +106,11 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		value = ifelse( i <= n_sims*0.9, 0, beta.true )
 		beta = data.frame(mu = rep(0, n_clusters), b = c(0, value, rep(0, n_clusters-2)))
 		a = n_clusters 
-		b = nlevels(X$Batch)-1
-		v = rgamma(1, var.batch, 1)
-		beta_batch = matrix(rnorm(a*b, sd=sqrt(v)), a, b)
+		b = nlevels(info$Batch)-1
+		beta_batch = matrix(rnorm(a*b, sd=sqrt(var.batch)), a, b)
 		beta = cbind(beta, beta_batch)
 
-		eta = model.matrix(~., X) %*% t(beta)
+		eta = model.matrix(~., info) %*% t(beta)
 
 		probs = exp(eta)
 
@@ -140,13 +139,13 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 		# CLR
 		Y = t(as.data.frame(compositions::clr(counts)))
-		fit_clr = suppressMessages(dream( Y, formula, X, BPPARAM=SerialParam(), useWeights=FALSE))
+		fit_clr = suppressMessages(dream( Y, formula, info, BPPARAM=SerialParam(), useWeights=FALSE))
 		fit_clr = eBayes(fit_clr)
 		tab_clr = topTable(fit_clr, coef="trait", sort.by="none")
 
 		# crumblr
 		cobj = crumblr(counts, max.ratio=5)
-		fit = suppressMessages(dream(cobj, formula, X, BPPARAM=SerialParam()))
+		fit = suppressMessages(dream(cobj, formula, info, BPPARAM=SerialParam()))
 		fit = eBayes(fit)
 		tab.crumblr = topTable(fit, coef="trait", sort.by="none")
 
@@ -164,7 +163,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df_p$crumblr = tab.crumblr$P.Value[i]
 
 		if( use.sccoda){
-			res = sccoda_wrapper(counts, X, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
+			res = sccoda_wrapper(counts, info, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
 
 			res$scCoda = 1 - res[,'Inclusion probability']  
 
@@ -189,7 +188,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 				# keep only samples with at elast 10 reads
 				i = rowSums(counts) > 10
-				res = testComposition( counts[i,], formula, X[i,], coef="trait", eval="test", method = method)
+				res = testComposition( counts[i,], formula, info[i,], coef="trait", eval="test", method = method)
 				res = data.frame(Method = method, res, check.names=FALSE)
 			}
 			res
@@ -651,9 +650,12 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 n_batches = 20
 n_sims = 1000 
 methods = c('lm', "poisson")
-# c( 0, .5, 1, 3)
-df_res2 = lapply(c( 10), function(var.batch){  
-		run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=FALSE) 
+
+df_res2 = lapply(c(0, .01, .05, .1), function(var.frac){  
+
+	var.batch = beta.true^2* var.frac / (1 - var.frac)
+
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=FALSE) 
 }) 
 df_res2 = do.call(rbind, df_res2)
 ```
@@ -734,18 +736,18 @@ RhpcBLASctl::omp_set_num_threads(1)
 RhpcBLASctl::blas_set_num_threads(1)
 
 # each batch is observed at last twice
-X = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
-rownames(X) = paste0("sample_", 1:nrow(X))
+info = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
+rownames(info) = paste0("sample_", 1:nrow(info))
 
 value = beta.true
 beta = data.frame(mu = rep(0, n_clusters), b = c(0, value, rep(0, n_clusters-2)))
 a = n_clusters 
-b = nlevels(X$Batch)-1
+b = nlevels(info$Batch)-1
 v = rgamma(1, var.batch, 1)
 beta_batch = matrix(rnorm(a*b, sd=sqrt(v)), a, b)
 beta = cbind(beta, beta_batch)
 
-eta = model.matrix(~., X) %*% t(beta)
+eta = model.matrix(~., info) %*% t(beta)
 
 probs = exp(eta)
 
@@ -779,7 +781,7 @@ df_time = data.frame()
 # CLR
 res = system.time(replicate(100, {
 Y = t(as.data.frame(compositions::clr(counts)))
-fit_clr = suppressMessages(dream( Y, formula, X, BPPARAM=SerialParam(), useWeights=FALSE))
+fit_clr = suppressMessages(dream( Y, formula, info, BPPARAM=SerialParam(), useWeights=FALSE))
 fit_clr = eBayes(fit_clr)
 tab_clr = topTable(fit_clr, coef="trait", sort.by="none")
 }))
@@ -789,7 +791,7 @@ df_time = rbind(df_time, data.frame(Method = "CLR", Time = as.numeric(res[3]) / 
 # crumblr
 res = system.time(replicate(100,{
 cobj = crumblr(counts)
-fit = suppressMessages(dream(cobj, formula, X, BPPARAM=SerialParam()))
+fit = suppressMessages(dream(cobj, formula, info, BPPARAM=SerialParam()))
 fit = eBayes(fit)
 tab.crumblr = topTable(fit, coef="trait", sort.by="none")
 }))
@@ -797,7 +799,7 @@ df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3]
 
 # scCoda
 # res = system.time({
-# 		a = sccoda_wrapper(counts, X, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
+# 		a = sccoda_wrapper(counts, info, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
 # })
 # df_time = rbind(df_time, data.frame(Method = "scCoda", Time = as.numeric(res[3])))
 
@@ -807,7 +809,7 @@ df_time_multiple = lapply( methods, function(method){
 		res = system.time(replicate(5, {
 			# keep only samples with at elast 10 reads
 			i = rowSums(counts) > 10
-			res = testComposition( counts[i,], formula, X[i,], coef="trait", eval="test", method = method)
+			res = testComposition( counts[i,], formula, info[i,], coef="trait", eval="test", method = method)
 		}))
 		data.frame(Method = method, Time = as.numeric(res[3])/5)
 })
