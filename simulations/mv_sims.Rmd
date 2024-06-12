@@ -162,7 +162,7 @@ fig2 = df %>%
 		ylab("False positive rate") +
 		scale_x_continuous(breaks = seq(2,12, by=2))
 
-plot_grid(fig1, fig2, aling="v", axis="tblr", labels=LETTERS[1:2])
+plot_grid(fig1, fig2, aling="h", labels=LETTERS[1:2])
 ```
 
 
