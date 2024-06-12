@@ -647,9 +647,9 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Increasing batch effect
 ```{r sim2}  
-n_batches = 2
-n_sims = 100 
-methods = c('lm', "poisson")
+n_batches = 20
+# n_sims = 1000 
+# methods = c('lm', "poisson")
  
 df_res2 = lapply(c(0, .01, .05, .1), function(var.frac){  
 
@@ -736,7 +736,7 @@ plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 # n_clusters = 20
 RhpcBLASctl::omp_set_num_threads(1)
 RhpcBLASctl::blas_set_num_threads(1)
-
+ 
 # each batch is observed at last twice
 info = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
 rownames(info) = paste0("sample_", 1:nrow(info))
