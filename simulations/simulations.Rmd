@@ -163,7 +163,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df_p$crumblr = tab.crumblr$P.Value[i]
 
 		if( use.sccoda){
-			res = sccoda_wrapper(counts, info, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
+			res = sccoda_wrapper(counts, info, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.14.3/0/bin/python")
 
 			res$scCoda = 1 - res[,'Inclusion probability']  
 
@@ -792,7 +792,7 @@ df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3]
 
 # scCoda
 # res = system.time({
-# 		a = sccoda_wrapper(counts, info, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.8.0/0/bin/python")
+# 		a = sccoda_wrapper(counts, info, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.14.3/0/bin/python")
 # })
 # df_time = rbind(df_time, data.frame(Method = "scCoda", Time = as.numeric(res[3])))
 
