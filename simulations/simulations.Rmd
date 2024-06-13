@@ -214,7 +214,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	df_res = do.call(rbind, df_res)
 
 	if( !is.numeric(df_res$p.value) ) browser()
-	
+
 	# small offset to fix error if p-value is exactly zero
 	df_res$p.value <- df_res$p.value + 1e-300
 
@@ -722,7 +722,7 @@ df_res2 = lapply(c(0, .01, .05, .1), function(var.frac){
 
 	var.batch = beta.true^2* var.frac / (1 - var.frac)
 
-	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=FALSE) 
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=1, short=FALSE) 
 }) 
 df_res2 = do.call(rbind, df_res2)
 ```
