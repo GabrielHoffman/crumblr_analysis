@@ -77,7 +77,7 @@ names(cols) = c("FE.empirical", "FE", "sidak", "fisher")
 # sample size
 n = 200
 
-n_sims = 1000
+n_sims = 100000
 
 methods = c("FE.empirical", "FE", "sidak", "fisher")
 

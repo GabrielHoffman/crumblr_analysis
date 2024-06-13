@@ -66,14 +66,14 @@ library(gtools)
 library(RColorBrewer)
 library(tidyverse)
 
-# library(reticulate)
-# python_path = "/sc/arion/work/hoffmg01/condaEnv/r-reticulate/bin/python"
-# use_python(python_path)
-# scoda = import("sccoda")
-# scoda.utils = import("sccoda.util.cell_composition_data")
-# scoda.analysis = import("sccoda.util.comp_ana")
+library(reticulate)
+python_path = "/sc/arion/work/hoffmg01/condaEnv/r-reticulate/bin/python"
+use_python(python_path)
+scoda = import("sccoda")
+scoda.utils = import("sccoda.util.cell_composition_data")
+scoda.analysis = import("sccoda.util.comp_ana")
 
-# source("scCoda_wrapper.R")
+source("scCoda_wrapper.R")
 source("cellTypeCompositionTest.R")
 ```
 
@@ -164,7 +164,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df_p$crumblr = tab.crumblr$P.Value[i]
 
 		if( use.sccoda){
-			res = sccoda_wrapper(counts, info, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.14.3/0/bin/python")
+			res = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/r-reticulate/bin/python")
 
 			res$scCoda = 1 - res[,'Inclusion probability']  
 
@@ -793,11 +793,10 @@ tab.crumblr = topTable(fit, coef="trait", sort.by="none")
 df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3]) / 100))
 
 # scCoda
-# res = system.time({
-# 		a = sccoda_wrapper(counts, info, formula, python_path = "/hpc/users/hoffmg01/.cache/R/basilisk/1.14.3/0/bin/python")
-# })
-# df_time = rbind(df_time, data.frame(Method = "scCoda", Time = as.numeric(res[3])))
-
+res = system.time({
+		a = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/r-reticulate/bin/python")
+})
+df_time = rbind(df_time, data.frame(Method = "scCoda", Time = as.numeric(res[3])))
 
 df_time_multiple = lapply( methods, function(method){
 
