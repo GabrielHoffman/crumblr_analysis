@@ -221,7 +221,8 @@ res = fitVarPartModel(cobj, form.dream, colData(pb), fxn = f, showWarnings=FALSE
 res = do.call(rbind, res) 
 
 CT = "IN_SST"
-df = data.frame(Composition = cobj$E[CT,],
+df = data.frame(CLR = cobj$E[CT,],
+                CLR.se = sqrt(1/cobj$weights[CT,]),
                 Composition.residuals = res[CT,],
                 fractions = fracs[,CT],
                 Age = pb$Age,
@@ -234,12 +235,13 @@ fig1 = ggplot(df, aes(Age, fractions)) +
   geom_smooth(method="lm") +
   ggtitle(CT)
 
-fig2 = ggplot(df, aes(Age, Composition)) +
+fig2 = ggplot(df, aes(Age, CLR, color=CLR.se)) +
   geom_point() +
   theme_classic() +
-  theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5)) +
+  theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="bottom") +
   geom_smooth(method="lm") +
-  ggtitle(CT)
+  ggtitle(CT) +
+  scale_color_gradient(name = "Standard error", low = "grey", high="red", limits=c(0, 2.2)) 
 
 fig3 = ggplot(df, aes(Age, Composition.residuals)) +
   geom_point() +
