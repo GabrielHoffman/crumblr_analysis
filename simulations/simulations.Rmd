@@ -640,7 +640,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 # Increasing batch effect
 ```{r sim2}  
 n_batches = 10 
-mc.cores = 1
+# mc.cores = 1
 n_sims = 1000 
 methods = c('lm', "poisson")
  
