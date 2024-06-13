@@ -157,7 +157,9 @@ run_crumblr_analysis = function(pb, form.vp, form.dream, coef){
 
   res = treeTest( fit, cobj, hc, coef=coef)
 
-  fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
+  # fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
+
+  fig1 = plotTreeTestBeta(res) + xlim(0, 15) #+ theme(legend.position="none")
 
   tab = topTable(fit, coef=coef, number=Inf)
 
