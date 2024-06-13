@@ -248,7 +248,7 @@ fig2 = df %>%
 		scale_color_manual(values=cols) +
 		xlab("Number of samples") +
 		scale_x_continuous(limits=c(0,510), expand=c(0,0)) + 
-		scale_y_continuous(limits=c(0,0.25), expand=c(0,0)) + 
+		scale_y_continuous(limits=c(0,0.15), expand=c(0,0)) + 
 		ylab("False positive rate")
 
 plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
