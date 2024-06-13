@@ -360,7 +360,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
 # With scCoda
-```{r scCoda}
+```{r scCoda, eval=FALSE}
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
@@ -384,7 +384,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11}
+```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=FALSE}
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
