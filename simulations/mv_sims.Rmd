@@ -158,7 +158,7 @@ fig2 = df %>%
 		geom_hline(yintercept=0.05, color="grey50", linetype="dashed") +
 		scale_color_manual(values=cols) +
 		xlab("Number of responses") +
-		scale_y_continuous(limits=c(0,.1), expand=c(0,0)) + 
+		scale_y_continuous(limits=c(0,.15), expand=c(0,0)) + 
 		ylab("False positive rate") +
 		scale_x_continuous(breaks = seq(2,22, by=4))
 
