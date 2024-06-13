@@ -18,11 +18,18 @@ R
 
 rmarkdown::render('simulations.Rmd')
 
+# module purge
+# ml anaconda3/2024.02
+conda create -n "sccoda" python 
+
+# new screen
+conda activate sccoda
+pip install sccoda
 
 
-conda activate /sc/arion/work/hoffmg01/condaEnv/r-reticulate
-ml gcc/11.2.0 pandoc/2.6
-export LD_LIBRARY_PATH=/sc/arion/work/hoffmg01/condaEnv/r-reticulate/lib/:$LD_LIBRARY_PATH
+ENV=/sc/arion/work/hoffmg01/condaEnv/sccoda/
+conda activate $ENV
+export LD_LIBRARY_PATH=$ENV/lib/:$LD_LIBRARY_PATH
 
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations
 R
@@ -65,7 +72,7 @@ library(RColorBrewer)
 library(tidyverse)
 
 library(reticulate)
-python_path = "/sc/arion/work/hoffmg01/condaEnv/r-reticulate/bin/python"
+python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python"
 use_python(python_path)
 scoda = import("sccoda")
 scoda.utils = import("sccoda.util.cell_composition_data")
@@ -162,7 +169,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df_p$crumblr = tab.crumblr$P.Value[i]
 
 		if( use.sccoda){
-			res = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/r-reticulate/bin/python")
+			res = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python")
 
 			res$scCoda = 1 - res[,'Inclusion probability']  
 
@@ -859,7 +866,7 @@ df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3]
 
 # scCoda
 res = system.time({
-		a = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/r-reticulate/bin/python")
+		a = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python")
 })
 df_time = rbind(df_time, data.frame(Method = "scCoda", Time = as.numeric(res[3])))
 
