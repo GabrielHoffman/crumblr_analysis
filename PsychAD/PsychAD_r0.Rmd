@@ -184,7 +184,7 @@ run_crumblr_analysis = function(pb, form.vp, form.dream, coef){
 
 
 ## Test disease
-```{r test.disease, fig.width=10}
+```{r test.disease, fig.width=15}
 coef = "DxAD"
 pb = pb.subclass
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + (1|Dx) + pH + PMI
@@ -195,7 +195,7 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 
 
 ## Test Age in controls
-```{r test.Age, fig.width=10}
+```{r test.Age, fig.width=15}
 coef = "Age"
 pb = pb.subclass[,pb.subclass$Dx == "Control"]
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
