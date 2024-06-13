@@ -77,7 +77,7 @@ names(cols) = c("FE.empirical", "FE", "sidak", "fisher")
 # sample size
 n = 200
 
-n_sims = 100000
+n_sims = 1000
 
 methods = c("FE.empirical", "FE", "sidak", "fisher")
 
@@ -108,7 +108,7 @@ df = lapply(seq(2,22, by=4), function(m){
 		fit = eBayes(fit)
 
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x)
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=1000)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
@@ -170,7 +170,7 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 # Increase sample size
 ```{r run_samplesize}
 # number of responses
-m = 20
+m = 6
   
 df = lapply(seq(50, 500, by=50), function(n){
 
@@ -196,7 +196,7 @@ df = lapply(seq(50, 500, by=50), function(n){
 		fit = eBayes(fit)
 
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x)
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=1000)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
