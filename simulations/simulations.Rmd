@@ -26,7 +26,7 @@ conda create -n "sccoda" python
 conda activate sccoda
 pip install sccoda
 
-
+ml pandoc
 ENV=/sc/arion/work/hoffmg01/condaEnv/sccoda/
 conda activate $ENV
 export LD_LIBRARY_PATH=$ENV/lib/:$LD_LIBRARY_PATH
@@ -712,7 +712,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Increasing batch effect
 ```{r sim2}  
-n_batches = 10 
+n_batches = 40 
 n_sims = 1000 
 # methods = c('lm', "poisson")
  
