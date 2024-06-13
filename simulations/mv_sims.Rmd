@@ -170,7 +170,7 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 # Increase sample size
 ```{r run_samplesize}
 # number of responses
-m = 6
+m = 12
   
 df = lapply(seq(50, 500, by=50), function(n){
 
