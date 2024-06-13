@@ -732,6 +732,7 @@ Parameters:
  - n_clusters: `r n_clusters`
  - mean_counts: `r mean_counts`
  - beta.true: `r beta.true`
+ - n_batches: `r n_batches`
  - tau: `r tau`
 
 
