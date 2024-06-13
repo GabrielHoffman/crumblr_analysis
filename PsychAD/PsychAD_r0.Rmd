@@ -208,7 +208,8 @@ run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ### Compare slopes
 Is the residual plot over fit?  Collapse to Donor level results
 ```{r compare.slopes.controls}
-cobj = crumblr(cellCounts(pb))
+# get CLR values from crumblr, but don't regularize weights
+cobj = crumblr(cellCounts(pb), max.ratio=Inf)
 
 fracs = cellCounts(pb) / rowSums(cellCounts(pb))
 
@@ -261,6 +262,9 @@ sessionInfo()
 ```{r exitd, cache=FALSE}
 knitr::knit_exit()
 ```
+
+
+
 
 
 
