@@ -13,8 +13,6 @@ output:
 
 
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/PsychAD
-ml python git
-ml gcc/11.2.0
 git pull
 R --vanilla
 
