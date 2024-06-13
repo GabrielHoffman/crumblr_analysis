@@ -18,21 +18,19 @@ R
 
 rmarkdown::render('simulations.Rmd')
 
+
+
 conda activate /sc/arion/work/hoffmg01/condaEnv/r-reticulate
+ml gcc/11.2.0 pandoc/2.6
+export LD_LIBRARY_PATH=/sc/arion/work/hoffmg01/condaEnv/r-reticulate/lib/:$LD_LIBRARY_PATH
+
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations
 R
 
-system("ml git; git pull"); rmarkdown::render("simulations.Rmd");
+system("git pull"); rmarkdown::render("simulations.Rmd");
 
-
-
-# disable X11
-
-ssh -x sklar1
 
 # https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
-
-
 
 --->
 
@@ -361,6 +359,75 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
+# With scCoda
+```{r scCoda}
+mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
+n_samples = 200
+n_clusters = 10
+mean_counts = 2000
+n_sims = 100 
+beta.true = .2
+n_batches = floor(n_samples/2)
+var.batch = 0
+tau = 10 
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")    
+          
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=TRUE, mc.cores=mc.cores, short=TRUE)  
+```
+
+Parameters:
+
+ - n_samples: `r n_samples`
+ - n_clusters: `r n_clusters`
+ - mean_counts: `r mean_counts`
+ - beta.true: `r beta.true`
+ - var.batch: `r var.batch`
+ - tau: `r tau`
+
+
+```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11}
+cols = brewer.pal(9, "Set1")
+cols[cols=="#FFFF33"] = "#FDDB27"
+names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
+
+CT = "CT_1"
+# AUPR
+aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+fig1 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+	ggplot(aes(method, AUPR, fill=method)) + 
+	geom_bar(stat="identity", position = "dodge") + 
+	theme_classic() + 
+	coord_flip() + 
+	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + 
+	theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + 
+	scale_alpha_discrete( range = c(.3, 1)) + 
+	ggtitle("AUPR") + 
+	geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) +
+	scale_fill_manual(values=cols)
+
+# FPR
+fig2 = df_res %>%
+		as_tibble %>%
+		filter(assay == CT) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		ggplot( aes(method, FPR, fill=method)) + 
+		geom_bar(stat="identity", position = "dodge") + 
+		theme_classic() + 
+		coord_flip() + 
+		scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + 
+		theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + 
+		scale_alpha_discrete( range = c(.3, 1)) + ggtitle("False positive rate") + 
+		geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + 
+		ylab("False positive rate") +
+	scale_fill_manual(values=cols)
+
+plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+```
+
+
 
 # Mixed model
 ```{r run.mixed}
@@ -639,10 +706,9 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Increasing batch effect
 ```{r sim2}  
-n_batches = 10 
-# mc.cores = 1
+n_batches = 30 
 n_sims = 1000 
-methods = c('lm', "poisson")
+# methods = c('lm', "poisson")
  
 df_res2 = lapply(c(0, .01, .05, .1), function(var.frac){  
 
