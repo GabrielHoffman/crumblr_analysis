@@ -189,7 +189,7 @@ coef = "DxAD"
 pb = pb.subclass
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + (1|Dx) + pH + PMI
 form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + scale(Age) + Dx + scale(pH) + scale(PMI)
-
+ 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
@@ -200,7 +200,7 @@ coef = "Age"
 pb = pb.subclass[,pb.subclass$Dx == "Control"]
 form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
 form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
-
+ 
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
