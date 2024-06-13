@@ -361,7 +361,6 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 # With scCoda
 ```{r scCoda}
-mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
@@ -372,7 +371,7 @@ var.batch = 0
 tau = 10 
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")    
           
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=TRUE, mc.cores=mc.cores, short=TRUE)  
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=TRUE, mc.cores=1, short=TRUE)  
 ```
 
 Parameters:
