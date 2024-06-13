@@ -77,6 +77,12 @@ source("scCoda_wrapper.R")
 source("cellTypeCompositionTest.R")
 ```
 
+/hpc/users/hoffmg01/.cache/R/basilisk/1.14.3/0/bin/python
+import sccoda
+import sccoda.util.cell_composition_data
+import sccoda.util.comp_ana
+
+
 
 ```{r sim.functions}
 rmultinomdir = function(n, size, alpha){
@@ -638,9 +644,10 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Increasing batch effect
 ```{r sim2}  
-n_batches = 60 
-# n_sims = 1000 
-# methods = c('lm', "poisson")
+n_batches = 10 
+mc.cores = 1
+n_sims = 1000 
+methods = c('lm', "poisson")
  
 df_res2 = lapply(c(0, .01, .05, .1), function(var.frac){  
 
