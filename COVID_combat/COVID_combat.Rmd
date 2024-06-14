@@ -66,8 +66,13 @@ sce = sce[,sce$GEX_region != "E: Doublets"]
 # remove nan cells
 sce = sce[,sce$minor_subset != "nan"]
 
-sce$Source = factor(sce$Source, c("HV", "COVID_HCW_MILD", "COVID_MILD", "COVID_SEV", "COVID_CRIT", "COVID_LDN", "Sepsis", "Flu"))
+# remove samples with few cells
+totalCells = with(colData(sce), table(donor_id))
+keepIds = names(totalCells)[totalCells > 500]
+sce = sce[,sce$donor_id %in% keepIds]
 
+# factor for source
+sce$Source = factor(sce$Source, c("HV", "COVID_HCW_MILD", "COVID_MILD", "COVID_SEV", "COVID_CRIT", "COVID_LDN", "Sepsis", "Flu"))
 ```
 
 # UMAP provided with data
@@ -205,26 +210,43 @@ ggplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", 
 # get CLR values from crumblr, but don't regularize weights
 cobj = crumblr(cellCounts(pb), max.ratio=Inf)
 
+library(ggbeeswarm)
 
 CT = "PB"
-CT = "cMono.cyc"
+# CT = "cMono.cyc"
+# CT = "RET"
+CT = "CD4.TEFF.prolif"
 df = data.frame(CLR = cobj$E[CT,],
                 Source = pb$Source,
                 se = 1/sqrt(cobj$weights[CT,]),
+                counts = cellCounts(pb)[,CT],
+                totalCells = rowSums(cellCounts(pb)),
                 colData(pb))
 
-ggplot(df, aes(Source, CLR)) +
-	geom_boxplot() +
-	theme_classic() +
-	theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1)
-	ggtitle(CT)
+n.skip = sum(scale(df$se) > 3)
+zmax = sort(df$se, decreasing=TRUE)[n.skip+1]
+
+fig = df %>%
+	filter(Source != "COVID_LDN") %>%
+	ggplot(aes(Source, CLR, color=pmin(zmax, se))) +
+		geom_boxplot(width=.3) +
+		geom_beeswarm(cex = 2, size=3) + 
+		theme_classic() +
+		theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1, axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+		ggtitle(CT) +
+		scale_color_gradient2(low="grey", high="red", limits= c(0,zmax*1.01), name = "Standard error")
+
+ggsave(fig, file="~/www/test.png")
+
+df %>%
+	arrange(-se) %>% 
+	head %>%
+	select(CLR, Source, se, counts, totalCells)
+```
 
 
-# need to remove age and Sex
 
-form = ~ Age + sex + Source
-fit = dream(cobj, form, colData(pb))
-fit = eBayes(fit)
+
 
 
 
