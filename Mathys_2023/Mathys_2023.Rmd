@@ -124,7 +124,7 @@ df %>%
 ```
 
 # Cell_Type
-```{r CT, fig.width=12}
+```{r CT, fig.height=15, fig.width=15}
 # Controls only
 idx = which(pb$ADdiag2types != "AD")
 cobj = crumblr(cellCounts(pb)[idx,])
