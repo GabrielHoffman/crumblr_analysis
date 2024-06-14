@@ -20,7 +20,7 @@ rmarkdown::render('simulations.Rmd')
 
 # module purge
 # ml anaconda3/2024.02
-conda create -n "sccoda" python 
+# conda create -n "sccoda" python 
 
 # new screen
 conda activate sccoda
@@ -720,7 +720,7 @@ df_res2 = lapply(c(0, .05, .1, .2), function(var.frac){
 
 	var.batch = beta.true^2* var.frac / (1 - var.frac)
 
-	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods = c("lm"), tau=tau, use.sccoda=FALSE, mc.cores=48, short=FALSE) 
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods = c("lm", "poisson", "NB"), tau=tau, use.sccoda=FALSE, mc.cores=48, short=FALSE) 
 }) 
 df_res2 = do.call(rbind, df_res2)
 ```
