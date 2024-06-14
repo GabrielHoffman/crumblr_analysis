@@ -21,8 +21,6 @@ vignette: >
 
 
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/Kfoury_CancerCell_2021
-ml python git gcc/11.2.0
-git pull
 R --vanilla
 
 
@@ -237,7 +235,11 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 
+```{r sd2, fig.width=10, fig.height=5}
+fig1 = plotTreeTestBeta(res) + xlim(0, 15) + theme(legend.position="none")
 
+fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
+```
 
 
 

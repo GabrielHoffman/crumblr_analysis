@@ -16,8 +16,11 @@ params:
 
 <!---
 
+bsub -Is -q premium -R span[hosts=1] -R rusage[mem=20000] -W 12:00 -P acc_CommonMind -n 12 bash
+
+
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/1M-scBloodNL
-ml python git
+ml python git gcc/11.2.0
 git pull
 R --vanilla
 

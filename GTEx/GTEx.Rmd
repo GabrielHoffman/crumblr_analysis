@@ -24,7 +24,7 @@ git pull
 R --vanilla
 
 
-system("git pull"); rmarkdown::render("1M-scBloodNL_crumblr.Rmd");
+system("git pull"); rmarkdown::render("GTEx.Rmd");
 
 
 https://hoffmg01.hpc.mssm.edu/crumblr_analysis/1M-scBloodNL/1M-scBloodNL_crumblr.html
@@ -47,7 +47,7 @@ knitr::opts_chunk$set(
 ```{r get.data, eval=FALSE}
 # https://gtexportal.org/home/datasets
 
-cd /hpc/users/hoffmg01/work/eval_methods/dreamlet/data
+cd /sc/arion/projects/CommonMind/hoffman/scRNAseq_data
 
 wget --no-check-certificate https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad
 wget --no-check-certificate https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad
@@ -65,7 +65,7 @@ library(gplots)
 
 ```{r load.data}
 # specify HDF5 file
-file = '/hpc/users/hoffmg01/work/eval_methods/dreamlet/data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad'
+file = '/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad'
 
 sce = readH5AD( file, use_hdf5=TRUE)
 
@@ -76,11 +76,7 @@ sce = sce[,colData(sce)$scrublet=='False']
 
 # Joint UMAP
 ```{r umap, dev="png", fig.height=12, fig.width=8}
-# extract UMAP coordinates and annotations
-df = cbind(reducedDim(sce, "X_umap"), colData(sce))
-df = data.frame(df)
-
-ggplot(df, aes(V1, V2, color=Granular.cell.type)) + geom_point(size=.05) + theme_classic() + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="bottom") + guides(colour = guide_legend(override.aes = list(size = 1.5))) + xlab("UMAP1") + ylab("UMAP2") 
+plotProjection(sce, "X_umap", 'Granular.cell.type', 1)
 ```
 
 

@@ -153,7 +153,7 @@ run_crumblr_analysis = function(pb, form.vp, form.dream, coef){
   fit = eBayes(fit)
 
   ### Multivariate test along hierarchy
-  hc = buildClusterTreeFromPB(pb)
+  hc = buildClusterTreeFromPB(pb, assays=rownames(fit))
 
   res = treeTest( fit, cobj, hc, coef=coef)
 
@@ -204,6 +204,17 @@ form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
 run_crumblr_analysis(pb, form.vp, form.dream, coef)
 ```
 
+coef = "Age:DxAD"
+pb = pb.subclass
+form.vp = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age + pH + PMI
+form.dream = ~ (1|SubID) + (1|poolID) + (1|Sex) + Age*Dx + pH + PMI
+fig = run_crumblr_analysis(pb, form.vp, form.dream, coef)
+
+ggsave(fig, file="~/www/test.png", width=12)
+
+
+
+
 
 ### Compare slopes
 Is the residual plot over fit?  Collapse to Donor level results
@@ -222,7 +233,6 @@ res = do.call(rbind, res)
 
 CT = "IN_SST"
 df = data.frame(CLR = cobj$E[CT,],
-                CLR.se = sqrt(1/cobj$weights[CT,]),
                 Composition.residuals = res[CT,],
                 fractions = fracs[,CT],
                 Age = pb$Age,
@@ -235,7 +245,7 @@ fig1 = ggplot(df, aes(Age, fractions)) +
   geom_smooth(method="lm") +
   ggtitle(CT)
 
-fig2 = ggplot(df, aes(Age, CLR, color=CLR.se)) +
+fig2 = ggplot(df, aes(Age, CLR, color=se)) +
   geom_point() +
   theme_classic() +
   theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="bottom") +

@@ -14,16 +14,12 @@ output:
 
 
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/COVID_combat/
-ml python git
-ml gcc/11.2.0
-git pull
 R --vanilla
-
 
 system("git pull"); rmarkdown::render("COVID_combat.Rmd");
 
 
-# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/COVID_combat
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/COVID_combat/COVID_combat.html
 
 
 
@@ -69,6 +65,9 @@ sce = sce[,sce$GEX_region != "E: Doublets"]
 
 # remove nan cells
 sce = sce[,sce$minor_subset != "nan"]
+
+sce$Source = factor(sce$Source, c("HV", "COVID_HCW_MILD", "COVID_MILD", "COVID_SEV", "COVID_CRIT", "COVID_LDN", "Sepsis", "Flu"))
+
 ```
 
 # UMAP provided with data
@@ -200,6 +199,49 @@ ggplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", 
 	theme(aspect.ratio=ratio, axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
 	scale_fill_gradient2(low="blue", mid="white", high="red", limits=c(-lim, lim)) 
 ```
+
+# Plot of one cell type
+```{r compare}
+# get CLR values from crumblr, but don't regularize weights
+cobj = crumblr(cellCounts(pb), max.ratio=Inf)
+
+
+CT = "PB"
+CT = "cMono.cyc"
+df = data.frame(CLR = cobj$E[CT,],
+                Source = pb$Source,
+                se = 1/sqrt(cobj$weights[CT,]),
+                colData(pb))
+
+ggplot(df, aes(Source, CLR)) +
+	geom_boxplot() +
+	theme_classic() +
+	theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1)
+	ggtitle(CT)
+
+
+# need to remove age and Sex
+
+form = ~ Age + sex + Source
+fit = dream(cobj, form, colData(pb))
+fit = eBayes(fit)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
    
