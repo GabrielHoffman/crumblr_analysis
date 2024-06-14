@@ -131,7 +131,7 @@ form = ~ Age + sex + Source
 fit = dream(cobj, form, colData(pb))
 fit = eBayes(fit)
 
-hc = buildClusterTreeFromPB(pb, "ward.D2")
+hc = buildClusterTreeFromPB(pb )
 ```
 
 
