@@ -27,7 +27,8 @@ R
 system("git pull"); rmarkdown::render("Mathys_2023.Rmd");
 
 
-# https://hoffmg01.u.hpc.mssm.edu/crumblr_analysis/Mathys_2023.html
+# https://hoffmg01.u.hpc.mssm.edu/crumblr_analysis/Mathys_2023/Mathys_2023.html
+
 
 --->
 
@@ -57,6 +58,8 @@ library(kableExtra)
 library(cowplot)
 library(ggplot2)
 library(crumblr)
+library(ggtree)
+library(aplot)
 ```
 
 # Load data
@@ -90,6 +93,7 @@ plotProjection(sce, "X_umap", annotation='Cell_Type')
 ```
 
 
+
 ## Properties of dataset
 ```{r properties}
 df = data.frame(table(pb$ADdiag2types))
@@ -120,17 +124,43 @@ df %>%
 ```
 
 # Cell_Type
-```{r CT}
+```{r CT, fig.width=12}
 # Controls only
-idx = which(pb$ADdiag2types == "nonAD")
+idx = which(pb$ADdiag2types != "AD")
 cobj = crumblr(cellCounts(pb)[idx,])
 
 form = ~ age + sex + Study + pmi 
+
+vp.c = fitExtractVarPartModel(cobj, form, colData(pb)[idx,])
+fig.vp = plotPercentBars( vp.c) 
+
 fit = dream(cobj, form, colData(pb)[idx,])
 fit = eBayes(fit)
 
 tab = topTable(fit, coef="age", number=Inf)
-tab
+
+hc = buildClusterTreeFromPB(pb)
+
+res = treeTest( fit, cobj, hc, coef="age", method="FE")
+
+fig1 = plotTreeTestBeta(res) + xlim(0, 25)
+
+tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
+tab$se = with(tab, logFC/t)
+
+fig2 = ggplot(tab, aes(celltype, logFC)) + 
+  geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
+  geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
+  geom_point(color="dodgerblue") +
+  theme_classic() +
+  coord_flip() +
+  xlab('') + 
+  ylab("Effect size") +
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
+# combine plots
+fig = fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 # Combine SST
