@@ -160,7 +160,7 @@ fig2 = ggplot(tab, aes(celltype, logFC)) +
         axis.ticks.y=element_blank())
 
 # combine plots
-fig = fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
+fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 # Combine SST
