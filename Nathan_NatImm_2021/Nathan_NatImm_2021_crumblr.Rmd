@@ -11,6 +11,21 @@ output:
 ---
 
 
+
+<!---
+
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/Nathan_NatImm_2021
+R --vanilla
+
+system("git pull"); rmarkdown::render("Nathan_NatImm_2021_crumblr.Rmd");
+
+
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/
+
+
+--->
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   echo = TRUE,
@@ -212,6 +227,13 @@ fig.logFC = ggplot(tab, aes(celltype, logFC)) +
 # combine plots
 fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
 ```
+
+```{r test.test2, fig.height=6, fig.width=12}
+# combine plots
+fig.tree = plotTreeTestBeta(res1) 
+fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
+```
+
 
 
 ## Correlation between coefficient estimates
