@@ -1,6 +1,6 @@
 ---
 title: "COVID COMBAT study"
-subtitle: 'crumblr analysis'
+subtitle: '(COvid-19 Multi-omics Blood ATlas (COMBAT) Consortium)[https://doi.org/10.1016/j.cell.2022.01.012]'
 author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
 date: "Run on `r Sys.time()`"
 output: 
@@ -211,11 +211,13 @@ ggplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", 
 cobj = crumblr(cellCounts(pb), max.ratio=Inf)
 
 library(ggbeeswarm)
+library(ggrepel)
 
-CT = "PB"
-# CT = "cMono.cyc"
+# CT = "PB"
+# CT = "MAIT"
+CT = "cMono.cyc"
 # CT = "RET"
-CT = "CD4.TEFF.prolif"
+# CT = "CD4.TEFF.prolif"
 df = data.frame(CLR = cobj$E[CT,],
                 Source = pb$Source,
                 se = 1/sqrt(cobj$weights[CT,]),
@@ -223,10 +225,25 @@ df = data.frame(CLR = cobj$E[CT,],
                 totalCells = rowSums(cellCounts(pb)),
                 colData(pb))
 
+# points to highlight
+df_count1 = df %>%
+	filter(counts > 0) %>%
+	arrange(-se) %>% 
+	head(2) %>%
+	select(CLR, Source, se, counts, totalCells)
+
+df_count2 = df %>%
+	arrange(se) %>% 
+	head(2) %>%
+	select(CLR, Source, se, counts, totalCells)
+
+df_count = rbind(df_count1, df_count2)
+
+
 n.skip = sum(scale(df$se) > 3)
 zmax = sort(df$se, decreasing=TRUE)[n.skip+1]
 
-fig = df %>%
+df %>%
 	filter(Source != "COVID_LDN") %>%
 	ggplot(aes(Source, CLR, color=pmin(zmax, se))) +
 		geom_boxplot(width=.3) +
@@ -234,18 +251,15 @@ fig = df %>%
 		theme_classic() +
 		theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1, axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
 		ggtitle(CT) +
-		scale_color_gradient2(low="grey", high="red", limits= c(0,zmax*1.01), name = "Standard error")
+		scale_color_gradient2(low="grey", high="red", limits= c(0,zmax*1.01), name = "Standard error") +
+		geom_text_repel(data=df_count, aes(Source, CLR, label=paste(counts, totalCells, sep=' / ')), color="black", box.padding=2)
+```
+
+<!---
 
 ggsave(fig, file="~/www/test.png")
 
-df %>%
-	arrange(-se) %>% 
-	head %>%
-	select(CLR, Source, se, counts, totalCells)
-```
-
-
-
+--->
 
 
 
