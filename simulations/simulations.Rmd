@@ -720,7 +720,7 @@ df_res2 = lapply(c(0, .05, .1, .2), function(var.frac){
 
 	var.batch = beta.true^2* var.frac / (1 - var.frac)
 
-	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=24, short=TRUE) 
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=48, short=TRUE) 
 }) 
 df_res2 = do.call(rbind, df_res2)
 ```
