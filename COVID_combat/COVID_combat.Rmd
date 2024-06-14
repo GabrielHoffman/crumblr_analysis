@@ -1,6 +1,6 @@
 ---
 title: "COVID COMBAT study"
-subtitle: '(COvid-19 Multi-omics Blood ATlas (COMBAT) Consortium)[https://doi.org/10.1016/j.cell.2022.01.012]'
+subtitle: '[COvid-19 Multi-omics Blood ATlas (COMBAT) Consortium](https://doi.org/10.1016/j.cell.2022.01.012)'
 author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
 date: "Run on `r Sys.time()`"
 output: 
