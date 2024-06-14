@@ -137,7 +137,7 @@ hc = buildClusterTreeFromPB(pb )
 
 ```{r run_test}
 run_test = function(coef){
-	res = treeTest( fit, cobj, hc, coef=coef, method="FE")
+	res = treeTest( fit, cobj, hc, coef=coef)
 
 	fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(coef)
 
@@ -187,7 +187,7 @@ rownames(tab) = c()
 tab$adj.P.Val = p.adjust(tab$P.Value, "fdr")
 
 # get order of cell types
-res = treeTest( fit, cobj, hc, coef=coef_array[1], method="FE")
+res = treeTest( fit, cobj, hc, coef=coef_array[1])
 fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(coef)
 lvls = rev(get_taxa_name(fig1))
 tab$celltype = factor(tab$celltype, lvls)
