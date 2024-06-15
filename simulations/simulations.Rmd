@@ -24,7 +24,7 @@ rmarkdown::render('simulations.Rmd')
 
 # new screen
 conda activate sccoda
-pip install sccoda
+# pip install sccoda
 
 ml pandoc
 ENV=/sc/arion/work/hoffmg01/condaEnv/sccoda/
@@ -107,7 +107,8 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 		RhpcBLASctl::omp_set_num_threads(1)
 
-		if( idx %% 10 == 0) message("\r", idx, " / ", n_sims, '    ', appendLF=FALSE)
+		if( idx %% 1 == 0) message("\r", idx, " / ", n_sims, '    ', appendLF=FALSE)
+		set.seed(idx)
 
 		value = ifelse( idx <= n_sims*0.9, 0, beta.true )
 		beta = data.frame(mu = rep(0, n_clusters), b = c(0, value, rep(0, n_clusters-2)))
@@ -720,7 +721,7 @@ df_res2 = lapply(c(0, .05, .1, .2), function(var.frac){
 
 	var.batch = beta.true^2* var.frac / (1 - var.frac)
 
-	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims = 3000, beta.true, n_batches, var.batch, methods = c("lm", "lmlog", "poisson"), tau=tau, use.sccoda=FALSE, mc.cores=48, short=FALSE) 
+	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims = 3000, beta.true, n_batches, var.batch, methods = methods, tau=tau, use.sccoda=FALSE, mc.cores=1, short=FALSE) 
 }) 
 df_res2 = do.call(rbind, df_res2)
 ```
