@@ -239,8 +239,7 @@ fig2 = plotTreeTestBeta(res1)
 fig3 = plotPercentBars( sortCols(vp), col=cols)
  
 fig2 +
-   theme(legend.position="bottom", legend.box = "vertical")
-| fig1 | fig3
+   theme(legend.position="bottom", legend.box = "vertical") | fig1 | fig3
 ```
 
 
