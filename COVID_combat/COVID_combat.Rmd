@@ -141,6 +141,8 @@ run_test = function(coef){
 
 	fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(coef)
 
+	fig2 = plotForest(res)
+
 	tab = topTable(fit, coef=coef, number=Inf)
 	tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
 	tab$se = with(tab, logFC/t)
@@ -204,6 +206,16 @@ ggplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", 
 	theme(aspect.ratio=ratio, axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
 	scale_fill_gradient2(low="blue", mid="white", high="red", limits=c(-lim, lim)) 
 ```
+
+
+
+```{r treeTest2}
+plotTreeTestBeta(res1) + xlim(0, 15) |
+crumblr::plotForest(res1) |
+plotPercentBars( sortCols(vp, col=cols)
+```
+
+
 
 # Plot of one cell type
 ```{r compare}
