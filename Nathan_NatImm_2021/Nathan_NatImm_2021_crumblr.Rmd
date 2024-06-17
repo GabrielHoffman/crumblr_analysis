@@ -234,7 +234,7 @@ fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
 ```
 
 ```{r treeTest2}
-crumblr::plotForest(res1, hide=TRUE) %>%
+(crumblr::plotForest(res1, hide=TRUE) + theme(aspect.ratio=3)) %>%
   insert_left(plotTreeTestBeta(res1) )  %>% 
   insert_right(plotPercentBars( sortCols(vp), col=cols))
 ```
