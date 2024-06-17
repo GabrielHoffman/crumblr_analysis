@@ -222,13 +222,13 @@ fig.logFC = ggplot(tab, aes(celltype, logFC)) +
   theme_classic() +
   xlab('') +
   theme(aspect.ratio=3, axis.text.y = element_blank())
- 
+  
 # combine plots
 fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
 ```
 
 ```{r test.test2, fig.height=6, fig.width=12}
-# combine plots
+# combine plots 
 fig.tree = plotTreeTestBeta(res1) 
 fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
 ```
@@ -237,7 +237,7 @@ fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
 fig1 = crumblr::plotForest(res1, hide=TRUE) + theme(aspect.ratio=3)
 fig2 = plotTreeTestBeta(res1)
 fig3 = plotPercentBars( sortCols(vp), col=cols)
-
+ 
 fig2 %>% insert_left(fig1)  %>% insert_right(fig3)
 fig2 | fig1 | fig3
 ```
