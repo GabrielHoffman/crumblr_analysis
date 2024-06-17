@@ -70,6 +70,7 @@ library(HMP)
 library(gtools)
 library(RColorBrewer)
 library(tidyverse)
+library(lme4)
 
 library(reticulate)
 python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python"
@@ -213,7 +214,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		save(df, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims/sims_", idx, ".RDATA"))
 
 		df
-	}, mc.cores=mc.cores)
+	}, mc.cores=mc.cores, mc.preschedule=FALSE)
 	df_res = do.call(rbind, df_res)
 
 	if( !is.numeric(df_res$p.value) ) save.image()
