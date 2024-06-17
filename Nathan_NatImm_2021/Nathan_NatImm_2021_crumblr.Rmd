@@ -20,8 +20,7 @@ R --vanilla
 system("git pull"); rmarkdown::render("Nathan_NatImm_2021_crumblr.Rmd");
 
 
-# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/
-
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/Nathan_NatImm_2021/Nathan_NatImm_2021_crumblr.html
 
 --->
 
@@ -236,7 +235,7 @@ fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
 
 ```{r treeTest2}
 plotTreeTestBeta(res1) + xlim(0, 15) |
-crumblr::plotForest(res1) |
+crumblr::plotForest(res1, hide=TRUE) |
 plotPercentBars( sortCols(vp), col=cols)
 ```
 
