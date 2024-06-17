@@ -143,20 +143,20 @@ run_test = function(coef){
 
 	fig2 = plotForest(res)
 
-	tab = topTable(fit, coef=coef, number=Inf)
-	tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
-	tab$se = with(tab, logFC/t)
+	# tab = topTable(fit, coef=coef, number=Inf)
+	# tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
+	# tab$se = with(tab, logFC/t)
 
-	fig2 = ggplot(tab, aes(celltype, logFC)) + 
-		geom_hline(yintercept=0, linetype="dashed", color="grey", linewidth=1) +
-		geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
-		geom_point(color="dodgerblue") +
-		theme_classic() +
-		coord_flip() + 
-		xlab('') + 
-		ylab("Effect size") +
-		theme(axis.text.y=element_blank(),
-		      axis.ticks.y=element_blank())
+	# fig2 = ggplot(tab, aes(celltype, logFC)) + 
+	# 	geom_hline(yintercept=0, linetype="dashed", color="grey", linewidth=1) +
+	# 	geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
+	# 	geom_point(color="dodgerblue") +
+	# 	theme_classic() +
+	# 	coord_flip() + 
+	# 	xlab('') + 
+	# 	ylab("Effect size") +
+	# 	theme(axis.text.y=element_blank(),
+	# 	      axis.ticks.y=element_blank())
  
 	# combine plots
 	fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
