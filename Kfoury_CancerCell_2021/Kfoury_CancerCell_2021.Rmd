@@ -216,7 +216,8 @@ res = treeTest( fit, cobj, hc, coef=coef)
 cols = c(brewer.pal(3, "Set1"), "grey85")
 
 plotTreeTestBeta(res) + xlim(0, 15) +
-  theme(legend.position = "left") |
+  theme(legend.position = "left") +
+   theme(legend.position="bottom", legend.box = "vertical")  |
 crumblr::plotForest(res, hide=TRUE) |
 plotPercentBars( sortCols(vp.c), col=cols) 
 ```
