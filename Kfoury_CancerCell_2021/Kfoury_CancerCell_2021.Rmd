@@ -62,6 +62,7 @@ library(aplot)
 library(tidyverse)
 library(ggcorrplot)
 library(DelayedArray)
+library(RColorBrewer)
 
 # set block size for reading DelayedMatrix in H5AD file
 # The default of 1e8 to small and increasing to the block size 
@@ -242,4 +243,11 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 
+```{r sd3, fig.width=10, fig.height=5}
+cols = c(brewer.pal(3, "Set1"), "grey85")
+
+plotTreeTestBeta(res) |
+plotForest(res) |
+plotPercentBars( sortCols(vp.c), col=cols)
+```
 
