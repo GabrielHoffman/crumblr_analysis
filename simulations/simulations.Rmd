@@ -210,7 +210,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
 
-		save(df, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims_", idx, ".RDATA"))
+		save(df, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims/sims_", idx, ".RDATA"))
 
 		df
 	}, mc.cores=mc.cores)
