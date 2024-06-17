@@ -239,7 +239,7 @@ fig2 = plotTreeTestBeta(res1)
 fig3 = plotPercentBars( sortCols(vp), col=cols)
 
 fig2 %>% insert_left(fig1)  %>% insert_right(fig3)
-fig1 | fig2 | fig3
+fig2 | fig1 | fig3
 ```
 
 
