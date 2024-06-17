@@ -213,40 +213,9 @@ hc = buildClusterTreeFromPB(pb)
 
 res = treeTest( fit, cobj, hc, coef=coef)
 
-fig1 = plotTreeTest(res) + xlim(0, 15) + theme(legend.position="none")
-
-tab = topTable(fit, coef=coef, number=Inf)
-
-tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig1)))
-tab$se = with(tab, logFC/t)
-
-fig2 = ggplot(tab, aes(celltype, logFC)) + 
-  geom_hline(yintercept=0, linetype="dashed", color="grey", size=1) +
-  geom_errorbar(aes(ymin = logFC - 1.96*se, ymax = logFC + 1.96*se), width=0) +
-  geom_point(color="dodgerblue") +
-  theme_classic() +
-  coord_flip() +
-  xlab('') + 
-  ylab("Effect size") +
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y=element_blank())
-
-# combine plots
-fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
-```
-
-
-```{r sd2, fig.width=10, fig.height=5}
-fig1 = plotTreeTestBeta(res) + xlim(0, 15) 
-
-fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
-```
-
-
-```{r sd3, fig.width=10, fig.height=5}
 cols = c(brewer.pal(3, "Set1"), "grey85")
 
-plotTreeTestBeta(res) |
+plotTreeTestBeta(res) + xlim(0, 15)|
 crumblr::plotForest(res) |
 plotPercentBars( sortCols(vp.c), col=cols)
 ```
