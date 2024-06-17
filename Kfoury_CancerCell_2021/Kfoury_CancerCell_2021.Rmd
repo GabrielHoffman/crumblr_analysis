@@ -247,7 +247,7 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 cols = c(brewer.pal(3, "Set1"), "grey85")
 
 plotTreeTestBeta(res) |
-plotForest(res) |
+crumblr::plotForest(res) |
 plotPercentBars( sortCols(vp.c), col=cols)
 ```
 
