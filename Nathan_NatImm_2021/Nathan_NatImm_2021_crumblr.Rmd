@@ -206,34 +206,6 @@ topTable(fit, coef='TB_statusCASE', number=Inf) %>%
 # Perform multivariate testing 
 res1 = treeTest( fit, cobj, hcl, coef="TB_statusCASE")
 
-# plot tree with results
-fig.tree = plotTreeTest(res1) + theme(legend.position="none")
-
-# plot of logFC
-tab = topTable(fit, "TB_statusCASE", number=Inf, sort.by="none")
-tab$celltype = factor(rownames(tab), rev(get_taxa_name(fig.tree)))
-tab$se = with(tab, logFC/ t)
-
-fig.logFC = ggplot(tab, aes(celltype, logFC)) +
-  geom_hline(yintercept=0, linetype="dashed", color="grey50") + 
-  geom_errorbar(aes(ymin=logFC - 1.96*se, ymax=logFC + 1.96*se), width=0) +
-  geom_point(color="dodgerblue") +
-  coord_flip() +
-  theme_classic() +
-  xlab('') +
-  theme(aspect.ratio=3, axis.text.y = element_blank())
-  
-# combine plots
-fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
-```
-
-```{r test.test2, fig.height=6, fig.width=12}
-# combine plots 
-fig.tree = plotTreeTestBeta(res1) 
-fig.logFC %>% insert_left(fig.tree)  %>% insert_right(fig.vp)
-```
-
-```{r treeTest2, fig.height=6, fig.width=12}
 fig1 = crumblr::plotForest(res1, hide=TRUE) + theme(aspect.ratio=3)
 fig2 = plotTreeTestBeta(res1)
 fig3 = plotPercentBars( sortCols(vp), col=cols)
