@@ -238,8 +238,9 @@ fig1 = crumblr::plotForest(res1, hide=TRUE) + theme(aspect.ratio=3)
 fig2 = plotTreeTestBeta(res1)
 fig3 = plotPercentBars( sortCols(vp), col=cols)
  
-fig2 %>% insert_left(fig1)  %>% insert_right(fig3)
-fig2 | fig1 | fig3
+fig2 +
+   theme(legend.position="bottom", legend.box = "vertical")
+| fig1 | fig3
 ```
 
 
@@ -290,26 +291,6 @@ df %>%
 ```
 
 
-
-
-
-## Correlation between coefficient estimates
-```{r ggcorrplot, fig.height=8, fig.width=8}
-# get covariance matrix
-V = vcov(fit, cobj, coef="TB_statusCASE")
-
-# convert to correlation matrix
-V = cov2cor(V)
-
-# shorten names
-rownames(V) = gsub(":TB_statusCASE", '', rownames(V))
-colnames(V) = gsub(":TB_statusCASE", '', colnames(V))
-
-# sort to match tree
-i = match(rev(get_taxa_name(fig.tree)), rownames(V))
-
-ggcorrplot(V[i,i], outline.color=NA, colors=c("blue3", "white", "red3"))
-```
 
 
 
