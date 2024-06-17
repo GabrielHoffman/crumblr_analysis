@@ -210,7 +210,7 @@ fit = eBayes(fit)
 ```{r sd, fig.width=10, fig.height=5}
 coef = "Tumor_Involved"
 hc = buildClusterTreeFromPB(pb)
-
+ 
 res = treeTest( fit, cobj, hc, coef=coef)
  
 cols = c(brewer.pal(3, "Set1"), "grey85")
