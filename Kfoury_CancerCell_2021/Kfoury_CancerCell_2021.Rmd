@@ -202,12 +202,14 @@ fit = eBayes(fit)
 
 
 ### Multivariate test along hierarchy
-```{r sd, fig.width=10, fig.height=5}
+```{r sd}
 coef = "Tumor_Involved"
 hc = buildClusterTreeFromPB(pb)
  
 res = treeTest( fit, cobj, hc, coef=coef)
- 
+```
+
+```{r plots, fig.width=10, fig.height=6} 
 cols = c(brewer.pal(3, "Set1"), "grey85")
 
 plotTreeTestBeta(res) + xlim(0, 15) +
