@@ -54,8 +54,6 @@ library(kableExtra)
 library(ggcorrplot)
 library(RColorBrewer)
 library(DelayedArray)
-
-setAutoBlockSize(1e9)
 ```
 
 # Load data
