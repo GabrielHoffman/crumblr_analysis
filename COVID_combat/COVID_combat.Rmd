@@ -209,7 +209,7 @@ ggplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", 
 
 
 
-```{r treeTest2}
+```{r treeTest2, eval=FALSE}
 plotTreeTestBeta(res) + xlim(0, 15) |
 crumblr::plotForest(res) |
 plotPercentBars( sortCols(vp), col=cols)
