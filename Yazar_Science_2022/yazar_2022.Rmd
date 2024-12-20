@@ -62,7 +62,7 @@ sce = readH5AD(file, use_hdf5=TRUE)
 counts(sce) = assay(sce, "X")
 
 # Compute pseudobulk
-pb <- aggregateToPseudoBulk(sce[1:100,],
+pb <- aggregateToPseudoBulk(sce,
     assay = "counts",     
     cluster_id = "cell_type",  
     sample_id = "donor_id",
