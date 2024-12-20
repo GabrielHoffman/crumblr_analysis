@@ -72,6 +72,8 @@ pb <- aggregateToPseudoBulk(sce[,sce$cell_type %in% keep],
     sample_id = "donor_id",
     verbose = FALSE)
 
+rm(sce)
+
 # crumblr transform
 cobj = crumblr(cellCounts(pb)[,keep])
 ```
