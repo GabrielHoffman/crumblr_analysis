@@ -1,0 +1,114 @@
+---
+title: "OneK1K single cell RNA-seq"
+subtitle: 'https://onek1k.org'
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+output: 
+  html_document:
+    toc: true
+    smart: true
+    self_contained: false
+---
+
+<!---
+
+
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/Yazar_Science_2022/
+R --vanilla
+
+system("git pull"); rmarkdown::render("yazar_2022.Rmd");
+
+
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/COVID_combat/COVID_combat.html
+
+
+
+# cd 
+
+--->
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  dev = c("png", "pdf"),
+  package.startup.message = FALSE,
+  cache = TRUE,
+  cache.lazy = FALSE)
+```
+
+
+```{r load, cache=FALSE}
+library(SingleCellExperiment)
+library(zellkonverter)
+library(dreamlet)
+library(crumblr)
+library(aplot) 
+library(RColorBrewer) 
+library(ggtree) 
+library(kableExtra)
+library(tidyverse) 
+library(cowplot)
+```
+
+```{r read.data}
+# read single cell RNA-seq
+file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/Yazar_Science_2022/08984b3c-3189-4732-be22-62f1fe8f15a4.h5ad"
+sce = readH5AD(file, use_hdf5=TRUE)
+counts(sce) = assay(sce, "X")
+
+# Compute pseudobulk
+pb <- aggregateToPseudoBulk(sce[1:100,],
+    assay = "counts",     
+    cluster_id = "cell_type",  
+    sample_id = "donor_id",
+    verbose = FALSE)
+
+# crumblr transform
+cobj = crumblr(cellCounts(pb))
+```
+
+
+```{r analysis}
+form = ~ age + (1|sex) + (1|pool_number) 
+res.vp = fitExtractVarPartModel(cobj, form, colData(pb) )
+
+cols = c(brewer.pal(ncol(res.vp)-1, "Set1"), "grey85")
+fig.vp = plotPercentBars(sortCols(res.vp), col=cols)
+
+form = ~ age + (1|sex) + (1|pool_number) 
+fit = dream(cobj, form, colData(pb))
+fit = eBayes(fit)
+
+hc = buildClusterTreeFromPB(pb)
+```
+
+```{r topTable}
+topTable(fit, coef="age", number=Inf) %>%   
+  select(logFC, AveExpr, t, P.Value, adj.P.Val) %>% 
+  kbl() %>%  
+  kable_classic(full_width = FALSE)
+```
+
+
+```{r treeTest}
+res = treeTest( fit, cobj, hc, coef="age")
+
+fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(coef)
+
+fig2 = plotForest(res)
+
+# combine plots
+fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
+```
+
+
+
+
+
+
+
