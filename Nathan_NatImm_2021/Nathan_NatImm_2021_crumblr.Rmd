@@ -62,6 +62,7 @@ library(DelayedArray)
 path = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/Nathan_NatImm_2021/"
 file = paste0(path, "/Nathan_NatImm_2021.h5ad")
 sce = readH5AD(file, use_hdf5=TRUE)   
+counts(sce) = assay(sce, "X")
 
 # get only single-cell RNA-seq
 # rest is CITE-seq proteins
