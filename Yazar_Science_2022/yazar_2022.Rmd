@@ -61,15 +61,19 @@ file = "/sc/arion/projects/CommonMind/hoffman/scRNAseq_data/Yazar_Science_2022/0
 sce = readH5AD(file, use_hdf5=TRUE)
 counts(sce) = assay(sce, "X")
 
+# keep cell types with suficient counts
+tab = table(sce$cell_type) > 1000
+keep = names(tab)[tab]
+
 # Compute pseudobulk
-pb <- aggregateToPseudoBulk(sce,
+pb <- aggregateToPseudoBulk(sce[,sce$cell_type %in% keep],
     assay = "counts",     
     cluster_id = "cell_type",  
     sample_id = "donor_id",
     verbose = FALSE)
 
 # crumblr transform
-cobj = crumblr(cellCounts(pb))
+cobj = crumblr(cellCounts(pb)[,keep])
 ```
 
 
@@ -83,7 +87,7 @@ fig.vp = plotPercentBars(sortCols(res.vp), col=cols)
 form = ~ age + (1|sex) + (1|pool_number) 
 fit = dream(cobj, form, colData(pb))
 fit = eBayes(fit)
-
+ 
 hc = buildClusterTreeFromPB(pb)
 ```
 
