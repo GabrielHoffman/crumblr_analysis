@@ -103,8 +103,11 @@ topTable(fit, coef="age", number=Inf) %>%
 
 ```{r treeTest}
 res = treeTest( fit, cobj, hc, coef="age")
+```
 
-fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(coef)
+```{r plots, fig.width=18, fig.height=6}
+fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(
+  'Age')
 
 fig2 = plotForest(res)
 
