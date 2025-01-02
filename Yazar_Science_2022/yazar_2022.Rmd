@@ -50,6 +50,7 @@ library(crumblr)
 library(aplot) 
 library(tidyverse) 
 library(RColorBrewer)
+library(scales)
 library(ggtree) 
 library(kableExtra)
 library(tidyverse) 
@@ -184,7 +185,7 @@ figList = lapply(rownames(cobj$E), function(CT){
       theme_classic() +
       theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1) +
       ggtitle(gsub(",", "\n", CT)) +
-      scale_color_gradient2(low="grey", high="red", name = "SE") +
+      scale_color_gradient(low=muted('red', 80, 1), high="red", name = "SE") +
       geom_smooth(method=lm, formula = y ~ x, color="navy", se=FALSE)
 })
 
@@ -195,10 +196,22 @@ plot_grid(plotlist=figList, ncol=3)
 library(splines)
 i = 10
 figList[[i]] + 
-  geom_smooth(method=lm, formula = y ~ x + splines::bs(x, 2), color="green", se=FALSE) +
-  geom_smooth(method="lm", formula = y ~ x + splines::bs(x, 2), weight=1, color="turquoise", se=FALSE)
+  geom_smooth(method=lm, formula = y ~ x + splines::bs(x, 3), color="green", se=FALSE) +
+  geom_smooth(method="lm", formula = y ~ x + splines::bs(x, 3), weight=1, color="turquoise", se=FALSE)
 ```
 
+<!----
+
+form = ~ scale(age) + I(scale(age)^2) + (1|sex) + (1|pool_number) 
+fitnl = dream(cobj, form, colData(pb))
+
+
+tab = topTable(fitnl, coef="I(scale(age)^2)", number=Inf) %>%   
+  select(logFC, AveExpr, t, P.Value, adj.P.Val)
+
+CT = rownames(cobj$E)[i]
+tab[CT,]
+--->
 
 
 
@@ -218,7 +231,7 @@ figList = lapply(rownames(cobj$E), function(CT){
       theme_classic() +
       theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1) +
       ggtitle(gsub(",", "\n", CT)) +
-      scale_color_gradient2(low="grey", high="red", name = "SE") +
+      scale_color_gradient(low=muted('red', 80, 1), high="red", name = "SE") +
       geom_smooth(method=lm, formula = y ~ x, color="navy", se=FALSE)
 })
 
