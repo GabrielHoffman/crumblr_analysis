@@ -165,7 +165,7 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 # Plot each regression
-```{r plot.regressions, height=18, width=10}
+```{r plot.regressions, fig.height=18, fig.width=10}
 # compute residuals
 form = ~ (1|sex) + (1|pool_number) 
 fit = dream(cobj, form, colData(pb))
