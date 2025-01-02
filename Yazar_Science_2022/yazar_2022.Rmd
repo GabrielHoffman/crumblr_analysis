@@ -191,6 +191,18 @@ figList = lapply(rownames(cobj$E), function(CT){
 plot_grid(plotlist=figList, ncol=3)
 ```
 
+```{r nonlinear}
+library(splines)
+i = 10
+figList[[i]] + 
+  geom_smooth(method=lm, formula = y ~  splines::bs(x, 2), color="green", se=FALSE) +
+  geom_smooth(method="lm", formula = y ~  splines::bs(x, 2), weight=1, color="turquoise", se=FALSE)
+```
+
+
+
+
+
 ```{r plot.regressions.residuals, fig.height=18, fig.width=10}
 # plot of residuals
 figList = lapply(rownames(cobj$E), function(CT){
