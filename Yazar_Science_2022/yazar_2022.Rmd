@@ -156,7 +156,7 @@ res = treeTest( fit, cobj, hc, coef="age")
 ```
 
 ```{r plots, fig.width=18, fig.height=6}
-fig1 = plotTreeTestBeta(res) + ggtitle('Age') + theme(legend.position="none") 
+fig1 = plotTreeTestBeta(res) + ggtitle('Age') 
 
 fig2 = plotForest(res)
 
