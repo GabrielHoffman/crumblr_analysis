@@ -209,7 +209,7 @@ hc = buildClusterTreeFromPB(pb)
 res = treeTest( fit, cobj, hc, coef=coef)
 ```
 
-```{r plots, fig.width=10, fig.height=6} 
+```{r plots, fig.width=10, fig.height=5} 
 cols = c(brewer.pal(3, "Set1"), "grey85")
 
 fig1 = plotTreeTestBeta(res) + xlim(0, 15) +
