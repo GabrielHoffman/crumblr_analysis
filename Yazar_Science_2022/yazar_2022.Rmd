@@ -48,7 +48,8 @@ library(zellkonverter)
 library(dreamlet)
 library(crumblr)
 library(aplot) 
-library(RColorBrewer) 
+library(tidyverse) 
+library(RColorBrewer)
 library(ggtree) 
 library(kableExtra)
 library(tidyverse) 
@@ -77,6 +78,27 @@ rm(sce)
 # crumblr transform
 cobj = crumblr(cellCounts(pb)[,keep])
 ```
+
+# bar plot of cell composition
+```{r barplot, fig.width=18, fig.height=6}
+df = cellCounts(pb)[,keep] %>%
+        data.frame
+df_fracs = df / rowSums(df) 
+
+
+df_fracs %>%
+  rowid_to_column("Sample") %>% 
+  pivot_longer(!Sample)
+
+fig = ggplot(aes(Sample))
+
+
+
+```
+
+
+
+
 
 
 ```{r analysis}
