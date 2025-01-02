@@ -19,7 +19,7 @@ R --vanilla
 system("git pull"); rmarkdown::render("yazar_2022.Rmd");
 
 
-# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/COVID_combat/COVID_combat.html
+# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/Yazar_Science_2022/yazar_2022.html
 
 
 
@@ -66,11 +66,18 @@ counts(sce) = assay(sce, "X")
 tab = table(sce$cell_type) > 1000
 keep = names(tab)[tab]
 
-# Compute pseudobulk
+# Compute pseudobulk by donor
 pb <- aggregateToPseudoBulk(sce[,sce$cell_type %in% keep],
     assay = "counts",     
     cluster_id = "cell_type",  
     sample_id = "donor_id",
+    verbose = FALSE)
+
+# Compute pseudobulk by pool
+pb_pool <- aggregateToPseudoBulk(sce[,sce$cell_type %in% keep],
+    assay = "counts",     
+    cluster_id = "cell_type",  
+    sample_id = "pool_number",
     verbose = FALSE)
 
 rm(sce)
@@ -81,23 +88,34 @@ cobj = crumblr(cellCounts(pb)[,keep])
 
 # bar plot of cell composition
 ```{r barplot, fig.width=18, fig.height=6}
+# By donor
 df = cellCounts(pb)[,keep] %>%
         data.frame
 df_fracs = df / rowSums(df) 
 
-
 df_fracs %>%
   rowid_to_column("Sample") %>% 
-  pivot_longer(!Sample)
+  pivot_longer(!Sample) %>%
+  ggplot(aes(Sample, value, fill=name)) +
+    geom_bar(stat="identity") +
+    theme(legend.position="none", aspect.ratio=1/4) +
+    coord_cartesian(expand=FALSE) +
+    ylab("Cell fraction")
 
-fig = ggplot(aes(Sample))
+# By pool
+df = cellCounts(pb_pool)[,keep] %>%
+        data.frame
+df_fracs = df / rowSums(df) 
 
-
-
+df_fracs %>%
+  rowid_to_column("Pool") %>% 
+  pivot_longer(!Pool) %>%
+  ggplot(aes(Pool, value, fill=name)) +
+    geom_bar(stat="identity") +
+    theme(legend.position="none", aspect.ratio=1/4) +
+    coord_cartesian(expand=FALSE) +
+    ylab("Cell fraction")
 ```
-
-
-
 
 
 
