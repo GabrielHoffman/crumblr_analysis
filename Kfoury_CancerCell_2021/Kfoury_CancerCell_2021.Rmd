@@ -209,13 +209,16 @@ hc = buildClusterTreeFromPB(pb)
 res = treeTest( fit, cobj, hc, coef=coef)
 ```
 
-```{r plots, fig.width=10, fig.height=7} 
+```{r plots, fig.width=10, fig.height=6} 
 cols = c(brewer.pal(3, "Set1"), "grey85")
 
-plotTreeTestBeta(res) + xlim(0, 15) +
-   theme(legend.position="bottom", legend.box = "vertical")  |
-crumblr::plotForest(res, hide=TRUE) |
-plotPercentBars( sortCols(vp.c), col=cols) 
+fig1 = plotTreeTestBeta(res) + xlim(0, 15) +
+   theme(legend.position="bottom", legend.box = "vertical") 
+fig2 = crumblr::plotForest(res, hide=TRUE) 
+fig3 = plotPercentBars( sortCols(vp.c), col=cols) 
+
+# combine plots
+fig2 %>% insert_left(fig1) %>% insert_right(fig3)
 ```
 
 
