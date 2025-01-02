@@ -165,7 +165,7 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
 # Plot each regression
-```{r plot.regressions, fig.height=18, fig.width=10}
+```{r plot.regressions.CLR, fig.height=18, fig.width=10}
 # compute residuals
 form = ~ (1|sex) + (1|pool_number) 
 fit = dream(cobj, form, colData(pb))
@@ -190,8 +190,9 @@ figList = lapply(rownames(cobj$E), function(CT){
 })
 
 plot_grid(plotlist=figList, ncol=3)
+```
 
-
+```{r plot.regressions.residuals, fig.height=18, fig.width=10}
 # plot of residuals
 figList = lapply(rownames(cobj$E), function(CT){
 
@@ -201,7 +202,7 @@ figList = lapply(rownames(cobj$E), function(CT){
                   colData(pb))
 
   df %>% 
-    ggplot(aes(age, resid, color=se, weight=1/se^2)) +
+    ggplot(aes(age, residuals, color=se, weight=1/se^2)) +
       geom_point() +
       theme(aspect.ratio=1) +
       theme_classic() +
