@@ -174,7 +174,6 @@ fit = dream(cobj, form, colData(pb))
 figList = lapply(rownames(cobj$E), function(CT){
 
   df = data.frame(CLR = cobj$E[CT,],
-                  resid = residuals(fit)[CT,],
                   se = 1/sqrt(cobj$weights[CT,]),
                   colData(pb))
 
@@ -196,8 +195,7 @@ plot_grid(plotlist=figList, ncol=3)
 # plot of residuals
 figList = lapply(rownames(cobj$E), function(CT){
 
-  df = data.frame(CLR = cobj$E[CT,],
-                  resid = residuals(fit)[CT,],
+  df = data.frame(residuals = residuals(fit)[CT,],
                   se = 1/sqrt(cobj$weights[CT,]),
                   colData(pb))
 
