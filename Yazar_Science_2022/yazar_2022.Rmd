@@ -86,7 +86,7 @@ rm(sce)
 cobj = crumblr(cellCounts(pb)[,keep])
 ```
 
-# bar plot of cell composition
+# Bar plots of cell composition
 ```{r barplot, fig.width=18, fig.height=6}
 # By donor
 df = cellCounts(pb)[,keep] %>%
@@ -113,6 +113,15 @@ df_fracs %>%
   ggplot(aes(Pool, value, fill=name)) +
     geom_bar(stat="identity") +
     theme(legend.position="none", aspect.ratio=1/4) +
+    coord_cartesian(expand=FALSE) +
+    ylab("Cell fraction")
+
+df_fracs %>%
+  rowid_to_column("Pool") %>% 
+  pivot_longer(!Pool) %>%
+  ggplot(aes(Pool, value, fill=name)) +
+    geom_bar(stat="identity") +
+    # theme(legend.position="none", aspect.ratio=1/4) +
     coord_cartesian(expand=FALSE) +
     ylab("Cell fraction")
 ```
