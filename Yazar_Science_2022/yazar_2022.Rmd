@@ -164,6 +164,87 @@ fig2 = plotForest(res)
 fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 ```
 
+# Plot each regression
+```{r plots, height=18, width=10}
+# compute residuals
+form = ~ (1|sex) + (1|pool_number) 
+fit = dream(cobj, form, colData(pb))
+
+# plot of CLR
+figList = lapply(rownames(cobj$E), function(CT){
+
+  df = data.frame(CLR = cobj$E[CT,],
+                  resid = residuals(fit)[CT,],
+                  se = 1/sqrt(cobj$weights[CT,]),
+                  colData(pb))
+
+  df %>% 
+    ggplot(aes(age, CLR, color=se, weight=1/se^2)) +
+      geom_point() +
+      theme(aspect.ratio=1) +
+      theme_classic() +
+      theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1) +
+      ggtitle(gsub(",", "\n", CT)) +
+      scale_color_gradient2(low="grey", high="red", name = "SE") +
+      geom_smooth(method=lm, formula = y ~ x, color="navy", se=FALSE)
+})
+
+plot_grid(plotlist=figList, ncol=3)
+
+
+# plot of residuals
+figList = lapply(rownames(cobj$E), function(CT){
+
+  df = data.frame(CLR = cobj$E[CT,],
+                  resid = residuals(fit)[CT,],
+                  se = 1/sqrt(cobj$weights[CT,]),
+                  colData(pb))
+
+  df %>% 
+    ggplot(aes(age, resid, color=se, weight=1/se^2)) +
+      geom_point() +
+      theme(aspect.ratio=1) +
+      theme_classic() +
+      theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1) +
+      ggtitle(gsub(",", "\n", CT)) +
+      scale_color_gradient2(low="grey", high="red", name = "SE") +
+      geom_smooth(method=lm, formula = y ~ x, color="navy", se=FALSE)
+})
+
+plot_grid(plotlist=figList, ncol=3)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
