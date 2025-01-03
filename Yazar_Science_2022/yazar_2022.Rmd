@@ -64,11 +64,8 @@ sce = readH5AD(file, use_hdf5=TRUE)
 counts(sce) = assay(sce, "X")
 
 # keep cell types with suficient counts
-# tab = table(sce$cell_type) > 1000
-# keep = names(tab)[tab]
-keep = unique(sce$cell_type)
-
-
+tab = table(sce$cell_type) > 1000
+keep = names(tab)[tab]
 
 # Compute pseudobulk by donor
 pb <- aggregateToPseudoBulk(sce[,sce$cell_type %in% keep],
