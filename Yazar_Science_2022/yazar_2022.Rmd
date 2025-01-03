@@ -162,7 +162,7 @@ form = ~ (1|sex) + (1|pool_number)
 fit = dream(cobj, form, colData(pb))
 
 # plot of CLR
-figList = lapply(rownames(cobj$E)[10], function(CT){
+figList = lapply(rownames(cobj$E), function(CT){
 
   df = data.frame(CLR = cobj$E[CT,],
                   se = 1/sqrt(cobj$weights[CT,]),
