@@ -116,15 +116,6 @@ df_fracs %>%
     theme(legend.position="none", aspect.ratio=1/4) +
     coord_cartesian(expand=FALSE) +
     ylab("Cell fraction")
-
-df_fracs %>%
-  rowid_to_column("Pool") %>% 
-  pivot_longer(!Pool) %>%
-  ggplot(aes(Pool, value, fill=name)) +
-    geom_bar(stat="identity") +
-    # theme(legend.position="none", aspect.ratio=1/4) +
-    coord_cartesian(expand=FALSE) +
-    ylab("Cell fraction")
 ```
 
 
