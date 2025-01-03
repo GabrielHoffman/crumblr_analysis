@@ -195,8 +195,8 @@ figList[[i]] +
 ```{r all.nonlinear, fig.height=18, fig.width=10}
 figList2 = lapply( figList, function(fig){
   fig + 
-  geom_smooth(method=lm, formula = y ~ x + splines::bs(x, 3), color="green", se=FALSE) +
-  geom_smooth(method="lm", formula = y ~ x + splines::bs(x, 3), weight=1, color="turquoise", se=FALSE)
+  geom_smooth(method=lm, formula = y ~ x + I(x^2), color="green", se=FALSE) +
+  geom_smooth(method="lm", formula = y ~ x + I(x^2), weight=1, color="turquoise", se=FALSE)
   })
 
 plot_grid(plotlist=figList2, ncol=3)
