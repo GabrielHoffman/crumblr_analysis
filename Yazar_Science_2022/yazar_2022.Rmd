@@ -149,7 +149,7 @@ res = treeTest( fit, cobj, hc, coef="age")
 ```{r plots, fig.width=18, fig.height=6}
 fig1 = plotTreeTestBeta(res) + ggtitle('Age') 
 
-fig2 = plotForest(res)
+fig2 = crumblr::plotForest(res, hide=TRUE)
 
 # combine plots
 fig2 %>% insert_left(fig1) %>% insert_right(fig.vp) 
