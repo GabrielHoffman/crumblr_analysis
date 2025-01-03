@@ -146,7 +146,7 @@ topTable(fit, coef="age", number=Inf) %>%
 res = treeTest( fit, cobj, hc, coef="age")
 ```
 
-```{r plots, fig.width=18, fig.height=6}
+```{r plots, fig.width=14, fig.height=5.5}
 fig1 = plotTreeTestBeta(res) + ggtitle('Age') 
 
 fig2 = crumblr::plotForest(res, hide=TRUE)
@@ -162,7 +162,7 @@ form = ~ (1|sex) + (1|pool_number)
 fit = dream(cobj, form, colData(pb))
 
 # plot of CLR
-figList = lapply(rownames(cobj$E), function(CT){
+figList = lapply(rownames(cobj$E)[10], function(CT){
 
   df = data.frame(CLR = cobj$E[CT,],
                   se = 1/sqrt(cobj$weights[CT,]),
@@ -175,7 +175,7 @@ figList = lapply(rownames(cobj$E), function(CT){
       theme_classic() +
       theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1) +
       ggtitle(gsub(",", "\n", CT)) +
-      scale_color_gradient(low=muted('red', 60, 1), high="red", name = "SE") +
+      scale_color_gradient(low=muted('red', 70, 20), high="red", name = "SE") +
       geom_smooth(method=lm, formula = y ~ x, color="navy", se=FALSE)
 })
 
