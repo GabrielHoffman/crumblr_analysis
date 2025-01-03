@@ -139,7 +139,7 @@ hc = buildClusterTreeFromPB(pb )
 run_test = function(coef){
 	res = treeTest( fit, cobj, hc, coef=coef)
 
-	fig1 = plotTreeTest(res) + theme(legend.position="none") + ggtitle(coef)
+	fig1 = plotTreeTestBeta(res) + theme(legend.position="none") + ggtitle(coef)
 
 	fig2 = plotForest(res)
 
@@ -170,7 +170,7 @@ names(figList) = coef_array
 ```
 
 ```{r plot, fig.height=7, fig.width=15, cache=FALSE}
-figList  
+figList    
 ```
 
 ```{r topTable1, fig.height=12, fig.width=8, cache=FALSE}
@@ -205,14 +205,6 @@ ggplot(tab, aes(coef, celltype, fill=logFC, label=ifelse(adj.P.Val < 0.05, "*", 
 	theme_classic() + 
 	theme(aspect.ratio=ratio, axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
 	scale_fill_gradient2(low="blue", mid="white", high="red", limits=c(-lim, lim)) 
-```
-
-
-
-```{r treeTest2, eval=FALSE}
-plotTreeTestBeta(res) + xlim(0, 15) |
-crumblr::plotForest(res) |
-plotPercentBars( sortCols(vp), col=cols)
 ```
 
 
