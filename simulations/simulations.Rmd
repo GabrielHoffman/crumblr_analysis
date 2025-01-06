@@ -384,7 +384,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 
 # With scCoda
-```{r scCoda, eval=TRUE}
+```{r scCoda, eval=FALSE}
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
