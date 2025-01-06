@@ -246,7 +246,7 @@ df = lapply(c(50, 200, 300), function(n){
 		fit = eBayes(fit)
 
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=100)
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=100, shrink.cov=FALSE)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
