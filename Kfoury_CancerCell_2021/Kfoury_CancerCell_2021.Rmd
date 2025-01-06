@@ -221,7 +221,40 @@ fig3 = plotPercentBars( sortCols(vp.c), col=cols)
 fig2 %>% insert_left(fig1) %>% insert_right(fig3)
 ```
 
+### Plot of pericytes
+```{r example}
+library(ggbeeswarm)
+library(ggrepel)
 
+CT = "Pericytes"
+df = data.frame(CLR = cobj$E[CT,],
+                DiseaseStatus = pb$Status,
+                se = 1/sqrt(cobj$weights[CT,]),
+                counts = cellCounts(pb)[,CT],
+                totalCells = rowSums(cellCounts(pb)))
+
+# points to highlight
+df_count1 = df %>%
+  filter(counts == 0) %>%
+  arrange(-se) %>% 
+  head(2) 
+
+df_count2 = df %>%
+  arrange(se, -counts) %>% 
+  head(2) 
+
+df_count = rbind(df_count1, df_count2)
+
+df %>%
+  ggplot(aes(DiseaseStatus, CLR, color=se)) +
+    geom_boxplot(width=.3) +
+    geom_beeswarm(cex = 2, size=3) + 
+    theme_classic() +
+    theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1, axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+    ggtitle(CT) +
+    scale_color_gradient2(low="grey", high="red", name = "Standard error") +
+    geom_text_repel(data=df_count, aes(DiseaseStatus, CLR, label=paste(counts, totalCells, sep=' / ')), color="black", box.padding=2) 
+```
 
 
 
