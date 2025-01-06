@@ -75,7 +75,7 @@ cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "
 # sample size
 n = 200
 
-n_sims = 1000
+n_sims = 10000
 
 methods = c("FE.empirical", "FE", "sidak", "fisher")
 
@@ -167,9 +167,9 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 # Increase sample size
 ```{r run_samplesize, cache=TRUE}
 # number of responses
-m = 15
+m = 15 
   
-df = lapply(c(50, 200, 300), function(n){
+df = lapply(c(50, 500, 50), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
 
