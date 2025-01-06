@@ -309,7 +309,7 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 10000 
+n_sims = 1000 
 beta.true = .2
 n_batches = floor(n_samples/2)
 var.batch = 0
@@ -371,6 +371,10 @@ fig2 = df_res %>%
 	scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+```
+
+```{r exit, cache=FALSE}
+knitr::knit_exit()
 ```
 
 # With scCoda
@@ -723,6 +727,7 @@ n_batches = 50
  
 df_res2 = lapply(c(0, .05, .1, .2), function(var.frac){  
 
+	cat("var.frac: ", var.frac, "\n")
 	var.batch = beta.true^2* var.frac / (1 - var.frac)
 
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims = n_sims, beta.true, n_batches, var.batch, methods = methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=FALSE) 
