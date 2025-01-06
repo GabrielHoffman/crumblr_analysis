@@ -99,7 +99,7 @@ rmultinomdir = function(n, size, alpha){
 
 run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
-	# each batch is observed at last twice
+	# each batch is observed at least twice
 	info = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
 
 	rownames(info) = paste0("sample_", 1:nrow(info))
@@ -313,7 +313,7 @@ n_sims = 1000
 beta.true = .2
 n_batches = floor(n_samples/2)
 var.batch = 0
-tau = 10 
+tau = 3 
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")    
           
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE)  
