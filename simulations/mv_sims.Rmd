@@ -176,7 +176,7 @@ n_sims = 10000
 # number of responses
 m = 12
   
-df = lapply(c(100, 200), function(n){
+df = lapply(c(50, 200), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
 
@@ -201,7 +201,7 @@ df = lapply(c(100, 200), function(n){
 		fit = eBayes(fit)
 
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=1000)
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=10000)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
