@@ -107,7 +107,7 @@ df = lapply(seq(2,22, by=4), function(m){
 		fit = eBayes(fit)
 
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=100)
+			res = mvTest(fit, obj, coef="X", method=x)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
