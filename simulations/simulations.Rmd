@@ -152,7 +152,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		tab_clr = topTable(fit_clr, coef="trait", sort.by="none")
 
 		# crumblr
-		cobj = crumblr(counts, max.ratio=30)
+		cobj = crumblr(counts, max.ratio=2)
 		fit = suppressMessages(dream(cobj, formula, info, BPPARAM=SerialParam()))
 		fit = eBayes(fit)
 		tab.crumblr = topTable(fit, coef="trait", sort.by="none")
