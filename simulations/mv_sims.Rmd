@@ -221,7 +221,7 @@ n_sims = 10000
 # number of responses
 m = 12
   
-df = lapply(c(50, 200), function(n){
+df = lapply(c(50, 200, 300), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
 
