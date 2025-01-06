@@ -123,7 +123,7 @@ df = do.call(rbind, df)
 
 samples: `r n`
 
-```{r plots, cache=FALSE, fig.width=8, fig.height=3.5}
+```{r plots, cache=FALSE, fig.width=8, fig.height=3.5, cache=FALSE}
 f = function(pvalue, isDE){
 	pr <- pr.curve(scores.class0 = -log10(pvalue[isDE]), 
 					scores.class1 = -log10(pvalue[!isDE]),
@@ -212,7 +212,7 @@ df = do.call(rbind, df)
 
 responses: `r m`
 
-```{r plots_samplesize, cache=FALSE, fig.width=8, fig.height=3.5}
+```{r plots_samplesize, cache=FALSE, fig.width=8, fig.height=3.5, cache=FALSE}
 f = function(pvalue, isDE){
 	pr <- pr.curve(scores.class0 = -log10(pvalue[isDE]), 
 					scores.class1 = -log10(pvalue[!isDE]),
