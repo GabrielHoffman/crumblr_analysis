@@ -66,7 +66,7 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 
 # cols = rainbow(4)
 # cols = c("#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78")[c(1,3,5,7)]
-cols = c(FE = "#4421af", FE.empirical = "5ad45a", Sidak = "0d88e6", fisher = "#b30000")
+cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "#b30000")
 ```
 
 # Increase number of responses
