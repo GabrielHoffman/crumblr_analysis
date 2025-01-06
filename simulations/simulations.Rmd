@@ -11,6 +11,8 @@ output:
 ---
 
 
+ conda activate /sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/
+ 
 
 <!---
 cd /Users/gabrielhoffman/workspace/repos/crumblr_analysis/simulations
@@ -39,6 +41,8 @@ system("git pull"); rmarkdown::render("simulations.Rmd");
 
 bsub -P acc_CommonMind -q gpu -n 1 -R a100 -gpu num=1  -W 01:00 -Is /bin/bash
 
+
+ml cuda/12.4.0 mpfr/4.0.2 cmake
 
 # https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
 
@@ -377,9 +381,6 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
-```{r exit, cache=FALSE, eval=FALSE}
-knitr::knit_exit()
-```
 
 # With scCoda
 ```{r scCoda, eval=FALSE}
@@ -809,6 +810,9 @@ plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 
 
+```{r exit, cache=FALSE, eval=FALSE}
+knitr::knit_exit()
+```
 
 # Method times
 ```{r times}
