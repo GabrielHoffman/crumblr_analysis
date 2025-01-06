@@ -170,6 +170,9 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 
 # Increase sample size
 ```{r run_samplesize, cache=FALSE}
+
+n_sims = 10000
+
 # number of responses
 m = 12
   
