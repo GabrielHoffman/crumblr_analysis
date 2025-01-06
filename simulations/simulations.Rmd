@@ -37,6 +37,9 @@ R
 system("git pull"); rmarkdown::render("simulations.Rmd");
 
 
+bsub -P acc_CommonMind -q gpu -n 1 -R a100 -gpu num=1  -W 01:00 -Is /bin/bash
+
+
 # https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
 
 --->
@@ -72,14 +75,14 @@ library(RColorBrewer)
 library(tidyverse)
 library(lme4)
 
-# library(reticulate)
-# python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python"
-# use_python(python_path)
-# scoda = import("sccoda")
-# scoda.utils = import("sccoda.util.cell_composition_data")
-# scoda.analysis = import("sccoda.util.comp_ana")
+library(reticulate)
+python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python"
+use_python(python_path)
+scoda = import("sccoda")
+scoda.utils = import("sccoda.util.cell_composition_data")
+scoda.analysis = import("sccoda.util.comp_ana")
 
-# source("scCoda_wrapper.R")
+source("scCoda_wrapper.R")
 source("cellTypeCompositionTest.R")
 ```
 
