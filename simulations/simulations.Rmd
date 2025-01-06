@@ -313,7 +313,7 @@ n_sims = 1000
 beta.true = .2
 n_batches = floor(n_samples/2)
 var.batch = 0
-tau = 3 
+tau = 5
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")    
           
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE)  
