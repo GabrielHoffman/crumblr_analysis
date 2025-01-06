@@ -70,14 +70,14 @@ cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "
 ```
 
 # Increase number of responses
-```{r run, cache=FALSE}
+```{r run, cache=TRUE}
 # Sidak: uses only smallest p-value
 # fisher: uses all p-values and assumes independence
 
 # sample size
 n = 200
 
-n_sims = 10000
+n_sims = 1000
 
 methods = c("FE.empirical", "FE", "sidak", "fisher")
 
@@ -173,7 +173,7 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 # number of responses
 m = 12
   
-df = lapply(seq(50, 500, by=150), function(n){
+df = lapply(seq(200, 200, by=150), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
 
@@ -198,7 +198,7 @@ df = lapply(seq(50, 500, by=150), function(n){
 		fit = eBayes(fit)
 
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=100)
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=1000)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
