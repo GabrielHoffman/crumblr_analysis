@@ -12,7 +12,7 @@ output:
 
 
  conda activate /sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/
- 
+
 
 <!---
 cd /Users/gabrielhoffman/workspace/repos/crumblr_analysis/simulations
@@ -810,7 +810,7 @@ plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 
 
-```{r exit, cache=FALSE, eval=FALSE}
+```{r exit, cache=FALSE}
 knitr::knit_exit()
 ```
 
