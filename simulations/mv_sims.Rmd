@@ -22,7 +22,7 @@ rmarkdown::render('mv_sims.Rmd')
 cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations
 R
 
-system("ml git; git pull"); rmarkdown::render("mv_sims.Rmd");
+system("git pull"); rmarkdown::render("mv_sims.Rmd");
 
 
 
@@ -190,6 +190,7 @@ df = lapply(seq(50, 500, by=50), function(n){
 		Y = X %*% beta + rmvnorm(n, sigma = Sigma)
 		colnames(Y) = paste0("gene_", seq(m))
 		rownames(Y) = paste0("sample_", seq(n))
+		rownames(X) = rownames(Y)
 
 		obj = new("EList", list(E = t(Y), weights=matrix(1, ncol(Y), nrow(Y))))
 
@@ -197,7 +198,7 @@ df = lapply(seq(50, 500, by=50), function(n){
 		fit = eBayes(fit)
 
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=1000)
+			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=100)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
