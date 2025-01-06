@@ -70,7 +70,7 @@ cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "
 ```
 
 # Increase number of responses
-```{r run}
+```{r run, cache=FALSE}
 # Sidak: uses only smallest p-value
 # fisher: uses all p-values and assumes independence
 
@@ -169,7 +169,7 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 
 
 # Increase sample size
-```{r run_samplesize}
+```{r run_samplesize, cache=FALSE}
 # number of responses
 m = 12
   
