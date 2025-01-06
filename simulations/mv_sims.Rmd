@@ -166,53 +166,6 @@ fig2 = df %>%
 plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 ```
 
-```{r replace}
-
-rwishart_chol= remaCor:::rwishart_chol
-msqrt = remaCor:::msqrt
-
-# chol rotates axes, and causes problems!!
-# Use eigen-axes
-get_sample = function(C_chol, nu){
-
-	# RSS ~ W(n,Sigma)
-
-	# C_chol = chol(C)
-	# C_i = rwishart(nu, C) / nu
-	# C_i_chol = rwishartc(nu, C) / sqrt(nu)
-	C_i_chol = rwishart_chol(nu, C_chol) / sqrt(nu)
-	C_i_chol = msqrt(crossprod(C_i_chol))
-	V_i_chol = C_i_chol / sqrt(nu)
-
-	beta_i = V_i_chol %*% rnorm(nrow(C_chol))
-
-	C_i_chol = rwishart_chol(nu, C_chol) / sqrt(nu)
-	# C_i_chol = msqrt(crossprod(C_i_chol))
-	V_i_chol = C_i_chol / sqrt(nu)
-
-	ones = matrix(1,1,length(beta_i))
-	V_i = crossprod(V_i_chol)
-
-	a = solve(V_i, beta_i)
-	b = solve(V_i, t(ones))
-
-	newx <- (ones %*% a)/(ones %*% b)
-	newv <- 1/(ones %*% b)
-	(newx / sqrt(newv))^2
-}
-
-assignInNamespace("get_sample" ,get_sample ,ns="remaCor")
-
-# # remaCor:::get_sample
-# Rprof()
-# a = replicate(10, LS.empirical(df$beta, df$se, C, nu=n-2))
-# res = summaryRprof()
-
-
-
-```
-
-
 # Increase sample size
 ```{r run_samplesize, cache=FALSE}
 
@@ -246,7 +199,7 @@ df = lapply(c(50, 200, 300), function(n){
 		fit = eBayes(fit)
 
 		res = lapply(methods, function(x){
-			res = mvTest(fit, obj, coef="X", method=x, n.mc.samples=1000, shrink.cov=FALSE)
+			res = mvTest(fit, obj, coef="X", method=x)
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
