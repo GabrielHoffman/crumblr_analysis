@@ -203,10 +203,10 @@ get_sample = function(C_chol, nu){
 
 assignInNamespace("get_sample" ,get_sample ,ns="remaCor")
 
-# remaCor:::get_sample
-Rprof()
-a = replicate(10, LS.empirical(df$beta, df$se, C, nu=n-2))
-res = summaryRprof()
+# # remaCor:::get_sample
+# Rprof()
+# a = replicate(10, LS.empirical(df$beta, df$se, C, nu=n-2))
+# res = summaryRprof()
 
 
 
