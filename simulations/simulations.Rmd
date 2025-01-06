@@ -374,7 +374,7 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
-```{r exit, cache=FALSE}
+```{r exit, cache=FALSE, eval=FALSE}
 knitr::knit_exit()
 ```
 
