@@ -309,7 +309,7 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 2000  
+n_sims = 200  
 beta.true = .2
 n_batches = floor(n_samples/2)
 var.batch = 0 
