@@ -123,7 +123,7 @@ df = do.call(rbind, df)
 
 samples: `r n`
 
-```{r plots, cache=FALSE, fig.width=8, fig.height=3.5, cache=FALSE}
+```{r plots, cache=FALSE, fig.width=8, fig.height=3.5}
 f = function(pvalue, isDE){
 	pr <- pr.curve(scores.class0 = -log10(pvalue[isDE]), 
 					scores.class1 = -log10(pvalue[!isDE]),
@@ -173,7 +173,7 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 # number of responses
 m = 12
   
-df = lapply(seq(200, 200, by=150), function(n){
+df = lapply(c(100, 200), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
 
