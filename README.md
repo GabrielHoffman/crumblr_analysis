@@ -7,6 +7,20 @@
 Here we present analysis code, data and results from 4 public datasets.
 
 
+## Aging in PBMCs
+- [Yazar, et al. Science (2022)](https://doi.org/10.1126/science.abf3041)
+- Data: [CELLxGENE](https://cellxgene.cziscience.com/collections/dde06e0f-ab3b-46be-96a2-a8082383c4a1)
+- Analysis code: [yazar\_2022.Rmd](https://github.com/GabrielHoffman/crumblr_analysis/blob/main/Yazar_Science_2022/yazar_2022.Rmd)
+- Results: [yazar_2022.html](https://ghoffman-cdn.s3.us-east-2.amazonaws.com/crumblr_analysis/yazar_2022.html)
+
+
+## T-cells following tuberculosis infection
+- [Nathan, et al. Nature Immunology (2021)](https://doi.org/10.1038/s41590-021-00933-1)
+- Data: [NCBI GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE158769)
+- Analysis code: [Nathan\_NatImm\_2021\_crumblr.Rmd](https://github.com/GabrielHoffman/crumblr_analysis/blob/main/Nathan_NatImm_2021/Nathan_NatImm_2021_crumblr.Rmd)
+- Results: [Nathan\_NatImm\_2021\_crumblr.html](https://ghoffman-cdn.s3.us-east-2.amazonaws.com/crumblr_analysis/Nathan_NatImm_2021_crumblr.html)
+
+
 ## Bone metastases from prostate cancer
 - [Kfoury, et al. Cancer Cell (2021)](https://doi.org/10.1016/j.ccell.2021.09.005)
 - Download and format data: [Kfoury\_CancerCell\_2021\_get\_data.Rmd](https://github.com/GabrielHoffman/dreamlet_analysis/blob/main/Kfoury_CancerCell_2021/Kfoury_CancerCell_2021_get_data.Rmd)
@@ -21,36 +35,4 @@ Here we present analysis code, data and results from 4 public datasets.
 - Results: [COVID\_combat.html](https://ghoffman-cdn.s3.us-east-2.amazonaws.com/crumblr_analysis/COVID_combat.html)
 
 
-## Aging in PBMCs
-- [Yazar, et al. Science (2022)](https://doi.org/10.1126/science.abf3041)
-- Data: [CELLxGENE](https://cellxgene.cziscience.com/collections/dde06e0f-ab3b-46be-96a2-a8082383c4a1)
-- Analysis code: [yazar\_2022.Rmd](https://github.com/GabrielHoffman/crumblr_analysis/blob/main/Yazar_Science_2022/yazar_2022.Rmd)
-- Results: [yazar_2022.html](https://ghoffman-cdn.s3.us-east-2.amazonaws.com/crumblr_analysis/yazar_2022.html)
 
-
-
-## T-cells following tuberculosis infection
-- [Nathan, et al. Nature Immunology (2021)](https://doi.org/10.1038/s41590-021-00933-1)
-- Data: [NCBI GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE158769)
-- Analysis code: [Nathan\_NatImm\_2021\_crumblr.Rmd](https://github.com/GabrielHoffman/crumblr_analysis/blob/main/Nathan_NatImm_2021/Nathan_NatImm_2021_crumblr.Rmd)
-- Results: [Nathan\_NatImm\_2021\_crumblr.html](https://ghoffman-cdn.s3.us-east-2.amazonaws.com/crumblr_analysis/Nathan_NatImm_2021_crumblr.html)
-
-
-
-
-
-<!---
-## Novel Alzheimer's snRNA-seq data
-- Generated as part of this work, and currently public
-- [PsychAD project and data](https://www.synapse.org/PsychAD_public)
-- Analysis code: [PsychAD\_r0\_analysis.Rmd](https://github.com/GabrielHoffman/dreamlet_analysis/blob/main/PsychAD_r0/PsychAD_r0_analysis.Rmd)
-- Results: [PsychAD\_r0\_analysis.html](https://ghoffman-cdn.s3.us-east-2.amazonaws.com/dreamlet_analysis/PsychAD_r0_analysis.html)
-
-## Reanalysis of external Alzheimer's snRNA-seq data 
-- [Mathys, et al. Cell (2023)](https://doi.org/10.1016/j.cell.2023.08.039)
-- Data: [MIT / ROSMAP study](https://www.synapse.org/#!Synapse:syn52293417)
-- Analysis code: [Mathys\_2023\_Major\_Cell\_Type.Rmd](https://github.com/GabrielHoffman/dreamlet_analysis/blob/main/Mathys_2023/Mathys_2023_Major_Cell_Type.Rmd)
-- Results: [Mathys\_2023\_Major\_Cell\_Type.html](https://ghoffman-cdn.s3.us-east-2.amazonaws.com/dreamlet_analysis/Mathys_2023_Major_Cell_Type.html)
--
-
----> 
