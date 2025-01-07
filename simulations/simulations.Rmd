@@ -43,7 +43,13 @@ bsub -P acc_CommonMind -q gpu -n 1 -R a100 -gpu num=1  -W 01:00 -Is /bin/bash
 ml cuda/12.4.0 mpfr/4.0.2 cmake
 
 
- conda activate /sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/
+conda activate /sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/
+
+cd /sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations
+export PYTHONPATH=
+R --vanilla
+rmarkdown::render("simulations.Rmd");
+
 
 
 # https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
@@ -81,14 +87,14 @@ library(RColorBrewer)
 library(tidyverse)
 library(lme4)
 
-library(reticulate)
-python_path = "/sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/bin/python"
-use_python(python_path)
-scoda = import("sccoda")
-scoda.utils = import("sccoda.util.cell_composition_data")
-scoda.analysis = import("sccoda.util.comp_ana")
+# library(reticulate)
+# python_path = "/sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/bin/python"
+# use_python(python_path)
+# scoda = import("sccoda")
+# scoda.utils = import("sccoda.util.cell_composition_data")
+# scoda.analysis = import("sccoda.util.comp_ana")
 
-source("scCoda_wrapper.R")
+# source("scCoda_wrapper.R")
 source("cellTypeCompositionTest.R")
 ```
 
@@ -384,7 +390,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 
 # With scCoda
-```{r scCoda, eval=TRUE}
+```{r scCoda, eval=FALSE}
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
@@ -408,7 +414,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=TRUE}
+```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=FALSE}
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
