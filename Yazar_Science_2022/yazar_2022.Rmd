@@ -227,11 +227,47 @@ plot_grid(plotlist=figList, ncol=3)
 ```
 
 
+<!---
 
 
+# Prediction
+```{r prediction}
+library(glmnet)
+
+idx.train = colData(pb)$pool_number %in% seq(60)
+
+y = colData(pb)$age
+alpha = 0
+
+X1 = t(cobj$E)
+fit1 = cv.glmnet(X1[idx.train,], y[idx.train], alpha = alpha)
+
+X2 = t(standardize(cobj))
+fit2 = cv.glmnet(X2[idx.train,], y[idx.train], alpha = alpha)
+
+# fractions
+X3 = apply(cellCounts(pb)[,keep], 1, function(x) x / sum(x))
+X3 = t(X3)
+fit3 = cv.glmnet(X3[idx.train,], y[idx.train], alpha = alpha)
+
+pdf("~/www/test.pdf")
+plot(fit1)
+plot(fit2)
+plot(fit3)
+dev.off()
+
+ypred1 = predict(fit1, newx = X1[!idx.train,], s = "lambda.1se")
+ypred2 = predict(fit2, newx = X2[!idx.train,], s = "lambda.1se")
+ypred3 = predict(fit3, newx = X3[!idx.train,], s = "lambda.1se")
+
+cor(y[!idx.train], ypred1)
+cor(y[!idx.train], ypred2)
+cor(y[!idx.train], ypred3)
+
+```
 
 
-
+--->
 
 
 
