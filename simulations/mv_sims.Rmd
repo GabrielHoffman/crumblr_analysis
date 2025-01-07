@@ -169,7 +169,7 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 # number of responses
 m = 15 
   
-df = lapply(c(50, 500, 50), function(n){
+df = lapply(seq(50, 500, by=50), function(n){
 
 	df = mclapply( seq(n_sims), function(i){		
 
