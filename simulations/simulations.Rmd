@@ -357,7 +357,7 @@ aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(method, AUPR, fill=method)) + 
 	geom_bar(stat="identity", position = "dodge") + 
 	theme_classic() + 
@@ -373,7 +373,7 @@ fig1 = df_res %>%
 fig2 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		ggplot( aes(method, FPR, fill=method)) + 
 		geom_bar(stat="identity", position = "dodge") + 
 		theme_classic() + 
@@ -415,9 +415,9 @@ Parameters:
 
 
 ```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=FALSE}
-cols = brewer.pal(9, "Set1")
-cols[cols=="#FFFF33"] = "#FDDB27"
-names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
+# cols = brewer.pal(9, "Set1")
+# cols[cols=="#FFFF33"] = "#FDDB27"
+# names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
 
 CT = "CT_1"
 # AUPR
@@ -425,7 +425,7 @@ aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(method, AUPR, fill=method)) + 
 	geom_bar(stat="identity", position = "dodge") + 
 	theme_classic() + 
@@ -441,7 +441,7 @@ fig1 = df_res %>%
 fig2 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		ggplot( aes(method, FPR, fill=method)) + 
 		geom_bar(stat="identity", position = "dodge") + 
 		theme_classic() + 
@@ -482,7 +482,7 @@ aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + 
 		geom_bar(stat="identity", position = "dodge") + 
 		theme_classic() + 
@@ -497,7 +497,7 @@ fig1 = df_res %>%
 fig2 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		ggplot(aes(method, FPR, fill=method, alpha=Status)) + 
 		geom_bar(stat="identity", position = "dodge") + 
 		theme_classic() + 
@@ -542,7 +542,7 @@ aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(mean_counts), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -556,7 +556,7 @@ fig1 = df_res %>%
 fig2 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(mean_counts), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -595,7 +595,7 @@ aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(tau), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -609,7 +609,7 @@ fig1 = df_res %>%
 fig2 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(tau), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -649,7 +649,7 @@ aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(n_clusters), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -663,7 +663,7 @@ fig1 = df_res %>%
 fig2 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(n_clusters), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -703,7 +703,7 @@ aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(n_samples), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -717,7 +717,7 @@ fig1 = df_res %>%
 fig2 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(factor(n_samples), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -763,14 +763,14 @@ aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 df_res2 %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
 
 ymax = max(max(df_res2$FPR), .1)
 df_res2 %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		ggplot(aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
 ```
 
@@ -784,7 +784,7 @@ aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
 fig1 = df_res2 %>%
 	filter(assay==CT) %>%
 	# filter(Status != "none") %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		mutate(var.frac = format(100 * var.batch / (var.batch + beta.true^2), digits=2)) %>%		 
  	ggplot(aes(var.frac, AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
@@ -800,7 +800,7 @@ fig1 = df_res2 %>%
 fig2 = df_res2 %>%
 	filter(assay==CT) %>%
 	# filter(Status != "none") %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		mutate(var.frac = format(100 * var.batch / (var.batch + beta.true^2), digits=2)) %>%		 
 	ggplot(aes(var.frac, FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
