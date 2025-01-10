@@ -414,7 +414,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=FALSE}
+```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=TRUE}
 # cols = brewer.pal(9, "Set1")
 # cols[cols=="#FFFF33"] = "#FDDB27"
 # names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
@@ -912,7 +912,7 @@ df_time = rbind(df_time, do.call(rbind, df_time_multiple))
 ymax = log10(max(df_time$Time)) + 2
 
 df_time %>%
-	mutate(Method = recode(Method, poisson = "Poisson", nb = "NB", lm="Linear model", lmlog = "Linear model - log", binomial="Binomial", betabinomial="Beta-binomial")) %>% 
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
  ggplot(aes(Method, log10(Time)+2, fill=Method)) +
 	geom_bar(stat="identity") +
 	theme_bw() +
