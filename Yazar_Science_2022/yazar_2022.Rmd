@@ -157,6 +157,7 @@ fig2 %>% insert_left(fig1) %>% insert_right(fig.vp)
 
 # Plot each regression
 ```{r plot.regressions.CLR, fig.height=18, fig.width=10}
+library(ggrepel)
 # compute residuals
 form = ~ (1|sex) + (1|pool_number) 
 fit = dream(cobj, form, colData(pb))
@@ -166,7 +167,21 @@ figList = lapply(rownames(cobj$E), function(CT){
 
   df = data.frame(CLR = cobj$E[CT,],
                   se = 1/sqrt(cobj$weights[CT,]),
-                  colData(pb))
+                  colData(pb),
+                  counts = cellCounts(pb)[,CT],
+                  totalCells = rowSums(cellCounts(pb)))
+
+  # points to highlight
+  df_count1 = df %>%
+    # filter(counts < 2) %>%
+    arrange(-se) %>% 
+    head(2) 
+
+  df_count2 = df %>%
+    arrange(se, -counts) %>% 
+    head(2) 
+
+  df_count = rbind(df_count1, df_count2)
 
   df %>% 
     ggplot(aes(age, CLR, color=se, weight=1/se^2)) +
@@ -175,8 +190,9 @@ figList = lapply(rownames(cobj$E), function(CT){
       theme_classic() +
       theme(plot.title = element_text(hjust = 0.5), aspect.ratio=1) +
       ggtitle(gsub(",", "\n", CT)) +
-      scale_color_gradient(low=muted('red', 70, 20), high="red", name = "SE") +
-      geom_smooth(method=lm, formula = y ~ x, color="navy", se=FALSE)
+      scale_color_gradient(low=muted('red', 70, 10), high="red", name = "SE") +
+      geom_smooth(method=lm, formula = y ~ x, color="navy", se=FALSE) +
+      geom_text_repel(data=df_count, aes(age, CLR, label=paste(counts, totalCells, sep=' / ')), color="black", box.padding=2) 
 })
 
 plot_grid(plotlist=figList, ncol=3)
@@ -187,7 +203,8 @@ library(splines)
 i = 10
 figList[[i]] + 
   geom_smooth(method=lm, formula = y ~ x + I(x^2), color="green", se=FALSE) +
-  geom_smooth(method="lm", formula = y ~ x + I(x^2), weight=1, color="turquoise", se=FALSE)
+  geom_smooth(method="lm", formula = y ~ x + I(x^2), weight=1, color="turquoise", se=FALSE) +
+    geom_text_repel(data=df_count, aes(DiseaseStatus, CLR, label=paste(counts, totalCells, sep=' / ')), color="black", box.padding=2) 
 ```
 
 
