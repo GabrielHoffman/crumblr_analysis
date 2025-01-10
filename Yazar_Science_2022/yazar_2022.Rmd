@@ -136,7 +136,9 @@ hc = buildClusterTreeFromPB(pb)
 
 ```{r topTable}
 topTable(fit, coef="age", number=Inf) %>%   
-  select(logFC, AveExpr, t, format(P.Value, scientific=TRUE), format(adj.P.Val, scientific=TRUE)) %>% 
+  select(logFC, AveExpr, t, P.Value, adj.P.Val) %>%
+  mutate(P.Value = format(P.Value, scientific=TRUE)) %>% 
+  mutate(adj.P.Val = format(adj.P.Val, scientific=TRUE)) %>% 
   kbl() %>%  
   kable_classic(full_width = FALSE)
 ```
