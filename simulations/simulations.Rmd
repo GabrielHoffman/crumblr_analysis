@@ -349,7 +349,7 @@ Parameters:
 ```{r plot.sims, cache=FALSE, fig.height=4, fig.width=11}
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
-names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
+names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log frac.)", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
 
 CT = "CT_1"
 # AUPR
