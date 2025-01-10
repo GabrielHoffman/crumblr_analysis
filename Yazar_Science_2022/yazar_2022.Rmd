@@ -203,8 +203,7 @@ library(splines)
 i = 10
 figList[[i]] + 
   geom_smooth(method=lm, formula = y ~ x + I(x^2), color="green", se=FALSE) +
-  geom_smooth(method="lm", formula = y ~ x + I(x^2), weight=1, color="turquoise", se=FALSE) +
-    geom_text_repel(data=df_count, aes(DiseaseStatus, CLR, label=paste(counts, totalCells, sep=' / ')), color="black", box.padding=2) 
+  geom_smooth(method="lm", formula = y ~ x + I(x^2), weight=1, color="turquoise", se=FALSE) 
 ```
 
 
