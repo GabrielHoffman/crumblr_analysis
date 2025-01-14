@@ -213,6 +213,15 @@ fig3 = plotPercentBars( sortCols(vp), col=cols)
 fig2 %>% insert_left(fig1) %>% insert_right(fig3)
 ```
 
+#### One node
+```{r node}
+res1 %>% 
+  as_tibble  %>% 
+  filter(label == target) %>%
+  select(label, beta, se, stat, pvalue, n_features, method, FDR) %>%
+  kbl %>%
+  kable_classic(full_width = FALSE)
+```
 
 # Plot of one cell type
 ```{r compare, fig.height=6, fig.width=12}
