@@ -123,7 +123,8 @@ ggplot(df, aes(TB_status, value, fill=variable)) +
   facet_wrap(~ variable) +
   theme_classic() +
   theme(aspect.ratio=1, legend.position="none") +
-  ylab("Fraction")
+  ylab("Fraction") +
+  scale_y_log10()
 ```
 
 # Evaluate crumblr and build tree
