@@ -115,7 +115,7 @@ testComposition = function( countMatrix, formula, data, coef, eval = c("test", "
 		}else if(method == 'logit'){
 			form = paste0("logit(`", k, "`  / TotalCells) ~ ", as.character(formula)[2])
 		}else if(method == 'asin'){
-			form = paste0("asin(`", k, "`  / TotalCells) ~ ", as.character(formula)[2])
+			form = paste0("asin(sqrt(`", k, "`  / TotalCells)) ~ ", as.character(formula)[2])
 		}else if(method %in% c("poisson", "nb") ){		
 			form = paste0("`", k, "` ~ offset(log(TotalCells)) + ", as.character(formula)[2])
 		}
