@@ -347,8 +347,6 @@ Parameters:
 
 
 ```{r plot.sims, cache=FALSE, fig.height=4, fig.width=11}
-
-
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log frac.)", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
@@ -374,7 +372,6 @@ fig1 = df_res %>%
 	ggtitle("AUPR") + 
 	geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) +
 	scale_fill_manual(values=cols)
-
 
 # FPR
 fig2 = df_res %>%
