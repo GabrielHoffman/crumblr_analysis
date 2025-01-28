@@ -1,6 +1,7 @@
 
 library(lmerTest)
 library(aod)
+library(LaplacesDemon)
 
 #' Test difference in cell type composition
 #'
@@ -16,7 +17,7 @@ library(aod)
 #' @importFrom variancePartition dream voomWithDreamWeights eBayes topTable
 #' @importFrom edgeR DGEList
 #' @export
-cellTypeCompositionTest = function( obj, formula, coef, method = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson", "dream")  ){
+cellTypeCompositionTest = function( obj, formula, coef, method = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson", "dream")  ){
 
 	stopifnot(is( obj, "SingleCellExperiment") )
 	method = match.arg(method)
@@ -61,7 +62,7 @@ cellTypeCompositionTest = function( obj, formula, coef, method = c( "nb", "binom
 #' @details Evaluates regression model where cell fraction is response using one of the 6 specified methods.  Methods can be fit with random effects, except for 'betabinomial'
 #'
 #' @export
-cellTypeCompositionVarPart = function( obj, formula, method = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")  ){
+cellTypeCompositionVarPart = function( obj, formula, method = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")  ){
 
 	stopifnot(is( obj, "SingleCellExperiment") )
 	method = match.arg(method)
@@ -85,14 +86,14 @@ cellTypeCompositionVarPart = function( obj, formula, method = c( "nb", "binomial
 
 
 # @param eval evaluate either hypothesis test 'test' or variance fractions 'vp'
-testComposition = function( countMatrix, formula, data, coef, eval = c("test", "vp"), method = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") ){
+testComposition = function( countMatrix, formula, data, coef, eval = c("test", "vp"), method = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson") ){
 
 	method = match.arg(method)
 	eval = match.arg(eval)
 
 	# if add pseudocount
 	# log cannot handle zero counts
-	if(method == 'lmlog'){
+	if(method %in% c('lmlog', 'logit', 'asin')) {
 		countMatrix = countMatrix + .25
 	}
 
@@ -111,6 +112,10 @@ testComposition = function( countMatrix, formula, data, coef, eval = c("test", "
 			form = paste0("`", k, "`  / TotalCells ~ ", as.character(formula)[2])
 		}else if(method == 'lmlog'){
 			form = paste0("log(`", k, "`  / TotalCells) ~ ", as.character(formula)[2])
+		}else if(method == 'logit'){
+			form = paste0("logit(`", k, "`  / TotalCells) ~ ", as.character(formula)[2])
+		}else if(method == 'asin'){
+			form = paste0("asin(`", k, "`  / TotalCells) ~ ", as.character(formula)[2])
 		}else if(method %in% c("poisson", "nb") ){		
 			form = paste0("`", k, "` ~ offset(log(TotalCells)) + ", as.character(formula)[2])
 		}
@@ -143,7 +148,7 @@ testComposition = function( countMatrix, formula, data, coef, eval = c("test", "
 #' @importFrom lme4 glmer glmer.nb lmerControl glmerControl .makeCC
 #' @importFrom lmerTest lmer
 #' @importFrom stats lm glm glm.control
-regModel = function(formula, data, coef, eval = c("test", "vp"), method = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson") ){
+regModel = function(formula, data, coef, eval = c("test", "vp"), method = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson") ){
 
 	method = match.arg(method)
 	eval = match.arg(eval)
@@ -161,7 +166,7 @@ regModel = function(formula, data, coef, eval = c("test", "vp"), method = c( "nb
 		}else if(method == "betabinomial"){
 			stop("'betabinomial' model can't accept random effects")
 
-		}else if(method %in% c("lm", "lmlog") ){
+		}else if(method %in% c("lm", "lmlog", "logit", "asin") ){
 			control = lmerControl(check.conv.singular = .makeCC(action = "ignore",  tol = 1e-4))
 	
 			fit = lmer(formula, data, control = control)			
@@ -190,7 +195,7 @@ regModel = function(formula, data, coef, eval = c("test", "vp"), method = c( "nb
 			fit = betabin(formula, ~ 1, data)
 			df_coef = summary(fit)@Coef[coef,,drop=FALSE]
 
-		}else if(method %in% c("lm", "lmlog") ){
+		}else if(method %in% c("lm", "lmlog", "logit", "asin") ){
 			fit = lm(formula, data)
 			df_coef = coef(summary(fit))
 

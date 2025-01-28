@@ -226,7 +226,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
 
-		save(df, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims/sims_", idx, ".RDATA"))
+		# save(df, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims/sims_", idx, ".RDATA"))
 
 		df
 	}, mc.cores=mc.cores, mc.preschedule=FALSE)
@@ -329,7 +329,7 @@ beta.true = .2
 n_batches = floor(n_samples/2)
 var.batch = 0 
 tau = 10 
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")     
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")     
           
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE)  
 ```
@@ -347,9 +347,15 @@ Parameters:
 
 
 ```{r plot.sims, cache=FALSE, fig.height=4, fig.width=11}
+
+
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log frac.)", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
+
+cols = c(cols[1:4], c("LM (logit)" = "#07f500", "LM (asin)" = "#3acfb8"), cols[5:9])
+
+pie(rep(1, length(cols)), col=cols)
 
 CT = "CT_1"
 # AUPR
@@ -357,7 +363,7 @@ aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log frac.)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 	ggplot(aes(method, AUPR, fill=method)) + 
 	geom_bar(stat="identity", position = "dodge") + 
 	theme_classic() + 
@@ -368,6 +374,7 @@ fig1 = df_res %>%
 	ggtitle("AUPR") + 
 	geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) +
 	scale_fill_manual(values=cols)
+
 
 # FPR
 fig2 = df_res %>%
@@ -399,7 +406,7 @@ beta.true = .2
 n_batches = floor(n_samples/2)
 var.batch = 0
 tau = 10 
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "poisson")    
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson") 
           
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=TRUE, mc.cores=1, short=TRUE)  
 ```
@@ -415,10 +422,6 @@ Parameters:
 
 
 ```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=TRUE}
-# cols = brewer.pal(9, "Set1")
-# cols[cols=="#FFFF33"] = "#FDDB27"
-# names(cols) = c("crumblr", "CLR", "Linear model", "Linear model - log", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
-
 CT = "CT_1"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
