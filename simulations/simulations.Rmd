@@ -51,6 +51,7 @@ R --vanilla
 rmarkdown::render("simulations.Rmd");
 
 
+scp minerva:"/sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations/simulations_files/figure-html/*pdf" .
 
 # https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
 
@@ -351,7 +352,7 @@ cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log)", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
 
-cols = c(cols[1:4], c("LM (logit)" = "#07f500", "LM (asin)" = "#3acfb8"), cols[5:9])
+cols = c(cols[1:4], c("LM (logit)" = "#80f57d", "LM (asin)" = "#3acfb8"), cols[5:9])
 
 CT = "CT_1"
 # AUPR
