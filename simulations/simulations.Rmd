@@ -763,6 +763,7 @@ df_res2 %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = as.character(method)) %>%
 		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
 
 ymax = max(max(df_res2$FPR), .1)
@@ -770,6 +771,7 @@ df_res2 %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
+		mutate(method = as.character(method)) %>%
 		ggplot(aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
 ```
 
