@@ -219,7 +219,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 				# betabinomial can't accept random effects
 				
 				res = data.frame(Method = method, 
-								assay = "CT_1",   
+								assay = "CT_2",   
 								Estimate = NA,  
 								se = NA,    
 								zstat  = NA,
@@ -343,12 +343,12 @@ n_samples = 200
 n_clusters = 10
 mean_counts = 2000
 n_sims = 5000  
-beta.true = .2
+beta.true = 1e-2 #.2
 n_batches = floor(n_samples/2)
 var.batch = 0 
 tau = 10
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
- 
+ methods = "lm"
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE) 
 
 ```
@@ -373,7 +373,7 @@ names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log)", "Binomial", "Beta
 cols = c(cols[1:4], c("LM (logit)" = "#80f57d", "LM (asin)" = "#3acfb8"), cols[5:9])
 cols["DESeq2"] = "#e6b598"
 
-CT = "CT_1"
+CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
@@ -410,9 +410,7 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
-```{r exit1, cache=FALSE}
-knitr::knit_exit()
-```
+<!---
 
 # With scCoda
 ```{r scCoda, eval=FALSE}
@@ -440,7 +438,7 @@ Parameters:
 
 
 ```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=TRUE}
-CT = "CT_1"
+CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
@@ -477,6 +475,7 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
+--->
 
 <!---
 # Mixed model
@@ -497,7 +496,7 @@ Parameters:
  - tau: `r tau`
 
 ```{r plot.sims.mixed, cache=FALSE, fig.height=4, fig.width=11}
-CT = "CT_1"
+CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
@@ -556,7 +555,7 @@ Parameters:
  - tau: `r tau`
 
 ```{r plot.increasing, cache=FALSE, fig.width=11, fig.height=4}
-CT = "CT_1"
+CT = "CT_2"
 
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -610,7 +609,7 @@ Parameters:
  - var.batch: `r var.batch`
 
 ```{r plot.increasing.tau, cache=FALSE, fig.width=11, fig.height=4}
-CT = "CT_1"
+CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
@@ -663,7 +662,7 @@ Parameters:
  - tau: `r tau`
 
 ```{r plot.increase.clusters, cache=FALSE, fig.width=11, fig.height=4}
-CT = "CT_1"
+CT = "CT_2"
 
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -718,7 +717,7 @@ Parameters:
 
 
 ```{r plot.increase.samples, cache=FALSE, fig.width=11, fig.height=4}
-CT = "CT_1"
+CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 fig1 = df_res %>%
@@ -800,7 +799,7 @@ df_res2 %>%
 
 
 ```{r plot.batch.effect, cache=FALSE, fig.width=11, fig.height=8}
-CT = "CT_1"
+CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
 
