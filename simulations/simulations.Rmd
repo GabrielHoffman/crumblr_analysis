@@ -177,7 +177,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		# DESeq2
 		dds = DESeqDataSetFromMatrix(t(counts), info, nobars(formula))
 		# dds = DESeq(dds, fitType='local', quiet=TRUE)		
-    dds <- estimateSizeFactors(dds)	
+    dds <- estimateSizeFactors(dds, sfType='poscounts')	
     # dds <- scran::computeSumFactors(dds)
 		# dds <- estimateDispersions(dds, fitType='mean', quiet=TRUE)
 		dds <- estimateDispersionsGeneEst(dds)
