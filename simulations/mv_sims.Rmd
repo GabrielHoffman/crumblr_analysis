@@ -224,7 +224,7 @@ df = lapply(seq(50, 500, by=50), function(n){
 			method = c("ACAT", "Harmonic")))
 
 		data.frame(i = i, isDE = i <= n_sims*.2, n, res)
-	}, mc.cores=mc.cores)
+	}, mc.cores=mc.cores) 
 	do.call(rbind, df) 
 })
 df = do.call(rbind, df)
