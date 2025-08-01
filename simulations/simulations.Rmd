@@ -87,9 +87,7 @@ library(gtools)
 library(RColorBrewer)
 library(tidyverse)
 library(lme4)
-library(ACAT)
 library(DESeq2)
-library(harmonicmeanp)
 
 # library(reticulate)
 # python_path = "/sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/bin/python"
