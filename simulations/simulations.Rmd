@@ -343,12 +343,12 @@ n_samples = 200
 n_clusters = 10
 mean_counts = 2000
 n_sims = 5000  
-beta.true = 1e-2 #.2
+beta.true = .2 / 100
 n_batches = floor(n_samples/2)
 var.batch = 0 
 tau = 10
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
- methods = "lm"
+
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE) 
 
 ```
@@ -418,7 +418,7 @@ n_samples = 200
 n_clusters = 10
 mean_counts = 2000
 n_sims = 100 
-beta.true = .2
+beta.true = .2 / 100
 n_batches = floor(n_samples/2)
 var.batch = 0
 tau = 10 
