@@ -66,7 +66,7 @@ library(harmonicmeanp)
 
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 
-cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "#b30000", Harmonic = "red", ACT = "orange")
+cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "#b30000", Harmonic = "red", ACAT = "orange")
 ```
 
 # Increase number of responses
@@ -125,7 +125,7 @@ df = lapply(m_array, function(m){
 			p.hmp(pv, L = length(pv))),
 			n_features = res$n_features[1],
 			lambda = res$lambda[1],
-			method = c("ACT", "Harmonic")))
+			method = c("ACAT", "Harmonic")))
 
 		data.frame(i = i, isDE = i <= n_sims*.2, m, res)
 	}, mc.cores=mc.cores)
@@ -165,8 +165,8 @@ fig2 = df %>%
 	group_by(method, m) %>%
 	summarize( FP = sum(pvalue < 0.05), len = length(pvalue) ) %>%
 	ggplot(aes(m, FP / len, color=method)) +
-		geom_point() +
-		geom_line() +
+		geom_point(size=2) +
+		geom_line(linewidth=1) +
 		theme_classic() +
 		theme(aspect.ratio=1) +
 		geom_hline(yintercept=0.05, color="grey50", linetype="dashed") +
@@ -182,7 +182,7 @@ plot_grid(fig1, fig2, align="v", labels=LETTERS[1:2])
 # Increase sample size
 ```{r run_samplesize, cache=TRUE}
 # number of responses
-m = 15 
+m = 15  
   
 df = lapply(seq(50, 500, by=50), function(n){
 
@@ -237,8 +237,8 @@ fig1 = df %>%
 	group_by(method, n) %>%
 	summarize( AUPR = f(pvalue, isDE)) %>%
 	ggplot(aes(n, AUPR, color=method)) +
-		geom_point() +
-		geom_line() +
+		geom_point(size=2) +
+		geom_line(linewidth=1) +
 		theme_classic() +
 		theme(aspect.ratio=1, legend.position="none") +
 		scale_y_continuous(limits=c(0,1.02), expand=c(0,0)) +
@@ -253,8 +253,8 @@ fig2 = df %>%
 	group_by(method, n) %>%
 	summarize( FP = sum(pvalue < 0.05), len = length(pvalue) ) %>%
 	ggplot(aes(n, FP / len, color=method)) +
-		geom_point() +
-		geom_line() +
+		geom_point(size=2) +
+		geom_line(linewidth=1) +
 		theme_classic() +
 		theme(aspect.ratio=1) +
 		geom_hline(yintercept=0.05, color="grey50", linetype="dashed") +
