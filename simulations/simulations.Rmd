@@ -176,6 +176,17 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		fit = eBayes(fit)
 		tab.crumblr = topTable(fit, coef="trait", sort.by="none")
 
+		# DESeq2
+		dds = DESeqDataSetFromMatrix(t(counts), info, nobars(formula))
+		# dds = DESeq(dds, fitType='local', quiet=TRUE)		
+    # dds <- estimateSizeFactors(dds)	
+    dds <- scran::computeSumFactors(dds)
+		# dds <- estimateDispersions(dds, fitType='mean', quiet=TRUE)
+		dds <- estimateDispersionsGeneEst(dds)
+ 		dispersions(dds) <- mcols(dds)$dispGeneEst
+    dds <- nbinomWaldTest(dds)
+		res = results(dds)
+
 		# # crumblr clr_2class
 		# cobj2cl = crumblr(counts, method="clr_2class", max.ratio=5)
 		# fit2cl = suppressMessages(dream(cobj2cl, formula, X, BPPARAM=SerialParam()))
@@ -188,6 +199,11 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 			check.names=FALSE)
 		i = match(df_p$assay, rownames(tab.crumblr))
 		df_p$crumblr = tab.crumblr$P.Value[i]
+
+		df_p = df_p %>%
+			left_join(data.frame(assay = rownames(res), 
+				DESeq2 = res$pvalue), 
+			by="assay")
 
 		if( use.sccoda){
 			res = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python")
@@ -323,19 +339,20 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 } 
 ```
 
-```{r model1}
+```{r model1, cache=FALSE}
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 300 # 5000  
+n_sims = 5000  
 beta.true = .2
 n_batches = floor(n_samples/2)
 var.batch = 0 
-tau = 10 
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")     
-          
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE)  
+tau = 10
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
+ 
+df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE) 
+
 ```
 
 
@@ -356,6 +373,7 @@ cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log)", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
 
 cols = c(cols[1:4], c("LM (logit)" = "#80f57d", "LM (asin)" = "#3acfb8"), cols[5:9])
+cols["DESeq2"] = "#e6b598"
 
 CT = "CT_1"
 # AUPR
@@ -394,7 +412,7 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
-```{r exit, cache=FALSE}
+```{r exit1, cache=FALSE}
 knitr::knit_exit()
 ```
 
