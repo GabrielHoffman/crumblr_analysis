@@ -343,7 +343,7 @@ n_samples = 200
 n_clusters = 10
 mean_counts = 2000
 n_sims = 100 #5000  
-beta.true = .2 / 100
+beta.true = 0.02
 n_batches = floor(n_samples/2)
 var.batch = 0 
 tau = 10
@@ -408,6 +408,10 @@ fig2 = df_res %>%
 	scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
+```
+
+```{r exit134, cache=FALSE}
+knitr::knit_exit()
 ```
 
 <!---
