@@ -149,7 +149,7 @@ fig1 = df %>%
 	group_by(method, m) %>%
 	summarize( AUPR = f(pvalue, isDE)) %>%
 	ggplot(aes(m, AUPR, color=method)) +
-		geom_point(size=1) +
+		geom_point(size=2) +
 		geom_line(linewidth=1) +
 		theme_classic() +
 		theme(aspect.ratio=1, legend.position="none") +
