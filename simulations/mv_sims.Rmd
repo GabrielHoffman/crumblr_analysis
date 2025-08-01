@@ -78,7 +78,7 @@ cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "
 n = 200
 
 # n_sims = 100000
-n_sims = 1000
+n_sims = 100
 
 methods = c("FE.empirical", "FE", "sidak", "fisher")
 
@@ -213,6 +213,16 @@ df = lapply(seq(50, 500, by=50), function(n){
 			res[,c('stat', 'pvalue', 'n_features', 'lambda', 'method')]
 		})
 		res = do.call(rbind, res)
+
+		# other methods
+		pv = topTable(fit, coef='X', number=Inf)$P.Value
+		res = res %>%
+			rbind(data.frame(stat = c(NA, NA), 
+			pvalue = c(ACAT(pv),
+			p.hmp(pv, L = length(pv))),
+			n_features = res$n_features[1],
+			lambda = res$lambda[1],
+			method = c("ACAT", "Harmonic")))
 
 		data.frame(i = i, isDE = i <= n_sims*.2, n, res)
 	}, mc.cores=mc.cores)
