@@ -87,6 +87,9 @@ library(gtools)
 library(RColorBrewer)
 library(tidyverse)
 library(lme4)
+library(ACAT)
+library(DESeq2)
+library(harmonicmeanp)
 
 # library(reticulate)
 # python_path = "/sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/bin/python"
@@ -325,7 +328,7 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 5000  
+n_sims = 300 # 5000  
 beta.true = .2
 n_batches = floor(n_samples/2)
 var.batch = 0 
@@ -391,6 +394,9 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
 
 # With scCoda
 ```{r scCoda, eval=FALSE}
