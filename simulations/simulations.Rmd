@@ -178,7 +178,8 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		dds = DESeqDataSetFromMatrix(t(counts), info, nobars(formula))
 		# dds = DESeq(dds, fitType='local', quiet=TRUE)		
 		tryCatch({
-    dds <- estimateSizeFactors(dds, type='ratio')	
+		geoMeans <- exp(rowMeans(log(counts(dds)+0.5)))
+		dds <- estimateSizeFactors(dds,geoMeans=geoMeans)
    	}, error = function(msg){
    		file = paste0("/sc/arion/scratch/hoffmg01/sims/dds_", idx, ".RDS")
    		saveRDS(dds, file=file)
