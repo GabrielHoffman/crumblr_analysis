@@ -66,7 +66,7 @@ library(harmonicmeanp)
 
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 
-cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "#b30000", Harmonic = "red", ACAT = "orange")
+cols = c(FE = "#4421af", FE.empirical = "#5ad45a", sidak = "#0d88e6", fisher = "#b30000", Harmonic = "red", ACT = "orange")
 ```
 
 # Increase number of responses
