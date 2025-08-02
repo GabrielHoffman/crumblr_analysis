@@ -159,6 +159,11 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		rownames(counts) = paste0("sample_", 1:nrow(counts))
 		colnames(counts) = paste0("CT_", 1:ncol(counts))
 
+		# remove samples with 
+		keep = rowSums(counts) > 10
+		counts = counts[keep,]
+		info = info[keep,]
+
 		cellTypeFreq = rowMeans(apply(counts, 1, function(x) x/sum(x)))
 		df_cellTypeFreq = data.frame(cellTypeFreq)
 
