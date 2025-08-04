@@ -108,7 +108,7 @@ testComposition = function( countMatrix, formula, data, coef, eval = c("test", "
 
 			form = paste0("cbind(`", k, "`, TotalCells - `", k, "`) ~ ", as.character(formula)[2])
 
-		}else if( method == "lm"){
+		}else if( method %in% c("lm")){
 			form = paste0("`", k, "`  / TotalCells ~ ", as.character(formula)[2])
 		}else if(method == 'lmlog'){
 			form = paste0("log(`", k, "`  / TotalCells) ~ ", as.character(formula)[2])

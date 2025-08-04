@@ -88,6 +88,7 @@ library(RColorBrewer)
 library(tidyverse)
 library(lme4)
 library(DESeq2)
+library(edgeR)
 
 # library(reticulate)
 # python_path = "/sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/bin/python"
@@ -117,7 +118,8 @@ rmultinomdir = function(n, size, alpha){
 run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
 	# each batch is observed at least twice
-	info = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
+	info = data.frame(trait = sample(n_samples, 2, replace=TRUE), 
+		Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
 
 	rownames(info) = paste0("sample_", 1:nrow(info))
 
@@ -182,27 +184,35 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		# DESeq2
 		dds = DESeqDataSetFromMatrix(t(counts), info, nobars(formula))
 		# dds = DESeq(dds, fitType='local', quiet=TRUE)		
-		tryCatch({
+		# tryCatch({
 		geoMeans <- exp(rowMeans(log(counts(dds)+0.5)))
 		dds <- estimateSizeFactors(dds,geoMeans=geoMeans)
-   	}, error = function(msg){
-   		file = paste0("/sc/arion/scratch/hoffmg01/sims/dds_", idx, ".RDS")
-   		saveRDS(dds, file=file)
-   		})
-    # dds <- scran::computeSumFactors(dds)
-		# dds <- estimateDispersions(dds, fitType='mean', quiet=TRUE)
-
+   	# }, error = function(msg){
+   	# 	file = paste0("/sc/arion/scratch/hoffmg01/sims/dds_", idx, ".RDS")
+   	# 	saveRDS(dds, file=file)
+   		# })
 		dds <- estimateDispersionsGeneEst(dds)
  		dispersions(dds) <- mcols(dds)$dispGeneEst
     dds <- nbinomWaldTest(dds)
 		res = results(dds)
 
-		# # crumblr clr_2class
-		# cobj2cl = crumblr(counts, method="clr_2class", max.ratio=5)
-		# fit2cl = suppressMessages(dream(cobj2cl, formula, X, BPPARAM=SerialParam()))
-		# fit2cl = eBayes(fit2cl)
-		# tab.crumblr2cl = topTable(fit2cl, coef="trait", sort.by="none")
-			# "crumblr2cl" = tab.crumblr2cl$P.Value,
+		# edgeR
+		y <- DGEList(counts=t(counts))
+		design = model.matrix(nobars(formula), info)
+		y <- estimateDisp(y, design)
+		fit.egdeR <- glmQLFit(y, design)
+		fit.egdeR <- glmLRT(fit.egdeR)
+		tab.edgeR <- topTags(fit.egdeR, n=Inf,sort.by="none")
+
+		frac = (counts+.25) / rowSums(counts)
+    res.wilcox = apply(frac, 2, function(x){
+    	trait = factor(info$trait)
+
+    	i = (trait == levels(trait)[1])
+      fitw = wilcox.test(x[i], x[!i])
+      fitw$p.value
+    })
+
 
 		df_p = data.frame(assay = rownames(tab_clr),
 			"CLR" = tab_clr$P.Value,
@@ -214,6 +224,17 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 			left_join(data.frame(assay = rownames(res), 
 				DESeq2 = res$pvalue), 
 			by="assay")
+
+		df_p = df_p %>%
+			left_join(data.frame(assay = rownames(tab.edgeR), 
+				edgeR = tab.edgeR$table$PValue), 
+			by="assay")
+
+		df_p = df_p %>%
+			left_join(data.frame(assay = names(res.wilcox), 
+				Wilcoxon = res.wilcox), 
+			by="assay")
+
 
 		if( use.sccoda){
 			res = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python")
@@ -256,7 +277,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 
 		df = merge(df, df_cellTypeFreq, by.x="assay", by.y="row.names")
 
-		save(df, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims/sims_", idx, ".RDATA"))
+		# save(df, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims/sims_", idx, ".RDATA"))
 
 		df
 	}, mc.cores=mc.cores, mc.preschedule=FALSE)
@@ -356,12 +377,13 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 5000  
-beta.true = 0.02
+n_sims = 100 #5000  
+beta.true = 3.5e-3
 n_batches = floor(n_samples/2)
 var.batch = 0 
 tau = 10
-methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
+# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
+methods = "lm"
 
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE) 
 ```
@@ -384,7 +406,9 @@ cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log)", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
 
 cols = c(cols[1:4], c("LM (logit)" = "#80f57d", "LM (asin)" = "#3acfb8"), cols[5:9])
-cols["DESeq2"] = "#e6b598"
+cols["DESeq2"] = "#D27741"
+cols["edgeR"] = "#E3AC8B"
+cols["Wilcoxon"] = "#F1D5F5"
 
 CT = "CT_2"
 # AUPR
@@ -423,7 +447,7 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
-```{r exit134, cache=FALSE, eval=FALSE}
+```{r exit134, cache=FALSE, eval=TRUE}
 knitr::knit_exit()
 ```
 
@@ -435,7 +459,7 @@ n_samples = 200
 n_clusters = 10
 mean_counts = 2000
 n_sims = 100 
-beta.true = .02
+# beta.true = .02
 n_batches = floor(n_samples/2)
 var.batch = 0
 tau = 10 
@@ -494,7 +518,6 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 --->
 
-<!---
 # Mixed model
 ```{r run.mixed}
 n_batches = floor(n_samples/2)
@@ -548,8 +571,6 @@ fig2 = df_res %>%
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
-
---->
 
 
 # Increasing number of cells
