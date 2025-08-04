@@ -1,0 +1,119 @@
+---
+title: "Evaluate Lin-Sullivan tests with Monte Carlo sampling"
+subtitle: ''
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+documentclass: article
+output: 
+  html_document:
+  toc: true
+  smart: false
+---
+
+<!---
+
+
+rmarkdown::render("remaCor_gamma.Rmd")
+
+
+--->
+
+```{r setup, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(  
+            tidy=FALSE, 
+            cache=TRUE,
+            echo=FALSE,
+            dev=c("png", "pdf"),
+            # dev.args = list(png = list(type = "Xlib")),
+            package.startup.message = FALSE,
+            message=FALSE, 
+            error=FALSE, 
+            warning=FALSE)
+
+knitr::opts_chunk$set()
+``` 
+
+
+```{R load.packages, cache=FALSE}
+library(remaCor)
+library(clusterGeneration)
+library(tidyverse)
+library(ggplot2)
+library(mvtnorm)
+library(parallel)
+```
+
+```{r sims}
+# sample size
+n = 100
+
+# number of response variables
+m = 6
+
+f = function(n.mc.samples){
+
+  mclapply(seq(200), function(i){
+    # Error covariance
+    Sigma = genPositiveDefMat(m)$Sigma
+
+    # regression parameters
+    beta = matrix(.3, 1, m)
+
+    # covariates
+    X = matrix(rnorm(n), ncol=1)
+    # covariates
+    X = matrix(rnorm(n), ncol=1)
+
+    # Simulate response variables
+    Y = X %*% beta + rmvnorm(n, sigma = Sigma) #rmvt(n, sigma = Sigma, df=2)
+
+    # Multivariate regression
+    fit = lm(Y ~ X)
+
+    # Correlation between residuals
+    C = cor(residuals(fit))
+
+    # Extract effect sizes and standard errors from model fit
+    df = lapply(coef(summary(fit)), function(a) 
+           data.frame(beta = a["X", 1], se = a["X", 2]))
+    df = do.call(rbind, df)
+
+    res.gamma = LS.empirical(df$beta, df$se, C, nu=n-2, n.mc.samples=n.mc.samples)
+    res.emp = LS.empirical(df$beta, df$se, C, nu=n-2, useGamma=FALSE, n.mc.samples=n.mc.samples)
+
+    data.frame(gamma = res.gamma$p, empirical = res.emp$p)
+  }, mc.cores=10) %>%
+    bind_rows %>%
+    mutate(n.mc.samples = n.mc.samples)
+}
+
+res = bind_rows(f(1000), f(10000), f(100000))
+```
+
+
+
+```{r plot, fig.width=7, cache=FALSE}
+Gamma = "Gamma"
+ggplot(res, aes(-log10(gamma), -log10(empirical))) +
+  geom_abline(intercept=0,slope=1, color="red") +
+  geom_point() +
+  theme_bw(15) +
+  theme(aspect.ratio=1) + 
+  xlab(bquote(.(Gamma)~approximation~(-log[10]~p))) + 
+  ylab(bquote(Empirical~(-log[10]~p))) +
+  facet_wrap(~n.mc.samples)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
