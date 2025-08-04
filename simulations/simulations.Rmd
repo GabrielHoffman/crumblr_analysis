@@ -53,9 +53,16 @@ rmarkdown::render("simulations.Rmd");
 
 scp minerva:"/sc/arion/projects/CommonMind/hoffman/crumblr_analysis/simulations/simulations_files/figure-html/*pdf" .
 
-# https://hoffmg01.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
+# https://hoffmg01.dmz.hpc.mssm.edu/crumblr_analysis/simulations/simulations.html
+
+
+
 
 --->
+
+
+
+
 
 ```{r setup, echo=FALSE, results="hide"}
 knitr::opts_chunk$set(	
@@ -377,7 +384,7 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 100 #5000  
+n_sims = 1000 #5000  
 beta.true = 3.5e-3
 n_batches = floor(n_samples/2)
 var.batch = 0 
@@ -447,7 +454,7 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
-```{r exit134, cache=FALSE, eval=TRUE}
+```{r exit134, cache=FALSE, eval=FALSE}
 knitr::knit_exit()
 ```
 
