@@ -125,7 +125,7 @@ rmultinomdir = function(n, size, alpha){
 run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
 	# each batch is observed at least twice
-	info = data.frame(trait = sample(n_samples, 2, replace=TRUE), 
+	info = data.frame(trait = sample(seq(2), n_samples, replace=TRUE), 
 		Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
 
 	rownames(info) = paste0("sample_", 1:nrow(info))
@@ -188,59 +188,57 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		fit = eBayes(fit)
 		tab.crumblr = topTable(fit, coef="trait", sort.by="none")
 
-		# DESeq2
-		dds = DESeqDataSetFromMatrix(t(counts), info, nobars(formula))
-		# dds = DESeq(dds, fitType='local', quiet=TRUE)		
-		# tryCatch({
-		geoMeans <- exp(rowMeans(log(counts(dds)+0.5)))
-		dds <- estimateSizeFactors(dds,geoMeans=geoMeans)
-   	# }, error = function(msg){
-   	# 	file = paste0("/sc/arion/scratch/hoffmg01/sims/dds_", idx, ".RDS")
-   	# 	saveRDS(dds, file=file)
-   		# })
-		dds <- estimateDispersionsGeneEst(dds)
- 		dispersions(dds) <- mcols(dds)$dispGeneEst
-    dds <- nbinomWaldTest(dds)
-		res = results(dds)
-
-		# edgeR
-		y <- DGEList(counts=t(counts))
-		design = model.matrix(nobars(formula), info)
-		y <- estimateDisp(y, design)
-		fit.egdeR <- glmQLFit(y, design)
-		fit.egdeR <- glmLRT(fit.egdeR)
-		tab.edgeR <- topTags(fit.egdeR, n=Inf,sort.by="none")
-
-		frac = (counts+.25) / rowSums(counts)
-    res.wilcox = apply(frac, 2, function(x){
-    	trait = factor(info$trait)
-
-    	i = (trait == levels(trait)[1])
-      fitw = wilcox.test(x[i], x[!i])
-      fitw$p.value
-    })
-
-
 		df_p = data.frame(assay = rownames(tab_clr),
 			"CLR" = tab_clr$P.Value,
 			check.names=FALSE)
 		i = match(df_p$assay, rownames(tab.crumblr))
 		df_p$crumblr = tab.crumblr$P.Value[i]
 
-		df_p = df_p %>%
-			left_join(data.frame(assay = rownames(res), 
-				DESeq2 = res$pvalue), 
-			by="assay")
+		if( ! variancePartition:::.isMixedModelFormula(formula) ){
 
-		df_p = df_p %>%
-			left_join(data.frame(assay = rownames(tab.edgeR), 
-				edgeR = tab.edgeR$table$PValue), 
-			by="assay")
+			# DESeq2
+			dds = DESeqDataSetFromMatrix(t(counts), info, nobars(formula))
+			geoMeans <- exp(rowMeans(log(counts(dds)+0.5)))
+			dds <- estimateSizeFactors(dds,geoMeans=geoMeans)
+			dds <- estimateDispersionsGeneEst(dds)
+	 		dispersions(dds) <- mcols(dds)$dispGeneEst
+	    dds <- nbinomWaldTest(dds)
+			res = results(dds)
 
-		df_p = df_p %>%
-			left_join(data.frame(assay = names(res.wilcox), 
-				Wilcoxon = res.wilcox), 
-			by="assay")
+			# edgeR
+			y <- DGEList(counts=t(counts))
+			design = model.matrix(nobars(formula), info)
+			y <- estimateDisp(y, design)
+			fit.egdeR <- glmQLFit(y, design)
+			fit.egdeR <- glmLRT(fit.egdeR)
+			tab.edgeR <- topTags(fit.egdeR, n=Inf,sort.by="none")
+
+			# Wilcox
+			frac = (counts+.25) / rowSums(counts)
+	    res.wilcox = apply(frac, 2, function(x){
+	    	trait = factor(info$trait)
+
+	    	i = (trait == levels(trait)[1])
+	      fitw = wilcox.test(x[i], x[!i])
+	      fitw$p.value
+	    })
+
+			
+			df_p = df_p %>%
+				left_join(data.frame(assay = rownames(res), 
+					DESeq2 = res$pvalue), 
+				by="assay")
+
+			df_p = df_p %>%
+				left_join(data.frame(assay = rownames(tab.edgeR), 
+					edgeR = tab.edgeR$table$PValue), 
+				by="assay")
+
+			df_p = df_p %>%
+				left_join(data.frame(assay = names(res.wilcox), 
+					Wilcoxon = res.wilcox), 
+				by="assay")
+		}
 
 
 		if( use.sccoda){
@@ -385,10 +383,10 @@ n_samples = 200
 n_clusters = 10
 mean_counts = 2000
 n_sims = 100 #5000  
-beta.true = 3.5e-3
+beta.true = 0.03
 n_batches = floor(n_samples/2)
 var.batch = 0 
-tau = 10
+tau = 5
 # methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
 methods = "lm"
 
@@ -525,60 +523,6 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 --->
 
-# Mixed model
-```{r run.mixed}
-n_batches = floor(n_samples/2)
-var.batch = .1
-  
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE)  
-```
-
-Parameters:
-
- - n_samples: `r n_samples`
- - n_clusters: `r n_clusters`
- - mean_counts: `r mean_counts`
- - beta.true: `r beta.true`
- - var.batch: `r var.batch`
- - tau: `r tau`
-
-```{r plot.sims.mixed, cache=FALSE, fig.height=4, fig.width=11}
-CT = "CT_2"
-# AUPR
-aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
-fig1 = df_res %>%
-		as_tibble %>%
-		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + 
-		geom_bar(stat="identity", position = "dodge") + 
-		theme_classic() + 
-		coord_flip() + 
-		scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + 
-		scale_alpha_discrete( range = c(1, 1)) + 
-		ggtitle("AUPR") + 
-		geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + 
-		scale_fill_manual(values=cols)
-
-# FPR
-fig2 = df_res %>%
-		as_tibble %>%
-		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		ggplot(aes(method, FPR, fill=method, alpha=Status)) + 
-		geom_bar(stat="identity", position = "dodge") + 
-		theme_classic() + 
-		coord_flip() + 
-		scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + 
-		theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + 
-		scale_alpha_discrete( range = c(1, 1)) + 
-		ggtitle("False positive rate") + 
-		geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + ylab("False positive rate") + 
-		scale_fill_manual(values=cols)
-
-plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
-```
-
 
 # Increasing number of cells
 ```{r increase.cells}
@@ -638,7 +582,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Increasing overdispersion
 ```{r increase.tau}
-df_res = lapply(c(1, 5, 10, 20), function(tau){
+df_res = lapply(c(1, 10, 20, 40), function(tau){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores) 
 }) 
 df_res = do.call(rbind, df_res)
@@ -691,7 +635,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Number of components
 ```{r increase.clusters} 
-df_res = lapply(c(7, 10, 15, 20), function(n_clusters){
+df_res = lapply(c(5, 15, 25, 40), function(n_clusters){
 	run_three_formulas( n_samples, n_clusters, mean_counts=mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda=FALSE, mc.cores=mc.cores) 
 }) 
 df_res = do.call(rbind, df_res)
@@ -747,7 +691,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```{r increase.samples} 
 df_res = lapply(c(20, 50, 100, 200), function(n_samples){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda=FALSE, mc.cores=mc.cores) 
-}) 
+})  
 df_res = do.call(rbind, df_res)
 ```
 
@@ -802,7 +746,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```{r sim2}  
 n_batches = 50 
  
-df_res2 = lapply(c(0, .05, .1, .2), function(var.frac){  
+df_res2 = lapply(c(0, .2, .5, .99), function(var.frac){  
 
 	cat("var.frac: ", var.frac, "\n")
 	var.batch = beta.true^2* var.frac / (1 - var.frac)
@@ -883,6 +827,18 @@ fig2 = df_res2 %>%
 
 plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
