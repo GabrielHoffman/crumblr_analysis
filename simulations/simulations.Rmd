@@ -335,7 +335,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 ```
 
 
-# Simulations
 ```{r run_simulations, cache=TRUE}
 run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda, mc.cores, short=TRUE){
 
@@ -377,13 +376,12 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 100 #5000  
+n_sims = 500 #5000  
 beta.true = 0.03
 n_batches = floor(n_samples/2)
 var.batch = 0 
 tau = 5
-# methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
-methods = "lm"
+methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
 
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE) 
 ```
@@ -759,7 +757,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r sim2.plots, fig.height=4, fig.width=10, cache=FALSE, eval=FALSE}
+```{r sim2.plots, fig.height=4, fig.width=10, cache=FALSE, eval=TRUE}
 aupr.rand = mean(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 df_res2 %>%
 		as_tibble %>%
