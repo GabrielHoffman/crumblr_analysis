@@ -222,7 +222,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	      fitw = wilcox.test(x[i], x[!i])
 	      fitw$p.value
 	    })
-
 			
 			df_p = df_p %>%
 				left_join(data.frame(assay = rownames(res), 
@@ -287,10 +286,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df
 	}, mc.cores=mc.cores, mc.preschedule=FALSE)
 	df_res = do.call(rbind, df_res)
-
-	if( !is.numeric(df_res$p.value) ){
-		browser()
-	}
 
 	# small offset to fix error if p-value is exactly zero
 	df_res$p.value <- df_res$p.value + 1e-300
@@ -405,7 +400,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.sims, cache=FALSE, fig.height=4, fig.width=11}
+```{r plot.sims, cache=FALSE, fig.height=4, fig.width=10}
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log)", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
@@ -483,7 +478,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=FALSE}
+```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=10, eval=FALSE}
 CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -543,7 +538,7 @@ Parameters:
  - var.batch: `r var.batch`
  - tau: `r tau`
 
-```{r plot.increasing, cache=FALSE, fig.width=11, fig.height=4}
+```{r plot.increasing, cache=FALSE, fig.width=10, fig.height=4}
 CT = "CT_2"
 
 # AUPR
@@ -597,7 +592,7 @@ Parameters:
  - beta.true: `r beta.true`
  - var.batch: `r var.batch`
 
-```{r plot.increasing.tau, cache=FALSE, fig.width=11, fig.height=4}
+```{r plot.increasing.tau, cache=FALSE, fig.width=10, fig.height=4}
 CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -650,7 +645,7 @@ Parameters:
  - var.batch: `r var.batch`
  - tau: `r tau`
 
-```{r plot.increase.clusters, cache=FALSE, fig.width=11, fig.height=4}
+```{r plot.increase.clusters, cache=FALSE, fig.width=10, fig.height=4}
 CT = "CT_2"
 
 # AUPR
@@ -705,7 +700,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.increase.samples, cache=FALSE, fig.width=11, fig.height=4}
+```{r plot.increase.samples, cache=FALSE, fig.width=10, fig.height=4}
 CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
@@ -748,9 +743,6 @@ n_batches = 50
  
 df_res2 = lapply(c(0, 1, 2, 4), function(var.frac){  
 
-	cat("var.frac: ", var.frac, "\n")
-	var.batch = beta.true^2* var.frac / (1 - var.frac)
-
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims = n_sims, beta.true, n_batches, var.batch, methods = methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=FALSE) 
 }) 
 df_res2 = do.call(rbind, df_res2)
@@ -767,7 +759,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r sim2.plots, fig.height=4, fig.width=11, cache=FALSE, eval=FALSE}
+```{r sim2.plots, fig.height=4, fig.width=10, cache=FALSE, eval=FALSE}
 aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 df_res2 %>%
 		as_tibble %>%
@@ -787,7 +779,7 @@ df_res2 %>%
 
 
 
-```{r plot.batch.effect, cache=FALSE, fig.width=11, fig.height=8}
+```{r plot.batch.effect, cache=FALSE, fig.width=10, fig.height=8}
 CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
