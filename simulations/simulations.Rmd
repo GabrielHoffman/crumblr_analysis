@@ -760,7 +760,7 @@ Parameters:
 
 
 ```{r sim2.plots, fig.height=4, fig.width=10, cache=FALSE, eval=FALSE}
-aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+aupr.rand = mean(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
 df_res2 %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
@@ -782,14 +782,13 @@ df_res2 %>%
 ```{r plot.batch.effect, cache=FALSE, fig.width=10, fig.height=8}
 CT = "CT_2"
 # AUPR
-aupr.rand = mean(unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)]))
+aupr.rand = mean(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
 
 fig1 = df_res2 %>%
 	filter(assay==CT) %>%
-	# filter(Status != "none") %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>% 
 		mutate(method = factor(method, sort(levels(method)))) %>%
- 	ggplot(aes(var.batch, AUPR, fill=method)) +
+ 	ggplot(aes(factor(var.batch), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
@@ -804,9 +803,8 @@ fig2 = df_res2 %>%
 	filter(assay==CT) %>%
 	# filter(Status != "none") %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		mutate(var.frac = format(100 * var.batch / (var.batch + beta.true^2), digits=2)) %>%	
 		mutate(method = factor(method, sort(levels(method)))) %>%	 
-	ggplot(aes(var.frac, FPR, fill=method)) +
+	ggplot(aes(factor(var.batch), FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
