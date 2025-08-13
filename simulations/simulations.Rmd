@@ -276,6 +276,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	df_res = do.call(rbind, df_res)
 
 	df_res$p.value = as.numeric(df_res$p.value)
+	df_res = df_res[!is.na(df_res$p.value),]
 
 	# Compute AUPR
 	df_aupr = lapply( unique(df_res$Method), function(method){
@@ -440,6 +441,12 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 
 
+
+
+
+```{r exit, cache=FALSE, eval=TRUE}
+knitr::knit_exit()
+```
 
 
 
