@@ -444,11 +444,6 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 
 
-```{r exit, cache=FALSE, eval=TRUE}
-knitr::knit_exit()
-```
-
-
 
 
 
