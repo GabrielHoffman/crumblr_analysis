@@ -410,6 +410,10 @@ fig2 = df_res %>%
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 ```
 
+
+
+
+
 <!---
 
 # With scCoda
@@ -751,6 +755,9 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
 
 
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
 
 
 # Increasing batch effect
@@ -844,9 +851,6 @@ plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 
 
-```{r exit, cache=FALSE}
-knitr::knit_exit()
-```
 
 # Method times
 ```{r times}
