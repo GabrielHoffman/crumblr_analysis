@@ -138,7 +138,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		RhpcBLASctl::omp_set_num_threads(1)
 
 		if( idx %% 1 == 0) message("\r", idx, " / ", n_sims, '    ', appendLF=FALSE)
-		set.seed(idx)
 
 		value = ifelse( idx <= n_sims*0.9, 0, beta.true )
 		beta = data.frame(mu = rep(0, n_clusters), 
