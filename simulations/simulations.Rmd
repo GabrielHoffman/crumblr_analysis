@@ -198,6 +198,10 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 			dds <- nbinomWaldTest(dds)
 			res = results(dds)
 
+			if( ! is.numeric(res$pvalue) ){
+				save(counts, info, formula, file = "save.RDATA")
+			}
+
 			df_p = df_p %>%
 				left_join(data.frame(assay = rownames(res), 
 					DESeq2 = res$pvalue), 
