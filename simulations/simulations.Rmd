@@ -88,6 +88,7 @@ library(RColorBrewer)
 library(tidyverse)
 library(lme4)
 library(DESeq2)
+library(edgeR)
 
 # library(reticulate)
 # python_path = "/sc/arion/work/hoffmg01/R.cache/R/basilisk/1.18.0/0/bin/python"
@@ -129,7 +130,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	})
 
 	totalCountsList = lapply( seq(n_sims), function(i){
-		rnegbin(nrow(probs), mu=mean_counts, theta = 2)
+		rnegbin(nrow(info), mu=mean_counts, theta = 2)
 		})
 
 	df_res = mclapply( 1:n_sims, function(idx){
@@ -143,13 +144,13 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		beta = data.frame(mu = rep(0, n_clusters), 
 						b = c(0, value, rep(0, n_clusters-2)))
 
-		beta = cbind(beta, BatchBatchList[[i]])
+		beta = cbind(beta, BatchBatchList[[idx]])
 
 		eta = model.matrix(~., info) %*% t(beta)
 
 		probs = exp(eta)
 
-		totalCounts = totalCountsList[[i]]
+		totalCounts = totalCountsList[[idx]]
 
 		if( tau == 1){
 			# large a0 corresponds to multinomial
@@ -179,28 +180,10 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		tab_clr = topTable(fit_clr, coef="trait", sort.by="none")
 
 		# crumblr
-		cobj = crumblr(counts, max.ratio=2)
+		cobj = crumblr(counts)
 		fit = suppressMessages(dream(cobj, formula, info, BPPARAM=SerialParam()))
 		fit = eBayes(fit)
 		tab.crumblr = topTable(fit, coef="trait", sort.by="none")
-
-		# DESeq2
-		dds = DESeqDataSetFromMatrix(t(counts), info, nobars(formula))
-		# dds = DESeq(dds, fitType='local', quiet=TRUE)		
-    # dds <- estimateSizeFactors(dds)	
-    dds <- scran::computeSumFactors(dds)
-		# dds <- estimateDispersions(dds, fitType='mean', quiet=TRUE)
-		dds <- estimateDispersionsGeneEst(dds)
- 		dispersions(dds) <- mcols(dds)$dispGeneEst
-    dds <- nbinomWaldTest(dds)
-		res = results(dds)
-
-		# # crumblr clr_2class
-		# cobj2cl = crumblr(counts, method="clr_2class", max.ratio=5)
-		# fit2cl = suppressMessages(dream(cobj2cl, formula, X, BPPARAM=SerialParam()))
-		# fit2cl = eBayes(fit2cl)
-		# tab.crumblr2cl = topTable(fit2cl, coef="trait", sort.by="none")
-			# "crumblr2cl" = tab.crumblr2cl$P.Value,
 
 		df_p = data.frame(assay = rownames(tab_clr),
 			"CLR" = tab_clr$P.Value,
@@ -208,10 +191,45 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		i = match(df_p$assay, rownames(tab.crumblr))
 		df_p$crumblr = tab.crumblr$P.Value[i]
 
-		df_p = df_p %>%
-			left_join(data.frame(assay = rownames(res), 
-				DESeq2 = res$pvalue), 
-			by="assay")
+		if( ! variancePartition:::.isMixedModelFormula(formula) ){
+
+			dds = DESeqDataSetFromMatrix(t(counts), info, formula)
+			dds <- estimateSizeFactors(dds)	
+			dds <- estimateDispersions(dds)
+			dds <- nbinomWaldTest(dds)
+			res = results(dds)
+
+			df_p = df_p %>%
+				left_join(data.frame(assay = rownames(res), 
+					DESeq2 = res$pvalue), 
+				by="assay")
+
+			design <- model.matrix(formula, info)
+			dge <- DGEList(t(counts))
+			dge <- normLibSizes(dge)
+			dge <- estimateDisp(dge, design)
+			fit <- glmQLFit(dge, design)
+			res <- glmQLFTest(fit, coef="trait")
+			tab <- topTags(res, n=Inf, sort.by="none")
+
+			df_p = df_p %>%
+				left_join(data.frame(assay = rownames(tab), 
+					edgeR = tab$table$PValue), 
+				by="assay")
+
+			res = lapply( seq(nrow(Y)), function(i){
+				y = t(t(Y[i,]))
+
+				res = wilcox.test(y[info$trait==0], y[info$trait!=0])
+				data.frame(assay = rownames(Y)[i], 
+								Wilcoxon = res$p.value)
+				}) %>%
+				bind_rows
+
+			df_p = df_p %>%
+				left_join(res, by="assay")
+		}
+
 
 		if( use.sccoda){
 			res = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python")
@@ -259,11 +277,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		df
 	}, mc.cores=mc.cores, mc.preschedule=FALSE)
 	df_res = do.call(rbind, df_res)
-
-	if( !is.numeric(df_res$p.value) ) save.image()
-
-	# small offset to fix error if p-value is exactly zero
-	df_res$p.value <- df_res$p.value + 1e-300
 
 	# Compute AUPR
 	df_aupr = lapply( unique(df_res$Method), function(method){
@@ -316,14 +329,12 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 
 	RNGkind("L'Ecuyer-CMRG")
 
-	set.seed(1)
 	formula = ~ trait
 	res_none = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda, mc.cores)
 	res_none$Status = "none"
 
 	if( short ) return(res_none)
 
-	set.seed(1)
 	formula = ~ trait + Batch
 	res_fixed = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda, mc.cores)
 	res_fixed$Status = "fixed"
@@ -333,7 +344,6 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 	df_res$Status = factor(df_res$Status, c("none", "fixed", "random"))
 	# return(df_res)
 	   
-	set.seed(1)
 	formula = ~ trait + (1|Batch)
 	res_random = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, FALSE, mc.cores)
 	res_random$Status = "random"
@@ -347,20 +357,26 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 } 
 ```
 
+
+```{r exit1, cache=FALSE, eval=FALSE}
+knitr::knit_exit()
+```
+
+
+
 ```{r model1, cache=FALSE}
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 100 #5000  
-beta.true = .2 / 100
+n_sims = 500 #5000  
+beta.true = .05
 n_batches = floor(n_samples/2)
 var.batch = 0 
 tau = 10
 methods = c( "nb", "binomial", "betabinomial", "lm", "lmlog", "logit", "asin", "poisson")   
 
 df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE) 
-
 ```
 
 
@@ -373,15 +389,18 @@ Parameters:
  - beta.true: `r beta.true`
  - var.batch: `r var.batch`
  - tau: `r tau`
+ - n_sims: `r n_sims`
 
 
 ```{r plot.sims, cache=FALSE, fig.height=4, fig.width=11}
 cols = brewer.pal(9, "Set1")
 cols[cols=="#FFFF33"] = "#FDDB27"
 names(cols) = c("crumblr", "CLR", "LM (fraction)", "LM (log)", "Binomial", "Beta-binomial", "NB", "Poisson", "scCoda")
-
+cols["LM (log)"] = "green2"
 cols = c(cols[1:4], c("LM (logit)" = "#80f57d", "LM (asin)" = "#3acfb8"), cols[5:9])
-cols["DESeq2"] = "#e6b598"
+cols["DESeq2"] = "#984EA3"
+cols["edgeR"] = "#e08958"
+cols["Wilcoxon"] = "#82f1f5"
 
 CT = "CT_2"
 # AUPR
