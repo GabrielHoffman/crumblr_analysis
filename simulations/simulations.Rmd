@@ -363,7 +363,7 @@ knitr::knit_exit()
 
 
 
-```{r model1, cache=FALSE}
+```{r model1, cache=TRUE}
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
@@ -735,7 +735,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 # Sample size
 ```{r increase.samples} 
-df_res = lapply(c(20, 50, 100, 200), function(n_samples){
+df_res = lapply(c(100, 200, 500), function(n_samples){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau, use.sccoda=FALSE, mc.cores=mc.cores) 
 }) 
 df_res = do.call(rbind, df_res)
