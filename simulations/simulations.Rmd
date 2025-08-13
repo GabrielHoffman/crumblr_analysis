@@ -275,9 +275,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 	}, mc.cores=mc.cores, mc.preschedule=FALSE)
 	df_res = do.call(rbind, df_res)
 
-	if( ! is.numeric(df_res$pvalue) ){
-		browser()
-	}
+	df_res$p.value = as.numeric(df_res$p.value)
 
 	# Compute AUPR
 	df_aupr = lapply( unique(df_res$Method), function(method){
