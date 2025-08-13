@@ -231,7 +231,6 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 				left_join(res, by="assay")
 		}
 
-
 		if( use.sccoda){
 			res = sccoda_wrapper(counts, info, formula, python_path = "/sc/arion/work/hoffmg01/condaEnv/sccoda/bin/python")
 
