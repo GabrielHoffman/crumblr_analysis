@@ -345,7 +345,7 @@ run_three_formulas = function(n_samples, n_clusters, mean_counts, n_sims, beta.t
 	df_res = rbind(res_none, res_fixed)
 
 	df_res$Status = factor(df_res$Status, c("none", "fixed", "random"))
-	# return(df_res)
+	return(df_res)
 	   
 	formula = ~ trait + (1|Batch)
 	res_random = run_simulation( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, FALSE, mc.cores)
@@ -372,7 +372,7 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 10
 mean_counts = 2000
-n_sims = 500 #5000  
+n_sims = 1000 #5000  
 beta.true = .05
 n_batches = floor(n_samples/2)
 var.batch = 0 
@@ -440,12 +440,6 @@ fig2 = df_res %>%
 	scale_fill_manual(values=cols)
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
-```
-
-
-
-```{r exit, cache=FALSE}
-knitr::knit_exit()
 ```
 
 
@@ -794,6 +788,16 @@ fig2 = df_res %>%
 
 plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
+
+
+
+
+```{r exit, cache=FALSE}
+knitr::knit_exit()
+```
+
+
+
 
 # Increasing batch effect
 ```{r sim2}  
