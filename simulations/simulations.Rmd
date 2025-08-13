@@ -367,9 +367,9 @@ knitr::knit_exit()
 ```{r model1, cache=TRUE}
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
-n_clusters = 12
+n_clusters = 15
 mean_counts = 2000
-n_sims = 200 #5000  
+n_sims = 1000 #5000  
 beta.true = .05
 n_batches = floor(n_samples/2)
 var.batch = 0 
@@ -514,62 +514,6 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 
 --->
 
-<!---
-# Mixed model
-```{r run.mixed, eval=FALSE}
-n_batches = floor(n_samples/2)
-var.batch = .1
-  
-df_res = run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=TRUE)  
-```
-
-Parameters:
-
- - n_samples: `r n_samples`
- - n_clusters: `r n_clusters`
- - mean_counts: `r mean_counts`
- - beta.true: `r beta.true`
- - var.batch: `r var.batch`
- - tau: `r tau`
-
-```{r plot.sims.mixed, cache=FALSE, fig.height=4, fig.width=11, eval=FALSE}
-CT = "CT_2"
-# AUPR
-aupr.rand = mean(unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)]))
-fig1 = df_res %>%
-		as_tibble %>%
-		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + 
-		geom_bar(stat="identity", position = "dodge") + 
-		theme_classic() + 
-		coord_flip() + 
-		scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + 
-		scale_alpha_discrete( range = c(1, 1)) + 
-		ggtitle("AUPR") + 
-		geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + 
-		scale_fill_manual(values=cols)
-
-# FPR
-fig2 = df_res %>%
-		as_tibble %>%
-		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		ggplot(aes(method, FPR, fill=method, alpha=Status)) + 
-		geom_bar(stat="identity", position = "dodge") + 
-		theme_classic() + 
-		coord_flip() + 
-		scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) + 
-		theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="none") + 
-		scale_alpha_discrete( range = c(1, 1)) + 
-		ggtitle("False positive rate") + 
-		geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + ylab("False positive rate") + 
-		scale_fill_manual(values=cols)
-
-plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
-```
-
---->
 
 
 # Increasing number of cells
@@ -797,10 +741,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```{r sim2}  
 n_batches = 50 
  
-df_res2 = lapply(c(0, 1e-2, 1e-1, 1), function(var.frac){  
-
-	cat("var.frac: ", var.frac, "\n")
-	var.batch = beta.true^2* var.frac / (1 - var.frac)
+df_res2 = lapply(c(1e-2, 1e-1), function(var.frac){  
 
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims = n_sims, beta.true, n_batches, var.batch, methods = methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=FALSE) 
 }) 
