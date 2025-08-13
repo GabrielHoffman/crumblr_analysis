@@ -788,7 +788,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 
 
 
-```{r exit, cache=FALSE}
+```{r exit, cache=FALSE, eval=TRUE}
 knitr::knit_exit()
 ```
 
@@ -799,7 +799,7 @@ knitr::knit_exit()
 ```{r sim2}  
 n_batches = 50 
  
-df_res2 = lapply(c(0, .05, .1, .2), function(var.frac){  
+df_res2 = lapply(c(0, 1e-2, 1e-1, 1), function(var.frac){  
 
 	cat("var.frac: ", var.frac, "\n")
 	var.batch = beta.true^2* var.frac / (1 - var.frac)
