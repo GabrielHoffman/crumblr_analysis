@@ -741,7 +741,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```{r sim2}  
 n_batches = 50 
  
-df_res2 = lapply(c(1e-2, 1e-1), function(var.frac){  
+df_res2 = lapply(c(1e-2, 1e-1), function(var.batch){  
 
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims = n_sims, beta.true, n_batches, var.batch, methods = methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores, short=FALSE) 
 }) 
@@ -759,23 +759,6 @@ Parameters:
  - tau: `r tau`
 
 
-```{r sim2.plots, fig.height=4, fig.width=11, cache=FALSE, eval=FALSE}
-aupr.rand = mean(unique(df_res2$AUPR.rnd[!is.na(df_res$AUPR.rnd)]))
-df_res2 %>%
-		as_tibble %>%
-		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		mutate(method = factor(method, sort(method))) %>%
-		ggplot(aes(method, AUPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=aupr.rand, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
-
-ymax = max(max(df_res2$FPR), .1)
-df_res2 %>%
-		as_tibble %>%
-		filter(assay == CT) %>%
-		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
-		mutate(method = factor(method, sort(method))) %>%
-		ggplot(aes(method, FPR, fill=method, alpha=Status)) + geom_bar(stat="identity", position = "dodge") + theme_classic() + coord_flip() + facet_wrap(~mean_counts + var.batch, ncol=4) + scale_y_continuous(expand=c(0, 0), limits=c(0, ymax)) + theme(aspect.ratio=1, plot.title = element_text(hjust = 0.5), legend.position="right")  + geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + scale_alpha_discrete( range = c(.3, 1)) + scale_fill_manual(values=cols)
-```
 
 
 
@@ -788,7 +771,7 @@ fig1 = df_res2 %>%
 	filter(assay==CT) %>%
 	filter(Status != "none") %>%
 	mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>% 
- 	ggplot(aes(var.frac, AUPR, fill=method)) +
+ 	ggplot(aes(var.batch, AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
@@ -803,7 +786,7 @@ fig2 = df_res2 %>%
 	filter(assay==CT) %>%
 	filter(Status != "none") %>%
 	mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>% 
-	ggplot(aes(var.frac, FPR, fill=method)) +
+	ggplot(aes(var.batch, FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
