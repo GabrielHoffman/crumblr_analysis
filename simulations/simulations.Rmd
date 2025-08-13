@@ -772,7 +772,7 @@ fig1 = df_res2 %>%
 	filter(Status != "none") %>%
 	mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>% 
 	mutate(method = factor(method, sort(names(cols)))) %>%
- 	ggplot(aes(var.batch, AUPR, fill=method)) +
+ 	ggplot(aes(factor(var.batch), AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, 1)) +
@@ -788,7 +788,7 @@ fig2 = df_res2 %>%
 	filter(Status != "none") %>%
 	mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>% 
 	mutate(method = factor(method, sort(names(cols)))) %>%
-	ggplot(aes(var.batch, pmin(0.3, FPR), fill=method)) +
+	ggplot(aes(factor(var.batch), pmin(0.3, FPR), fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
 	scale_y_continuous(expand=c(0, 0), limits=c(0, NA)) +
