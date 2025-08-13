@@ -762,7 +762,7 @@ Parameters:
 
 
 
-```{r plot.batch.effect, cache=FALSE, fig.width=11, fig.height=8}
+```{r plot.batch.effect, cache=FALSE, fig.width=9, fig.height=8}
 CT = "CT_2"
 # AUPR
 aupr.rand = mean(unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)]))
