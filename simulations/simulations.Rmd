@@ -697,7 +697,7 @@ Parameters:
  - tau: `r tau`
 
 
-```{r plot.increase.samples, cache=FALSE, fig.width=9, fig.height=4}
+```{r plot.increase.samples, cache=FALSE, fig.width=11, fig.height=4}
 CT = "CT_2"
 # AUPR
 aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
