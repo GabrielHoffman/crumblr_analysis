@@ -117,9 +117,20 @@ rmultinomdir = function(n, size, alpha){
 run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, formula, methods, tau, use.sccoda=FALSE, mc.cores=20){
 
 	# each batch is observed at least twice
-	info = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
-
+	info = data.frame(trait = c(rep(0, n_samples / 2), 
+	            rep(1, n_samples / 2)),
+	  Batch = factor(rep(seq(n_batches), n_samples / n_batches)))
 	rownames(info) = paste0("sample_", 1:nrow(info))
+
+	BatchBatchList = lapply( seq(n_sims), function(i){
+		a = n_clusters 
+		b = nlevels(info$Batch)-1
+		matrix(rnorm(a*b, sd=sqrt(var.batch)), a, b)
+	})
+
+	totalCountsList = lapply( seq(n_sims), function(i){
+		rnegbin(nrow(probs), mu=mean_counts, theta = 2)
+		})
 
 	df_res = mclapply( 1:n_sims, function(idx){
 
@@ -129,17 +140,16 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 		set.seed(idx)
 
 		value = ifelse( idx <= n_sims*0.9, 0, beta.true )
-		beta = data.frame(mu = rep(0, n_clusters), b = c(0, value, rep(0, n_clusters-2)))
-		a = n_clusters 
-		b = nlevels(info$Batch)-1
-		beta_batch = matrix(rnorm(a*b, sd=sqrt(var.batch)), a, b)
-		beta = cbind(beta, beta_batch)
+		beta = data.frame(mu = rep(0, n_clusters), 
+						b = c(0, value, rep(0, n_clusters-2)))
+
+		beta = cbind(beta, BatchBatchList[[i]])
 
 		eta = model.matrix(~., info) %*% t(beta)
 
 		probs = exp(eta)
 
-		totalCounts = rnegbin(nrow(probs), mu=mean_counts, theta = 3)
+		totalCounts = totalCountsList[[i]]
 
 		if( tau == 1){
 			# large a0 corresponds to multinomial
