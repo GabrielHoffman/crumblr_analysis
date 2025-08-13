@@ -367,9 +367,9 @@ knitr::knit_exit()
 ```{r model1, cache=TRUE}
 mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
-n_clusters = 10
+n_clusters = 12
 mean_counts = 2000
-n_sims = 1000 #5000  
+n_sims = 200 #5000  
 beta.true = .05
 n_batches = floor(n_samples/2)
 var.batch = 0 
