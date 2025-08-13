@@ -805,7 +805,7 @@ aupr.rand = unique(df_res2$AUPR.rnd[!is.na(df_res2$AUPR.rnd)])
 
 fig1 = df_res2 %>%
 	filter(assay==CT) %>%
-	# filter(Status != "none") %>%
+	filter(Status != "none") %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		mutate(var.frac = format(100 * var.batch / (var.batch + beta.true^2), digits=2)) %>%		 
 		mutate(method = factor(method, sort(levels(method)))) %>%
@@ -822,7 +822,7 @@ fig1 = df_res2 %>%
 # FPR
 fig2 = df_res2 %>%
 	filter(assay==CT) %>%
-	# filter(Status != "none") %>%
+	filter(Status != "none") %>%
 		mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>%
 		mutate(var.frac = format(100 * var.batch / (var.batch + beta.true^2), digits=2)) %>%	
 		mutate(method = factor(method, sort(levels(method)))) %>%	 
