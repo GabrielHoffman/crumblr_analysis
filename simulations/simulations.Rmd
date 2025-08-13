@@ -198,7 +198,7 @@ run_simulation = function( n_samples, n_clusters, mean_counts, n_sims, beta.true
 			dds <- nbinomWaldTest(dds)
 			res = results(dds)
 
-			save(formula, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims/sims_", idx, ".RDATA"))
+			# save(formula, counts, info, file = paste0("/sc/arion/scratch/hoffmg01/sims/sims_", idx, ".RDATA"))
 
 			df_p = df_p %>%
 				left_join(data.frame(assay = rownames(res), 
