@@ -403,7 +403,7 @@ cols["Wilcoxon"] = "#82f1f5"
 
 CT = "CT_2"
 # AUPR
-aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+aupr.rand = mean(unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)]))
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
@@ -475,7 +475,7 @@ Parameters:
 ```{r plot.sims.scoda, cache=FALSE, fig.height=4, fig.width=11, eval=FALSE}
 CT = "CT_2"
 # AUPR
-aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+aupr.rand = mean(unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)]))
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
@@ -533,7 +533,7 @@ Parameters:
 ```{r plot.sims.mixed, cache=FALSE, fig.height=4, fig.width=11, eval=FALSE}
 CT = "CT_2"
 # AUPR
-aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+aupr.rand = mean(unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)]))
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
@@ -593,7 +593,7 @@ Parameters:
 CT = "CT_2"
 
 # AUPR
-aupr.rand = unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)])
+aupr.rand = mean(unique(df_res$AUPR.rnd[!is.na(df_res$AUPR.rnd)]))
 fig1 = df_res %>%
 		as_tibble %>%
 		filter(assay == CT) %>%
