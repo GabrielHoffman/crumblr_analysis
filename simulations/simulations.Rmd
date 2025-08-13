@@ -771,7 +771,7 @@ fig1 = df_res2 %>%
 	filter(assay==CT) %>%
 	filter(Status != "none") %>%
 	mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>% 
-	mutate(method = factor(method, names(cols))) %>%
+	mutate(method = factor(method, sort(names(cols)))) %>%
  	ggplot(aes(var.batch, AUPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
@@ -787,7 +787,7 @@ fig2 = df_res2 %>%
 	filter(assay==CT) %>%
 	filter(Status != "none") %>%
 	mutate(method = recode(method, poisson = "Poisson", nb = "NB", lm="LM (fraction)", lmlog = "LM (log)", logit = "LM (logit)", asin = "LM (asin)", binomial="Binomial", betabinomial="Beta-binomial")) %>% 
-	mutate(method = factor(method, names(cols))) %>%
+	mutate(method = factor(method, sort(names(cols)))) %>%
 	ggplot(aes(var.batch, FPR, fill=method)) +
 	geom_bar(stat="identity", position = "dodge") +
 	theme_classic() +
