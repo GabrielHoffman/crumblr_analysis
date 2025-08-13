@@ -796,7 +796,8 @@ fig2 = df_res2 %>%
 	 geom_hline(yintercept=0.05, linetype="dashed", color="black", size=1) + 
 	 xlab("Batch effect") + 
 	 scale_fill_manual(values=cols)+
-	 facet_wrap(~Status)
+	 facet_wrap(~Status) +
+	 ylab("FPR")
 
 plot_grid(fig1, fig2, ncol=1, align="hv", axis="tblr", labels=LETTERS[1:2])
 ```
