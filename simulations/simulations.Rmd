@@ -575,7 +575,7 @@ plot_grid(fig1, fig2, nrow=1, align="hv", axis="tblr")
 n_batches = floor(n_samples/2)
 var.batch = 0 
        
-df_res = lapply( c(100, 500,1000, 2000, 4000), function(mean_counts){
+df_res = lapply( c(500, 1000, 2000, 4000), function(mean_counts){
 	run_three_formulas( n_samples, n_clusters, mean_counts, n_sims, beta.true, n_batches, var.batch, methods, tau=tau, use.sccoda=FALSE, mc.cores=mc.cores) 
 })
 df_res = do.call(rbind, df_res)
