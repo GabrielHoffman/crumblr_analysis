@@ -369,7 +369,7 @@ mc.cores = ifelse(Sys.info()["sysname"] == "Darwin", 10, 44)
 n_samples = 200
 n_clusters = 15
 mean_counts = 2000
-n_sims = 2000 #5000  
+n_sims = 10000  
 beta.true = .05
 n_batches = floor(n_samples/2)
 var.batch = 0 
@@ -815,14 +815,23 @@ knitr::knit_exit()
 
 # Method times
 ```{r times}
-# n_samples = 500
-# n_clusters = 20
+n_samples = 500
+n_clusters = 20
+n_batches = 50
+var.batch = 0
+mean_counts = 3000
+tau = 10
+beta.true = 0
+
 RhpcBLASctl::omp_set_num_threads(1)
 RhpcBLASctl::blas_set_num_threads(1)
  
 # each batch is observed at last twice
-info = data.frame(trait = rnorm(n_samples), Batch = factor(rep(sample.int(n_batches, n_samples/2, replace=TRUE), 2)))
+info = data.frame(trait = c(rep(0, n_samples / 2), 
+            rep(1, n_samples / 2)),
+  Batch = factor(rep(seq(n_batches), n_samples / n_batches)))
 rownames(info) = paste0("sample_", 1:nrow(info))
+
 
 value = beta.true
 beta = data.frame(mu = rep(0, n_clusters), b = c(0, value, rep(0, n_clusters-2)))
@@ -881,6 +890,51 @@ fit = eBayes(fit)
 tab.crumblr = topTable(fit, coef="trait", sort.by="none")
 }))
 df_time = rbind(df_time, data.frame(Method = "crumblr", Time = as.numeric(res[3]) / 100))
+
+
+
+# DESeq2
+res = system.time(replicate(10,{
+	dds = DESeqDataSetFromMatrix(t(counts), info, formula)
+	dds <- estimateSizeFactors(dds)	
+	dds <- estimateDispersions(dds)
+	dds <- nbinomWaldTest(dds)
+	res = results(dds)
+}))
+df_time = rbind(df_time, data.frame(Method = "DESeq2", Time = as.numeric(res[3]) / 10))
+
+
+# edgeR
+res = system.time(replicate(10,{
+	design <- model.matrix(formula, info)
+	dge <- DGEList(t(counts))
+	dge <- normLibSizes(dge)
+	dge <- estimateDisp(dge, design)
+	fit <- glmQLFit(dge, design)
+	res <- glmQLFTest(fit, coef="trait")
+	tab <- topTags(res, n=Inf, sort.by="none")
+}))
+df_time = rbind(df_time, data.frame(Method = "edgeR", Time = as.numeric(res[3]) / 10))
+
+
+
+# Wilcoxon
+res = system.time(replicate(10,{
+	res = lapply( seq(nrow(Y)), function(i){
+			y = t(t(Y[i,]))
+
+			res = wilcox.test(y[info$trait==0], y[info$trait!=0])
+			data.frame(assay = rownames(Y)[i], 
+							Wilcoxon = res$p.value)
+			}) %>%
+			bind_rows
+}))
+df_time = rbind(df_time, data.frame(Method = "Wilcoxon", Time = as.numeric(res[3]) / 10))
+
+
+
+
+
 
 # scCoda
 res = system.time({
