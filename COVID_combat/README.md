@@ -11,4 +11,4 @@ Replace file name in Line 59 of `COVID_combat.Rmd` with location of your H5AD
 https://github.com/GabrielHoffman/crumblr_analysis/blob/4e2f5e85ad177efb8c47b5c4706ab8d54d07114f/COVID_combat/COVID_combat.Rmd#L59
 
 ## 3) Run Rmarkdown code
-`rmarkdown::render("COVID_combat.Rmd"`
+`rmarkdown::render("COVID_combat.Rmd")`
