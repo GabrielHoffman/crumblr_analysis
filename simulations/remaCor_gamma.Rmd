@@ -1,0 +1,113 @@
+---
+title: "Evaluate Lin-Sullivan tests with Monte Carlo sampling"
+subtitle: ''
+author: "Developed by [Gabriel Hoffman](http://gabrielhoffman.github.io/)"
+date: "Run on `r Sys.time()`"
+documentclass: article
+output: 
+  html_document:
+  toc: true
+  smart: false
+---
+
+
+
+<!---
+cd /Users/gabrielhoffman/workspace/repos/crumblr_analysis/simulations
+R
+
+rmarkdown::render('remaCor_gamma2.Rmd')
+
+--->
+
+
+```{r load}
+library(remaCor)
+library(clusterGeneration)
+library(mvtnorm)
+library(parallel)
+
+f = function(n, m, n_sim, n.mc.samples){
+
+  res = mclapply(seq(n_sim), function(i){
+    # Error covariance
+    Sigma = genPositiveDefMat(m)$Sigma
+
+    # regression parameters
+    beta = matrix(.2, 1, m)
+
+    # covariates
+    X = matrix(rnorm(n), ncol=1)
+
+    # Simulate response variables
+    Y = X %*% beta + rmvnorm(n, sigma = Sigma)
+
+    # Multivariate regression
+    fit = lm(Y ~ X)
+
+    # Correlation between residuals
+    C = cor(residuals(fit))
+
+    # Extract effect sizes and standard errors from model fit
+    df = lapply(coef(summary(fit)), function(a) 
+           data.frame(beta = a["X", 1], se = a["X", 2]))
+    df = do.call(rbind, df)
+
+    # Empirical p-value
+    res1 = LS.empirical(df$beta, df$se, C, nu=n-2, useGamma=FALSE, n.mc.samples=n.mc.samples)
+
+    # Gamma approximation
+    res2 = LS.empirical(df$beta, df$se, C, nu=n-2, useGamma=TRUE, n.mc.samples=n.mc.samples)
+
+    data.frame(n.mc.samples = n.mc.samples,
+                p.empirical = res1$p, 
+                p.gamma = res2$p)
+  }, mc.cores=8)
+  do.call(rbind, res)
+}
+
+# sample size
+n = 100
+
+# number of response variables
+m = 6
+
+# number of simulation
+n_sim = 1000
+
+# Run simulations
+res1 = f(n, m, n_sim, 1e3)
+res2 = f(n, m, n_sim, 1e4)
+res3 = f(n, m, n_sim, 1e5)
+
+res = rbind(res1, res2, res3)
+```
+
+
+```{r plot, cache=FALSE}
+library(ggplot2)
+
+g = "Gamma"
+ggplot(res, aes(-log10(p.gamma), -log10(p.empirical))) +
+  geom_abline( color="red") +
+  geom_point() +
+  theme_bw() +
+  theme(aspect.ratio=1) +
+  xlab(bquote(.(g)~approximation~(-log[10]~p))) +
+  ylab(bquote(Empirical~(-log[10]~p))) +
+  facet_wrap(~n.mc.samples)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
